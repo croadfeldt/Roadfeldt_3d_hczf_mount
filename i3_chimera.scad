@@ -121,10 +121,10 @@ fanDirection = "right"; // [left:Fan outlet to the left, right:Fan outlet to rig
 fanTabWidth = 8;
 
 // How far out should the  tab the cooling fan hangs off of be. Must be above 0.
-fanTabDepth = 5;
+fanTabDepth = 8;
 
 // Degrees the fan mount is rotated in the vertical.
-fanTabAngle = 0;
+fanTabAngle = 45;
 
 // Degrees the fan mount is rotated in the horizontal. Affects fan duct only.
 fanTabHorizontalAngle = 0;
@@ -145,7 +145,7 @@ fanTabNubWidth = 4;
 fanTabNubClear = .1;
 
 // How thick should the wall of the fan duct be?
-fanDuctThickness = 1.5;
+fanDuctThickness = 1;
 
 // How far below the nozzle should the fan outlet point?
 fanDuctOutletOffset = 1;
@@ -230,16 +230,20 @@ fanScrewL = [0,
 	     (fanTabHole / 2) + fanTabHoleMat]; // Offset of the center of the fan mount screw from fanTabL
 
 // Variables for Fan Duct
-fanDuctConnectSize = [[27, 20, 20], // Outside dimensions
-		      [23.8, 16.8, 20]]; // Inside dimensions
+fanDuctConnectSize = [[27, 20, 20], // Outside dimensions of fan outlet
+		      [23.8, 16.8, 20]]; // Inside dimensions of fan outlet
 fanDuctOverlap = 3; // How much to over lap the connection to the fan.
-// Fan Duct starting location, left fan orientation in first vector, right in second.
+// Fan Duct starting location, left fan orientation in first vector, right in second. This is offset from fanScrewL. Does NOT take angles into account.
 fanDuctConnectL = [[-((fanDimensions[0] / 2) + fanDuctThickness + fanMountOffset[0]),
 		    - ((fanTabHole / 2) + fanTabHoleMat + fanMountThickness + fanDimensions[1] + fanMountOffset[1] + fanDuctThickness),
 		    - (fanDimensions[2] / 2 ) - fanDuctConnectSize[0][2] + fanDuctOverlap + fanMountOffset[2]],
 		   [((fanDimensions[0] / 2)  - fanDuctThickness - fanDuctConnectSize[0][0] + fanMountOffset[0]),
 		    - ((fanTabHole / 2) + fanTabHoleMat + fanMountThickness + fanDimensions[1] + fanMountOffset[1] + fanDuctThickness),
 		    - (fanDimensions[2] / 2 ) - fanDuctConnectSize[0][2] + fanDuctOverlap + fanMountOffset[2]]];
+fanDuctOutletSize = [15,1,3]; // Size of the fan duct outlets.
+fanDuctOutletNozzleOffsetL = [0,-18 - fanDuctThickness,4]; // Offset from the nozzles where the fan duct outlets should be placed.
+fanDuctOutletAngle = [- atan((fanDuctOutletNozzleOffsetL[2] + fanDuctOutletOffset) / abs(fanDuctOutletNozzleOffsetL[1])),0,0];
+fanDuctConnectRadius = 10;
 
 // Variables for probe extension and servo bracket.
 // Which side is the probe to be on?
@@ -737,69 +741,119 @@ module fan_screw_hole_single(radius,height,x,y,z) {
 // Fan Duct
 module fan_duct() {
      // Simple fan duct to get something working for now.
-     // Create the connecting to the fan.
+     hull() {
+	  // Create the connection to the fan.
+	  translate([0,0, fanDuctConnectRadius])
 	  cube([fanDuctConnectSize[0][0] + (fanDuctThickness * 2),
 		fanDuctConnectSize[0][1] + (fanDuctThickness * 2),
-		fanDuctConnectSize[0][2]]);
+		fanDuctConnectSize[0][2] - fanDuctConnectRadius]);
 
-     // Create the outlets.
-     // First determine which hot end is in use.
-     if(hotend == "chimera_v6") {
-	  // Chimera V6 - Nozzle 1 - Both Nozzles
-	  for(a=[0:1]) {
-	       if(fanDirection == "left") {
-		    // Reset position to 0,0,0 so we can properly place the nozzle outlets everytime.
-		    translate(-fanDuctConnectL[0])
-		    rotate([-fanTabHorizontalAngle,0,0])
-		    translate(-fanScrewL)
-			 rotate([0,0,-realFanTabAngle])
-			 translate(-fanTabL)
-			 // Start the process of placing the nozzles in the correct place. Split up to keep things simpler to understand for now.
-			 translate([chiPosLR + (chiWidth - 30) / 2, // Account for difference in chiWidth and actual cold end width, reset to left edge
-				    -xDepth -chiColdDepthOffset, // reset to rear of cold end
-				    chiPosUD]) // reset to top of cold end
-			 translate([chiV6NozzleL[a][0],
-				    chiV6NozzleL[a][1],
-				    chiV6NozzleL[a][2]])
-			 
-			 #cube([1,1,1]);
-			 }
-	       else {
-		    translate(-fanDuctConnectL[1])
-		    rotate([-fanTabHorizontalAngle,0,0])
-		    translate(-fanScrewL)
-			 rotate([0,0,-realFanTabAngle])
-			 translate(-fanTabL)
-			 // Start the process of placing the nozzles in the correct place. Split up to keep things simpler to understand for now.
-			 translate([chiPosLR + (chiWidth - 30) / 2, // Account for difference in chiWidth and actual cold end width, reset to left edge
-				    -xDepth -chiColdDepthOffset, // reset to rear of cold end
-				    chiPosUD]) // reset to top of cold end
-			 translate([chiV6NozzleL[a][0],
-				    chiV6NozzleL[a][1],
-				    chiV6NozzleL[a][2]])
-			 
-			 #cube([1,1,1]);
-			 }
+	  // Round out the bottom a bit
+	  translate([0,
+		     fanDuctConnectRadius - fanDuctThickness,
+		     fanDuctConnectRadius - fanDuctThickness])
+	       rotate([0,90,0])
+	       cylinder(r=fanDuctConnectRadius, h=fanDuctConnectSize[0][0] + (fanDuctThickness * 2),$fn=200);
+
+	  translate([0,
+		     fanDuctConnectSize[0][1] - (fanDuctConnectRadius - fanDuctThickness),
+		     fanDuctConnectRadius - fanDuctThickness])
+	       rotate([0,90,0])
+	       cylinder(r=fanDuctConnectRadius, h=fanDuctConnectSize[0][0] + (fanDuctThickness * 2),$fn=200);
+	  
+	  // Create the outlets.
+	  // First determine which hot end is in use.
+	  if(hotend == "chimera_v6") {
+	       chimera_v6_fan_duct(fanDuctThickness);
 	  }
      }
 }
 
 module fan_duct_holes() {
      // Carve out the inside part of the duct that wraps around the fan
-     translate([(fanDuctConnectSize[0][0] / 2) - (fanDuctConnectSize[1][0] / 2),
-		(fanDuctConnectSize[0][1] / 2) - (fanDuctConnectSize[1][1] / 2),
-		fanDuctConnectSize[0][2] - fanDuctOverlap])
-	  #cube([fanDuctConnectSize[0][0],
-		 fanDuctConnectSize[0][1],
-		 fanDuctOverlap + .1]);
+     hull () {
+	  translate([fanDuctThickness,
+		     fanDuctThickness,
+		     fanDuctConnectSize[0][2] - fanDuctOverlap])
+	       #cube([fanDuctConnectSize[0][0],
+		      fanDuctConnectSize[0][1],
+		      fanDuctOverlap + .1]);
+
+	  	  // Round out the bottom a bit
+	  translate([fanDuctThickness,
+		     fanDuctConnectRadius,
+		     fanDuctConnectRadius])
+	       rotate([0,90,0])
+	       cylinder(r=fanDuctConnectRadius, h=fanDuctConnectSize[0][0],$fn=200);
+
+	  translate([fanDuctThickness,
+		     fanDuctConnectSize[0][1] - (fanDuctConnectRadius),
+		     fanDuctConnectRadius])
+	       rotate([0,90,0])
+	       cylinder(r=fanDuctConnectRadius, h=fanDuctConnectSize[0][0],$fn=200);
+	  
+	  // Carve out the interior of the duct
+	  // First determine which hot end is in use.
+	  if(hotend == "chimera_v6") {
+	       #chimera_v6_fan_duct(0,true);
+	  }
+     }
      
-     // Carve out the opening for the air movement.
+/*     // Carve out the opening for the air movement.
      translate([(fanDuctConnectSize[0][0] / 2) + fanDuctThickness - (fanDuctConnectSize[1][0] / 2),
 		(fanDuctConnectSize[0][1] / 2) + fanDuctThickness - (fanDuctConnectSize[1][1] / 2),
 		(fanDuctConnectSize[0][2] / 2) - (fanDuctConnectSize[1][2] / 2) - .01])
 	  #cube([fanDuctConnectSize[1][0],
 		 fanDuctConnectSize[1][1],
 		 fanDuctConnectSize[1][2] + .02]);
+*/
+}
+
+module chimera_v6_fan_duct(wallThickness,interior=false) {
+     // Chimera V6 - Nozzle 1 - Both Nozzles
+     for(a=[0:1]) {
+	  if(fanDirection == "left") {
+	       // Reset position to 0,0,0 so we can properly place the nozzle outlets everytime.
+	       translate(-fanDuctConnectL[0])
+		    rotate([-fanTabHorizontalAngle,0,0])
+		    translate(-fanScrewL)
+		    rotate([0,0,-realFanTabAngle])
+		    translate(-fanTabL)
+		    // Start the process of placing the nozzles in the correct place. Split up to keep things simpler to understand for now.
+		    translate([chiPosLR + (chiWidth - 30) / 2, // Account for difference in chiWidth and actual cold end width, reset to left edge
+			       -xDepth -chiColdDepthOffset, // reset to rear of cold end
+			       chiPosUD]) // reset to top of cold end
+		    translate([chiV6NozzleL[a][0],
+			       chiV6NozzleL[a][1],
+			       chiV6NozzleL[a][2]])
+		    translate(fanDuctOutletNozzleOffsetL) // Offset from the nozzle where the outlet should be.
+		    // Rotate the duct outlets to point to the correct spot.
+		    rotate(fanDuctOutletAngle)
+		    cube([fanDuctOutletSize[0] + (wallThickness * 2),
+			   fanDuctOutletSize[1] + (interior ? .1 : 0),
+			   fanDuctOutletSize[2] + (wallThickness * 2)], center=true);
+	  }
+	  else {
+	       translate(-fanDuctConnectL[1])
+		    rotate([-fanTabHorizontalAngle,0,0])
+		    translate(-fanScrewL)
+		    rotate([0,0,-realFanTabAngle])
+		    translate(-fanTabL)
+		    // Start the process of placing the nozzles in the correct place. Split up to keep things simpler to understand for now.
+		    translate([chiPosLR + (chiWidth - 30) / 2, // Account for difference in chiWidth and actual cold end width, reset to left edge
+			       -xDepth -chiColdDepthOffset, // reset to rear of cold end
+			       chiPosUD]) // reset to top of cold end
+		    translate([chiV6NozzleL[a][0],
+			       chiV6NozzleL[a][1],
+			       chiV6NozzleL[a][2]])
+		    translate(fanDuctOutletNozzleOffsetL) // Offset from the nozzle where the outlet should be.
+		    // Rotate the duct outlets to point to the correct spot.
+		    rotate(fanDuctOutletAngle)
+		    cube([fanDuctOutletSize[0] + (wallThickness * 2),
+			   fanDuctOutletSize[1] + (interior ? .1 : 0),
+			   fanDuctOutletSize[2] + (wallThickness * 2)], center=true);
+	  }
+     }
 }
 
 
