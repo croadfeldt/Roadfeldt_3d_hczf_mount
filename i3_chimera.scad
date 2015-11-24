@@ -121,13 +121,13 @@ fanDirection = "right"; // [left:Fan outlet to the left, right:Fan outlet to rig
 fanTabWidth = 8;
 
 // How far out should the  tab the cooling fan hangs off of be. Must be above 0.
-fanTabDepth = 20;
+fanTabDepth = 5;
 
 // Degrees the fan mount is rotated in the vertical.
 fanTabAngle = 0;
 
 // Degrees the fan mount is rotated in the horizontal. Affects fan duct only.
-fanTabHorizontalAngle = 30;
+fanTabHorizontalAngle = 0;
 
 // How large to make the bolt hole that the fan bracket will bolt to.
 fanTabHole = 3.5;
