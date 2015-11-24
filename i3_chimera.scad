@@ -265,7 +265,7 @@ servoBracketBotScrewL = [0, 0, (servoBracketNutDiameter / 2) + servoBracketMat];
 servoBracketTopScrewL = [0, 0, servoTopLegStartL[2] + servoLegHeight + servoBracketMat + (servoBracketNutDiameter / 2)];
 
 // Toggle that controls if fan is shown.
-showFan = true;
+showFan = false;
 
 // X Carriage Mount
 
@@ -741,8 +741,14 @@ module fan_screw_hole_single(radius,height,x,y,z) {
 // Fan Duct
 module fan_duct() {
      // Simple fan duct to get something working for now.
+     // Create the connection to the fan.
+     translate([0,0, fanDuctConnectRadius])
+     cube([fanDuctConnectSize[0][0] + (fanDuctThickness * 2),
+	   fanDuctConnectSize[0][1] + (fanDuctThickness * 2),
+	   fanDuctConnectSize[0][2] - fanDuctConnectRadius + fanDuctOverlap]);
+
      hull() {
-	  // Create the connection to the fan.
+	  // Recreate the body of the fan shroud so we can hull to it.
 	  translate([0,0, fanDuctConnectRadius])
 	  cube([fanDuctConnectSize[0][0] + (fanDuctThickness * 2),
 		fanDuctConnectSize[0][1] + (fanDuctThickness * 2),
@@ -770,22 +776,29 @@ module fan_duct() {
 }
 
 module fan_duct_holes() {
-     // Carve out the inside part of the duct that wraps around the fan
+     // Carve out the inside part of connection to the fan.
+     translate([fanDuctThickness,
+		fanDuctThickness,
+		fanDuctConnectRadius + fanDuctThickness])
+	  #cube([fanDuctConnectSize[0][0],
+		 fanDuctConnectSize[0][1],
+		 fanDuctConnectSize[0][2] - fanDuctConnectRadius - fanDuctThickness + fanDuctOverlap + .1]);
      hull () {
+	  // Recreate and Carve out the inside part of the body, again so we can hull to it.
 	  translate([fanDuctThickness,
 		     fanDuctThickness,
-		     fanDuctConnectSize[0][2] - fanDuctOverlap])
+		     fanDuctConnectRadius + fanDuctThickness])
 	       #cube([fanDuctConnectSize[0][0],
 		      fanDuctConnectSize[0][1],
-		      fanDuctOverlap + .1]);
+		      fanDuctConnectSize[0][2] - fanDuctConnectRadius - fanDuctThickness + .1]);
 
-	  	  // Round out the bottom a bit
+	  // Round out the bottom a bit
 	  translate([fanDuctThickness,
 		     fanDuctConnectRadius,
 		     fanDuctConnectRadius])
 	       rotate([0,90,0])
 	       cylinder(r=fanDuctConnectRadius, h=fanDuctConnectSize[0][0],$fn=200);
-
+	  
 	  translate([fanDuctThickness,
 		     fanDuctConnectSize[0][1] - (fanDuctConnectRadius),
 		     fanDuctConnectRadius])
