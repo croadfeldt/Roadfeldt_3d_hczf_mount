@@ -124,7 +124,7 @@ fanTabWidth = 8;
 fanTabDepth = 8;
 
 // Degrees the fan mount is rotated in the vertical.
-fanTabAngle = 45;
+fanTabAngle = 0;
 
 // Degrees the fan mount is rotated in the horizontal. Affects fan duct only.
 fanTabHorizontalAngle = 0;
