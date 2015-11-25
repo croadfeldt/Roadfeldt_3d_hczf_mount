@@ -446,8 +446,6 @@ if(which == "serv" || which == "all") {
 
 // Z Probe Arm
 if(which == "zpro" || which == "all") {
-translate(zProbeTopL)
-     color("blue")cube(1,center=true);
      // Place the Z Probe Arm
      difference() {
 	  translate(zProbeTopL)
