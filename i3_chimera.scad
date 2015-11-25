@@ -42,11 +42,12 @@ use<delta_blower_fans.scad>;
 // fanm = Fan Mount
 // duct = Fan Duct
 // mag = Magnetic Z Probe mount
-// zprobe = Z Probe arm used with servo
+// zpro = Z Probe arm used with servo
 // all = All the parts
 
 // Which part should be exported.
-which = "all"; // [xcar:X Carriage Chimera Mount, serv:Servo Bracket, fanm:Fan Mount, duct:Fan Duct, all:All] 
+which = "all"; // [xcar:X Carriage Chimera Mount, serv:Servo Bracket, fanm:Fan Mount, duct:Fan Duct, zpro:Z Probe, all:All] 
+
 // Which Z Probe type is in use.
 servo_mag = "servo"; // [servo:Z Probe Servo, mag:Magnetic Sensor]
 
@@ -58,19 +59,19 @@ hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_volcano:Chimera D
 xWidth = 40;
 
 // How high to make the X Carriage back plane. Affects both X Carriage and servo mount.
-xHeight = 35;
+xHeight = 40;
 
 // How deep the overall X Back Plane should be.
-xDepth = 7;
+xDepth = 9;
 
 // The radius of the rounded X Back Plane corners.
-xCornerRadius = 5;
+xCornerRadius = 4;
 
 // How wide to make the X Carriage nut traps, point to point, not flat to flat.
 nutDiameter = 8.8;
 
 // How deep to make the X Carriage nut traps.
-nutDepth = 3.5;
+nutDepth = 4.5;
 
 // How wide to make the X Carriage bolt shaft holes.
 boltDiameter = 4.5;
@@ -87,8 +88,8 @@ chiWidth = 31;
 // Horizontal position of Chimera. This postion marks mm from left of backplane. Default middle, (xWidth - chiWidth) / 2
 chiPosLR = (xWidth - chiWidth) / 2;
 
-// Vertical position of Chimera. This position marks mm from bottom of backplane. Default middle, (xHeight / 2)
-chiPosUD = (xHeight / 2);
+// Vertical position of Chimera. This position marks mm from bottom of backplane. Default 18mm
+chiPosUD = 18;
 
 // Height of Chimera cold end. Normally 30, change only if needed.
 chiColdHeight = 30;
@@ -183,6 +184,45 @@ servoBracketNutDepth = 2.4;
 // Depth of the servo bracket base.
 servoBracketBaseDepth = 2;
 
+// Distance between center of servo motor output and side of the servo body.
+servoCenterOffset = 5;
+
+// Diameter of whole the servo fits through to mount the arm.
+servoShaftDiameter = 6.2;
+
+// Diameter of servo hat where it connects to the servo motor.
+servoHatTopDiameter = 6.2;
+
+// Length of servo hat.
+servoHatLength = 19;
+
+// Diameter of servo hat at the opposite end of the servo mount, the tip of the servo hat.
+servoHatTipDiameter = 4.2;
+
+// Depth the servo hat should recess into the Z Probe Arm.
+servoHatRecessDepth = 2;
+
+// Thickness of the Z Probe arm.
+zProbeThickness = 4;
+
+// Diameter of Z Probe switch mounting screws.
+zProbeScrewDiameter = 2;
+
+// Distance between Z Probe switch mount screws.
+zProbeScrewDistance = 10;
+
+// Distance from servo bracket to Z Probe Arm, purely for visualizing how the arm fits in the space provided.
+zProbeArmOffset = 4;
+
+// How much material should around the holes in the arm.
+zProbeArmMat = 2;
+
+// Distance between the switch mount holes and the side with the switch.
+zProbeSwitchHeight = 7.5;
+
+// Distance below nozzle you want the switch to trigger, roughly, depends on switch activation point.
+zProbeSwitchActivationDistance = 5;
+
 /* [Hidden] */
 
 // Variables used for calculations and not normally change variables..
@@ -254,15 +294,25 @@ servoBracketL = [ zProbeSide == "right" ?
 		 - (((servoScrewDistance + (servoBracketMat * 2) + (servoBracketNutDiameter * 2) + (servoBracketMat * 4) + (servoScrewDiameter * 2)) / 2) -
 		    (xHeight / 2))]; // Location of the bottom right corner of the z probe extension.
 
-servoBottomLegStartL = [- (servoBracketNutDiameter / 2) - servoBracketMat,
+servoBottomLegStartL = [- (servoBracketScrewDiameter / 2) - servoBracketMat,
 			- servoBracketMat - servoBracketBaseDepth - servoWidth - .1,
-			servoBracketNutDiameter < servoScrewDiameter ? servoScrewDiameter : servoBracketNutDiameter + (servoBracketMat * 2)];
+			servoBracketNutDiameter + (servoBracketMat * 2)];
 servoLegHeight = (servoBracketMat * 2) + servoScrewDiameter + ((servoScrewDistance / 2) - servoBracketMat - (servoHeight / 2));
 servoTopLegStartL = [servoBottomLegStartL[0],
 		     servoBottomLegStartL[1],
 		     servoBottomLegStartL[2] + servoLegHeight + servoHeight];
 servoBracketBotScrewL = [0, 0, (servoBracketNutDiameter / 2) + servoBracketMat];
 servoBracketTopScrewL = [0, 0, servoTopLegStartL[2] + servoLegHeight + servoBracketMat + (servoBracketNutDiameter / 2)];
+
+// Variables for Z Probe
+zProbeTopL = [zProbeSide == "right" ?
+	      servoBracketL[0] - (servoBracketNutDiameter / 2) - servoBracketMat - zProbeArmOffset:
+	      servoBracketL[0] + (servoBracketNutDiameter / 2) + servoBracketMat + zProbeArmOffset,
+	      - (xDepth + servoBracketBaseDepth + (servoWidth / 2)),
+	      servoBracketL[2] + servoBottomLegStartL[2] + servoLegHeight + servoCenterOffset];
+zProbeBottomL = [servoBracketL[0] - (servoBracketNutDiameter / 2) - servoBracketMat,
+		 - (xDepth + servoBracketBaseDepth + (servoWidth / 2)),
+		 - (zProbeTopL[2] - (chiMountUD + chiV6NozzleL[0][2])) + (servoHatTopDiameter / 2) + zProbeArmMat + zProbeSwitchHeight - zProbeSwitchActivationDistance];
 
 // Toggle that controls if fan is shown.
 showFan = true;
@@ -383,15 +433,28 @@ if(which == "duct" || which == "all") {
 }
 
 // Servo Bracket
-
 if(which == "serv" || which == "all") {
-     // Place the Z Probe Bracket.
+     // Place the Servo Bracket.
      difference() {
 	  translate(servoBracketL)
 	       servo_bracket();
 	  
 	  translate(servoBracketL)
 	       servo_bracket_holes();
+     }
+}
+
+// Z Probe Arm
+if(which == "zpro" || which == "all") {
+translate(zProbeTopL)
+     color("blue")cube(1,center=true);
+     // Place the Z Probe Arm
+     difference() {
+	  translate(zProbeTopL)
+	       z_probe_arm();
+	  
+	  translate(zProbeTopL)
+	       z_probe_arm_holes();
      }
 }
 
@@ -879,27 +942,24 @@ module chimera_v6_fan_duct(wallThickness,interior=false) {
 
 // Servo Bracket
 module servo_bracket() {
-     distance = servoTopLegStartL[2] - servoLegHeight - servoBottomLegStartL[2];
-     echo(distance);
-
      union() {
 	  // Create the top and bottom mounting holes.
 	  hull () {
 	       // Bottom
 	       translate(servoBracketBotScrewL)
 		    rotate([90,0,0])
-		    cylinder(r=(servoBracketNutDiameter / 2) + servoBracketMat, h=servoBracketBaseDepth, $fn=100);
+		    cylinder(r=(servoBracketScrewDiameter / 2) + servoBracketMat, h=servoBracketBaseDepth, $fn=100);
 	       
 	       // Top
 	       translate(servoBracketTopScrewL)
 		    rotate([90,0,0])
-		    cylinder(r=(servoBracketNutDiameter / 2) + servoBracketMat, h=servoBracketBaseDepth, $fn=100);
+		    cylinder(r=(servoBracketScrewDiameter / 2) + servoBracketMat, h=servoBracketBaseDepth, $fn=100);
 	  }
 	  
 	  // Create the servo enclosure.
 	  // Spin up a cube that we will punch a hole in for servo later.
 	  translate(servoBottomLegStartL)
-	       cube([(servoBracketMat * 2) + servoBracketNutDiameter,
+	       cube([(servoBracketMat * 2) + servoBracketScrewDiameter,
 		     servoBracketMat + servoWidth + .2,
 		     servoTopLegStartL[2] - servoBottomLegStartL[2] + servoLegHeight]);
      }
@@ -925,7 +985,7 @@ module servo_bracket_holes() {
      translate([servoBottomLegStartL[0] - .1,
 		servoBottomLegStartL[1] + servoBracketMat,
 		servoBottomLegStartL[2] + servoLegHeight])
-	  #cube([(servoBracketMat * 2) + servoBracketNutDiameter + .2,
+	  #cube([(servoBracketMat * 2) + servoBracketScrewDiameter + .2,
 		 servoWidth,
 		 servoHeight]);
 
@@ -935,12 +995,81 @@ module servo_bracket_holes() {
 		servoBottomLegStartL[1] + servoBracketMat + (servoWidth / 2),
 		servoBottomLegStartL[2] + servoLegHeight - ((servoScrewDistance - servoHeight) / 2)])
 	  rotate([-90,0,-90])
-	  #cylinder(d=servoScrewDiameter,h=((servoBracketMat * 2) + servoBracketNutDiameter + .2), $fn=100);
+	  #cylinder(d=servoScrewDiameter,h=((servoBracketMat * 2) + servoBracketScrewDiameter + .2), $fn=100);
 
      // Top
      translate([servoTopLegStartL[0] - .1,
 		servoTopLegStartL[1] + servoBracketMat + (servoWidth / 2),
 		servoTopLegStartL[2] + ((servoScrewDistance - servoHeight) / 2)])
 	  rotate([-90,0,-90])
-	  #cylinder(d=servoScrewDiameter,h=((servoBracketMat * 2) + servoBracketNutDiameter + .2), $fn=100);
+	  #cylinder(d=servoScrewDiameter,h=((servoBracketMat * 2) + servoBracketScrewDiameter + .2), $fn=100);
+}
+
+// Z Probe Arm
+module z_probe_arm() { //////// WARNING: NEED TO MAKE THIS NOZZLE AWARE, ASSUMES CHIMERA V6 FOR NOW//////////
+     // Create a couple of cylinders, hull them together to create the servo arm.
+     hull() {
+	  // Create the top of the Z Probe Arm
+	  translate([-(zProbeThickness / 2),0,0])
+	       rotate([0,90,0])
+	       cylinder(r=(servoHatTopDiameter / 2) + zProbeArmMat, h=zProbeThickness, $fn=100);
+	  
+	  // Create the bottom of the Z Probe Arm
+          translate([-(zProbeThickness / 2),0,zProbeBottomL[2]])
+		  rotate([0,90,0])
+		  cylinder(r=(servoHatTopDiameter / 2) + zProbeArmMat, h=zProbeThickness, $fn=100);
+     }
+
+     // Create the switch mount.
+     hull() {
+	  // Recreate the bottom of the Z Probe Arm so we can hull to it.
+	  translate([-(zProbeThickness / 2),0,zProbeBottomL[2]])
+	       rotate([0,90,0])
+	       cylinder(r=(servoHatTopDiameter / 2) + zProbeArmMat, h=zProbeThickness, $fn=100);
+
+	  // Create the cylinders for the switch mount.
+	  for(b=[0:1]) {
+	       translate([-(zProbeThickness / 2),
+			  b==0 ? -(zProbeScrewDistance / 2) + (zProbeScrewDiameter / 2) :
+			  (zProbeScrewDistance / 2) - (zProbeScrewDiameter / 2),
+			  zProbeBottomL[2] - (servoHatTopDiameter / 2)])
+		    rotate([0,90,0])
+		    cylinder(r=(zProbeScrewDiameter / 2) + zProbeArmMat, h=zProbeThickness, $fn=100);
+	       }
+     }	       
+}
+
+module z_probe_arm_holes() {
+     // Create the servo shaft whole.
+     translate([- (zProbeThickness / 2) - .1,0,0])
+     rotate([0,90,0])
+	  #cylinder(r=(servoShaftDiameter / 2), h=zProbeThickness + .2, $fn=100);
+     
+     // Create the servo hat recess.
+     #hull() {
+	  // Create the servo hat recess, top first.
+	  translate([zProbeSide == "right" ? - servoHatRecessDepth - .1 :
+		     (zProbeThickness / 2) - servoHatRecessDepth,
+		     0,0])
+	  rotate([0,90,0])
+	       cylinder(r=(servoHatTopDiameter / 2), h=servoHatRecessDepth + .1, $fn=100);
+	  
+	  // Create the bottom of servo hat recess.
+	  translate([zProbeSide == "right" ? - servoHatRecessDepth - .1 :
+		     (zProbeThickness / 2) - servoHatRecessDepth,
+		     0,- (servoHatLength - (servoHatTopDiameter / 2) - (servoHatTipDiameter / 2))])
+	       rotate([0,90,0])
+	       cylinder(r=(servoHatTipDiameter / 2), h=servoHatRecessDepth + .1, $fn=100);
+     }
+
+     // Create the holes that mount the switch.
+     	  // Create the cylinders for the switch mount.
+     for(b=[0:1]) {
+	  translate([-(zProbeThickness / 2) - .1,
+		     b==0 ? -(zProbeScrewDistance / 2) + (zProbeScrewDiameter / 2) :
+		     (zProbeScrewDistance / 2) - (zProbeScrewDiameter / 2),
+		     zProbeBottomL[2] - (servoHatTopDiameter / 2)])
+	       rotate([0,90,0])
+	       #cylinder(r=(zProbeScrewDiameter / 2), h=zProbeThickness + .2, $fn=100);
+     }
 }
