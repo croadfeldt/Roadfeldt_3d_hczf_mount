@@ -46,7 +46,7 @@ use<delta_blower_fans.scad>;
 // all = All the parts
 
 // Which part should be exported.
-which = "all"; // [xcar:X Carriage Chimera Mount, serv:Servo Bracket, fanm:Fan Mount, duct:Fan Duct, zpro:Z Probe, all:All] 
+which = "duct"; // [xcar:X Carriage Chimera Mount, serv:Servo Bracket, fanm:Fan Mount, duct:Fan Duct, zpro:Z Probe, all:All] 
 
 // Which Z Probe type is in use.
 servo_mag = "servo"; // [servo:Z Probe Servo, mag:Magnetic Sensor]
@@ -272,18 +272,19 @@ fanScrewL = [0,
 // Variables for Fan Duct
 fanDuctConnectSize = [[27, 20, 20], // Outside dimensions of fan outlet
 		      [23.8, 16.8, 20]]; // Inside dimensions of fan outlet
-fanDuctOverlap = 3; // How much to over lap the connection to the fan.
-// Fan Duct starting location, left fan orientation in first vector, right in second. This is offset from fanScrewL. Does NOT take angles into account.
-fanDuctConnectL = [[-((fanDimensions[0] / 2) + fanDuctThickness + fanMountOffset[0]),
-		    - ((fanTabHole / 2) + fanTabHoleMat + fanMountThickness + fanDimensions[1] + fanMountOffset[1] + fanDuctThickness),
-		    - (fanDimensions[2] / 2 ) - fanDuctConnectSize[0][2] + fanDuctOverlap + fanMountOffset[2]],
-		   [((fanDimensions[0] / 2)  - fanDuctThickness - fanDuctConnectSize[0][0] + fanMountOffset[0]),
-		    - ((fanTabHole / 2) + fanTabHoleMat + fanMountThickness + fanDimensions[1] + fanMountOffset[1] + fanDuctThickness),
-		    - (fanDimensions[2] / 2 ) - fanDuctConnectSize[0][2] + fanDuctOverlap + fanMountOffset[2]]];
-fanDuctOutletSize = [15,1,3]; // Size of the fan duct outlets.
+fanDuctOverlap = 2.75; // How much to over lap the connection to the fan.
 fanDuctOutletNozzleOffsetL = [0,-18 - fanDuctThickness,5]; // Offset from the nozzles where the fan duct outlets should be placed.
 fanDuctOutletAngle = [- atan((fanDuctOutletNozzleOffsetL[2] + fanDuctOutletOffset) / abs(fanDuctOutletNozzleOffsetL[1])),0,0];
-fanDuctConnectRadius = 10;
+fanDuctConnectRadius = fanDuctConnectSize[0][2] / 2; // Radius of the bottom of the fan duct below housing.
+fanDuctBowlDepth = 10; // How deep the bowl at the bottom of the fan duct should be.
+// Fan Duct starting location, left fan orientation in first vector, right in second. This is offset from fanScrewL. Does NOT take angles into account.
+fanDuctConnectL = [[-((fanDimensions[0] / 2) + fanMountOffset[0]),
+		    - ((fanTabHole / 2) + fanTabHoleMat + fanDimensions[1] + fanMountOffset[1] + fanMountThickness),
+		    - (fanDimensions[2] / 2 ) + fanMountOffset[2]],
+		   [((fanDimensions[0] / 2) - fanDuctConnectSize[0][0] + fanMountOffset[0]),
+		    - ((fanTabHole / 2) + fanTabHoleMat + fanDimensions[1] + fanMountOffset[1] + fanMountThickness),
+		    - (fanDimensions[2] / 2 ) + fanMountOffset[2]]];
+fanDuctOutletSize = [15,1,3]; // Size of the fan duct outlets.
 
 // Variables for probe extension and servo bracket.
 // Which side is the probe to be on?
@@ -803,31 +804,25 @@ module fan_screw_hole_single(radius,height,x,y,z) {
 module fan_duct() {
      // Simple fan duct to get something working for now.
      // Create the connection to the fan.
-     translate([0,0, fanDuctConnectRadius])
+     translate([-fanDuctThickness, -fanDuctThickness, - (fanDuctBowlDepth - fanDuctConnectRadius)])
      cube([fanDuctConnectSize[0][0] + (fanDuctThickness * 2),
 	   fanDuctConnectSize[0][1] + (fanDuctThickness * 2),
-	   fanDuctConnectSize[0][2] - fanDuctConnectRadius + fanDuctOverlap]);
+	   fanDuctBowlDepth - fanDuctConnectRadius + fanDuctOverlap]);
 
      hull() {
 	  // Recreate the body of the fan shroud so we can hull to it.
-	  translate([0,0, fanDuctConnectRadius])
+	  translate([-fanDuctThickness, -fanDuctThickness, - (fanDuctBowlDepth - fanDuctConnectRadius) - .1])
 	  cube([fanDuctConnectSize[0][0] + (fanDuctThickness * 2),
 		fanDuctConnectSize[0][1] + (fanDuctThickness * 2),
-		fanDuctConnectSize[0][2] - fanDuctConnectRadius]);
+		.1]);
 
 	  // Round out the bottom a bit
-	  translate([0,
-		     fanDuctConnectRadius - fanDuctThickness,
-		     fanDuctConnectRadius - fanDuctThickness])
+	  translate([-fanDuctThickness,
+		     fanDuctConnectRadius,
+		     - (fanDuctBowlDepth - fanDuctConnectRadius) - fanDuctConnectRadius - fanDuctThickness])
 	       rotate([0,90,0])
-	       cylinder(r=fanDuctConnectRadius, h=fanDuctConnectSize[0][0] + (fanDuctThickness * 2),$fn=200);
+	       cylinder(r=(fanDuctConnectRadius + fanDuctThickness), h=fanDuctConnectSize[0][0] + (fanDuctThickness * 2),$fn=200);
 
-	  translate([0,
-		     fanDuctConnectSize[0][1] - (fanDuctConnectRadius - fanDuctThickness),
-		     fanDuctConnectRadius - fanDuctThickness])
-	       rotate([0,90,0])
-	       cylinder(r=fanDuctConnectRadius, h=fanDuctConnectSize[0][0] + (fanDuctThickness * 2),$fn=200);
-	  
 	  // Create the outlets.
 	  // First determine which hot end is in use.
 	  if(hotend == "chimera_v6") {
@@ -838,38 +833,29 @@ module fan_duct() {
 
 module fan_duct_holes() {
      // Carve out the inside part of connection to the fan.
-     translate([fanDuctThickness,
-		fanDuctThickness,
-		fanDuctConnectRadius + fanDuctThickness])
-	  #cube([fanDuctConnectSize[0][0],
-		 fanDuctConnectSize[0][1],
-		 fanDuctConnectSize[0][2] - fanDuctConnectRadius - fanDuctThickness + fanDuctOverlap + .1]);
-     #hull () {
-	  // Recreate and Carve out the inside part of the body, again so we can hull to it.
-	  translate([fanDuctThickness,
-		     fanDuctThickness,
-		     fanDuctConnectRadius + fanDuctThickness])
-	       cube([fanDuctConnectSize[0][0],
-		      fanDuctConnectSize[0][1],
-		      fanDuctConnectSize[0][2] - fanDuctConnectRadius - fanDuctThickness + .1]);
+     translate([0,0, - (fanDuctBowlDepth - fanDuctConnectRadius) - .1])
+     #cube([fanDuctConnectSize[0][0],
+	   fanDuctConnectSize[0][1],
+	   fanDuctBowlDepth - fanDuctConnectRadius + fanDuctOverlap + .2]);
+
+     #hull() {
+	  // Recreate the body of the fan shroud so we can hull to it.
+	  translate([0,0, - (fanDuctBowlDepth - fanDuctConnectRadius) - .1])
+	  cube([fanDuctConnectSize[0][0],
+		fanDuctConnectSize[0][1],
+		.2]);
 
 	  // Round out the bottom a bit
-	  translate([fanDuctThickness,
+	  translate([0,
 		     fanDuctConnectRadius,
-		     fanDuctConnectRadius])
+		     - (fanDuctBowlDepth - fanDuctConnectRadius) - fanDuctConnectRadius])
 	       rotate([0,90,0])
-	       cylinder(r=fanDuctConnectRadius, h=fanDuctConnectSize[0][0],$fn=200);
-	  
-	  translate([fanDuctThickness,
-		     fanDuctConnectSize[0][1] - (fanDuctConnectRadius),
-		     fanDuctConnectRadius])
-	       rotate([0,90,0])
-	       cylinder(r=fanDuctConnectRadius, h=fanDuctConnectSize[0][0],$fn=200);
-	  
-	  // Carve out the interior of the duct
+	       cylinder(r=(fanDuctConnectRadius), h=fanDuctConnectSize[0][0],$fn=200);
+
+	  // Create the outlets.
 	  // First determine which hot end is in use.
 	  if(hotend == "chimera_v6") {
-	       #chimera_v6_fan_duct(0,true);
+	       chimera_v6_fan_duct(0, true);
 	  }
      }
 }
