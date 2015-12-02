@@ -46,7 +46,7 @@ use<delta_blower_fans.scad>;
 // all = All the parts
 
 // Which part should be exported.
-which = "duct"; // [xcar:X Carriage Chimera Mount, serv:Servo Bracket, fanm:Fan Mount, duct:Fan Duct, zpro:Z Probe, all:All] 
+which = "all"; // [xcar:X Carriage Chimera Mount, serv:Servo Bracket, fanm:Fan Mount, duct:Fan Duct, zpro:Z Probe, all:All] 
 
 // Which Z Probe type is in use.
 servo_mag = "servo"; // [servo:Z Probe Servo, mag:Magnetic Sensor]
@@ -89,7 +89,7 @@ chiWidth = 31;
 chiPosLR = (xWidth - chiWidth) / 2;
 
 // Vertical position of Chimera. This position marks mm from bottom of backplane. Default 18mm
-chiPosUD = 18;
+chiPosUD = 15;
 
 // Height of Chimera cold end. Normally 30, change only if needed.
 chiColdHeight = 30;
