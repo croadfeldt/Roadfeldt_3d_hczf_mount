@@ -1014,8 +1014,8 @@ module z_probe_arm() { //////// WARNING: NEED TO MAKE THIS NOZZLE AWARE, ASSUMES
 	  // Create the cylinders for the switch mount.
 	  for(b=[0:1]) {
 	       translate([-(zProbeThickness / 2),
-			  b==0 ? -((zProbeScrewDistance / 2) + (zProbeScrewDiameter / 2)) :
-			  ((zProbeScrewDistance / 2) + (zProbeScrewDiameter / 2)),
+			  b==0 ? -(zProbeScrewDistance / 2) :
+			  (zProbeScrewDistance / 2),
 			  zProbeBottomL[2] - (servoHatTopDiameter / 2)])
 		    rotate([0,90,0])
 		    cylinder(r=(zProbeScrewDiameter / 2) + zProbeArmMat, h=zProbeThickness, $fn=100);
@@ -1050,8 +1050,8 @@ module z_probe_arm_holes() {
      	  // Create the cylinders for the switch mount.
      for(b=[0:1]) {
 	  translate([-(zProbeThickness / 2) - .1,
-		     b==0 ? -((zProbeScrewDistance / 2) + (zProbeScrewDiameter / 2)) :
-		     ((zProbeScrewDistance / 2) + (zProbeScrewDiameter / 2)),
+		     b==0 ? -(zProbeScrewDistance / 2) :
+		     (zProbeScrewDistance / 2),
 		     zProbeBottomL[2] - (servoHatTopDiameter / 2)])
 	       rotate([0,90,0])
 	       #cylinder(r=(zProbeScrewDiameter / 2), h=zProbeThickness + .2, $fn=100);
