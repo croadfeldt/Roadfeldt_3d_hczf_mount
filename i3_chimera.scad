@@ -45,14 +45,24 @@ use<delta_blower_fans.scad>;
 // zpro = Z Probe arm used with servo
 // all = All the parts
 
-// Which part should be exported.
-which = "all"; // [xcar:X Carriage Chimera Mount, serv:Servo Bracket, fanm:Fan Mount, duct:Fan Duct, zpro:Z Probe, all:All] 
+/* [Features] */
 
-// Which Z Probe type is in use.
-servo_mag = "servo"; // [servo:Z Probe Servo, mag:Magnetic Sensor]
+// Which part should be exported.
+which = "all"; // [hotm:Back Plane & Cold / Hot End  Mount, servo:Servo Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, all:All] 
+
+// Which Z Probe type is in use. Select Servo here if you want to if you Servo Bracket selected above, otherwise it won't appear.
+servo_mag = "servo"; // [servo:Servo w/ Arm, mag:Magnetic Sensor, none:Neither/None]
 
 // Which hot end is in use.
 hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_volcano:Chimera Dual Volcano, cyclops:Cyclops]
+
+// Which side should the fan mount to? Be mindful of Z probe clearance.
+fanSide = "left"; // [left:Left side of hot end., right:Right side of hot end., none:No print cooling fan.]
+
+// Should the fan outlet point towards the left or the right? Be mindful of Z probe clearance.
+fanDirection = "right"; // [left:Fan outlet to the left, right:Fan outlet to right]
+
+/* [Back Plane] */
 
 // Variables for X Carriage
 // How wide to make the X Carriage back plane. Servo mount width is separate and below.
@@ -81,6 +91,8 @@ mountHoleWidth = 23;
 
 // Distance between mounting bolt holes in the vertical direction
 mountHoleHeight = 23;
+
+/* [Chimera Mount] */
 
 // Width of Chimera is 30, use 31 to account for 3d printer material overage. Use 30.5 for cnc.
 chiWidth = 31;
@@ -112,11 +124,7 @@ chiScrewHole = 3.2;
 // Size of hole for bowden tube fittings.
 chiBowdenHole = 8.2;
 
-// Which side should the fan mount to? Be mindful of Z probe clearance.
-fanSide = "left"; // [left:Left side of hot end., right:Right side of hot end.]
-
-// Should the fan outlet be towards the left or the right? Be mindful of Z probe clearance.
-fanDirection = "right"; // [left:Fan outlet to the left, right:Fan outlet to right]
+/* [Print Cooling Fan] */
 
 // How wide to make the tab the cooling fan hangs off of.
 fanTabWidth = 8;
@@ -150,6 +158,8 @@ fanDuctThickness = 1;
 
 // How far below the nozzle should the fan outlet point?
 fanDuctOutletOffset = 5;
+
+/* [Z Probe / Servo] */
 
 // Which side should the z probe be on? Be mindful of clearance with fan mount.
 zProbeSide = "right"; // [right:Right of hot end., left:Left of hot end.]
@@ -232,19 +242,20 @@ mountHoleHeightOffset = (xHeight - (mountHoleHeight /2));
 
 // Variables for Chimera mount
 chiBraceLength = chiColdDepth; // Length of brace for chimera mount in the horizontal. From back plane towards the front.
-chiBraceHeight = (chiColdHeight / 2); // How long the brace should be in the vertical, from mount down.
+chiBraceHeight = (chiColdHeight / 2) > (chiPosUD - xCornerRadius) ? (chiPosUD - xCornerRadius) : (chiColdHeight / 2); // How long the brace should be in the vertical, from mount down.
 chiMountDepth = (chiColdDepthOffset + 20); // How far out the Chimera mount top plate should be.
 chiMountWidth = (chiBraceThickness * 2) + chiWidth; // The width of the Chimera mount top plate.
-chiMountL =  ((xWidth / 2) - (chiMountWidth / 2)); // Left horizontal position of Chimera Mount.
-chiMountR = xWidth - chiMountL - chiBraceThickness; // Right horizontal position of Chimera Mount.
-chiMountUD = chiPosUD; // Vertical postion of Chimera Mount. Relative to Chimera Cold End.
+chiMountL = [((xWidth / 2) - (chiMountWidth / 2)),
+	     - (xDepth + chiMountDepth),
+	     chiPosUD]; // Position of Chimera Mount.
+chiMountR = chiMountWidth - chiBraceThickness; // Right horizontal position of Chimera Mount.
 chiScrewHoleHeight = chiMountThickness + .2; // How tall to make the Chimera mount screw holes.
-chiScrewLocs = [[chiMountL + (chiMountWidth / 2) - 8.5, xDepth + chiColdDepthOffset + 15],
-		[chiMountL + (chiMountWidth / 2), xDepth + chiColdDepthOffset + 3],
-		[chiMountL + (chiMountWidth / 2) + 8.5, xDepth + chiColdDepthOffset + 15]]; // X,Y locations for Chimera mount screw holes.
+chiScrewLocs = [[(chiMountWidth / 2) - 8.5, chiMountDepth - (chiColdDepthOffset + 15)],
+		[(chiMountWidth / 2), chiMountDepth - (chiColdDepthOffset + 3)],
+		[(chiMountWidth / 2) + 8.5, chiMountDepth - (chiColdDepthOffset + 15)]]; // X,Y locations for Chimera mount screw holes.
 chiBowdenHoleHeight = chiMountThickness + .2; // How tall to make the Bowden tube fitting holes.
-chiBowdenLocs = [[chiMountL + (chiMountWidth / 2) - 9, xDepth + chiColdDepthOffset + 6],
-		 [chiMountL + (chiMountWidth / 2) + 9, xDepth + chiColdDepthOffset + 6]]; // X,Y locations for Bowden tube fitting holes.
+chiBowdenLocs = [[(chiMountWidth / 2) - 9, chiMountDepth - (chiColdDepthOffset + 6)],
+		 [(chiMountWidth / 2) + 9, chiMountDepth - (chiColdDepthOffset + 6)]]; // X,Y locations for Bowden tube fitting holes.
 chiV6NozzleL = [[6,-6,-49.6],[24,-6,-49.6]]; // Location of Chimera V6 Nozzles in relation to top rear left corner of cold end.
 chiVolNozzleL = []; // Location of Chimera Volcano nozzles in relation to the top rear left corner of cold end.
 cycNozzleL =[]; // Locatopm Cyclops nozzle in relation to the top rear left corner of cold end.
@@ -252,10 +263,10 @@ cycNozzleL =[]; // Locatopm Cyclops nozzle in relation to the top rear left corn
 // Variables for fan mount tab.
 // Holds the x,y,z location for the start of fan tab.
 fanTabL = [ fanSide == "left" ?
-	    chiMountL :
-	    chiMountL + chiMountWidth,
-	   - xDepth - chiMountDepth,
-	   chiMountUD];
+	    chiMountL[0] :
+	    chiMountL[0] + chiMountWidth,
+	    chiMountL[1],
+	    chiMountL[2]];
 
 // Variables for the fan mount.
 fanBarWidth = fanTabWidth + (fanTabNubWidth * 2) + (fanTabNubClear * 2);
@@ -313,50 +324,80 @@ zProbeTopL = [zProbeSide == "right" ?
 	      servoBracketL[2] + servoBottomLegStartL[2] + servoLegHeight + servoCenterOffset];
 zProbeBottomL = [servoBracketL[0] - (servoBracketNutDiameter / 2) - servoBracketMat,
 		 - (xDepth + servoBracketBaseDepth + (servoWidth / 2)),
-		 - (zProbeTopL[2] - (chiMountUD + chiV6NozzleL[0][2])) + (servoHatTopDiameter / 2) + zProbeArmMat + zProbeSwitchHeight - zProbeSwitchActivationDistance];
+		 - (zProbeTopL[2] - (chiMountL[2] + chiV6NozzleL[0][2])) + (servoHatTopDiameter / 2) + zProbeArmMat + zProbeSwitchHeight - zProbeSwitchActivationDistance];
 
 // Toggle that controls if fan is shown.
 showFan = true;
 
 // X Carriage Mount
 
-if(which == "xcar" || which == "all") {
+if(which == "hotm" || which == "all") {
      // Spin up the Mount.
      difference () {
 	  union() {
 	       // Create the backplane.
 	       xback_plane();
-	       
-	       // Place the Chimera mount in the correct place on the back plane.
-	       chimera_mount();
-	       
-	       // Place the Fan Tab.
-	       fan_tab();
-	       
-	       // Place the Probe Extension.
-	       probe_ext();
+
+	       // Place the fan tab if needed.
+	       if(fanSide != "none") {
+		    // Create the Fab Mount Tab.
+		    translate(fanTabL)
+			 // Place the Fan Tab.
+			 fan_tab();
+	       }
+	  
+	       // Place the hot end mount, need to do here so holes are cut correctly.
+	       // Chimera Mount
+	       if(hotend == "chimera_v6") {
+		    // Place the Chimera mount
+		    translate(chiMountL)
+			 chimera_mount();
+	       }
+
+	       // Servo Extension
+	       if(servo_mag == "servo") {
+		    // Place the Servo / Z Probe extension.
+		    probe_ext();
+	  
+	       }
 	  }
-	  
-	  // Cut out the wholes needed to mount and use the Chimera.
-	  chimera_holes();
-	  
+
 	  // Cut out the holes needed to mount the back plane to the X Carriage.
 	  xback_holes();
-	  
-	  // Cut out the holes for the servo bracket.
-	  probe_ext_holes();
+
+	  // Cut the fan tab screw hole out if needed.
+	  if(fanSide != "none") {
+	       // Create the Fab Mount Tab.
+	       translate(fanTabL)
+		    // Create the hole for the fab tab screw.
+		    fan_tab_holes();
+	  }
+
+	  // Cut out the wholes for the appropriate cold / hot end.
+	  if(hotend == "chimera_v6") {
+	       // Cut out the wholes needed to mount and use the Chimera.
+	       translate(chiMountL)
+		    chimera_mount_holes();
+	  }
+
+	  // Servo Extension Holes
+	  if(servo_mag == "servo") {
+	       // Cut out the holes for the servo bracket.
+	       probe_ext_holes();
+	  }
      }
 
-     // Place the E3D Chimera fron Jons.
-     translate([(chiPosLR + (chiWidth /2)),
-		- (xDepth + chiColdDepthOffset + 6), // 6 is there to offset the fan in the e3d model, used to line everything up properly
-		chiPosUD - chiColdHeight])
-	  rotate([0,0,0])
-	  %e3d();
+     if(hotend == "chimera_v6") {
+	  // Place the E3D Chimera fron Jons.
+	  translate([(chiPosLR + (chiWidth /2)),
+		     - (xDepth + chiColdDepthOffset + 6), // 6 is there to offset the fan in the e3d model, used to line everything up properly
+		     chiPosUD - chiColdHeight])
+	       rotate([0,0,0])
+	       %e3d();
+     }
 }
 
 // Fan Mount
-
 if(which == "fanm" || which == "all") {
      // Spin up the Fan Mount.
      translate(fanTabL) // Use fanTabL here and then translate to correct position to avoid using sin/cos to determine position when rotated vertically
@@ -390,21 +431,8 @@ if(showFan == true && (which == "all" || which == "fanm")) {
 	       %blower_fan_50_20();
      }
 }
-/*
-translate([100,0,0])
-     if(fanDirection == "right") {
-	  rotate([0,-90,180])
-	       blower_fan_50_20();
-     }
-     else {
-	  rotate([0,-90,0])
-	       translate([0,-20,0])
-	       blower_fan_50_20();
-     }
-*/
 
 // Fan Duct
-
 if(which == "duct" || which == "all") {
      // Place the fan duct.
      translate(fanTabL)
@@ -429,32 +457,40 @@ if(which == "duct" || which == "all") {
 		    fan_duct_holes();
 	       }
 	  }
-     
-
 }
 
 // Servo Bracket
-if(which == "serv" || which == "all") {
+if((which == "servo" || which == "all") && servo_mag == "servo") {
      // Place the Servo Bracket.
-     difference() {
-	  translate(servoBracketL)
+     translate(servoBracketL)
+	  difference() {
 	       servo_bracket();
 	  
-	  translate(servoBracketL)
 	       servo_bracket_holes();
      }
 }
 
 // Z Probe Arm
-if(which == "zpro" || which == "all") {
+if(which == "zarm" || which == "all") {
      // Place the Z Probe Arm
-     difference() {
-	  translate(zProbeTopL)
+     translate(zProbeTopL)
+	  difference() {
 	       z_probe_arm();
 	  
-	  translate(zProbeTopL)
 	       z_probe_arm_holes();
      }
+}
+
+// Mag Sensor
+if(servo_mag == "mag") {
+     // Place the Mag sensor
+     difference() {
+	  translate(servoBracketL)
+	       mag_bracket();
+
+	  translate(servoBracketL)
+	       mag_bracket_holes();
+	  }
 }
 
 // Start of code that creates the objects.
@@ -528,40 +564,42 @@ module chimera_mount() {
      // Create the mount top plate and braces for the Chimera mount plate.
      union() {
 	  // Create the top plate to hang the Chimera from.
-	  translate([chiMountL,-xDepth - chiMountDepth,chiMountUD])
-	       cube([chiMountWidth, chiMountDepth + .1, chiMountThickness]);
+	  cube([chiMountWidth, chiMountDepth + .1, chiMountThickness]);
+
 	  // Left Brace
 	  hull() {
 	       // Horizontal
-	       translate([chiMountL,-xDepth - chiBraceLength,chiMountUD])
-		    cube([chiBraceThickness,chiBraceLength + .1,.1]);
+	       translate([0, (chiMountDepth - chiBraceLength), 0])
+		    cube([chiBraceThickness, chiBraceLength + .1, .1]);
+
 	       // Vertical
-	       translate([chiMountL,-xDepth,(chiMountUD - chiBraceHeight)])
-		    cube([chiBraceThickness,.1,chiBraceHeight + .1]);
+	       translate([0, chiMountDepth, -chiBraceHeight])
+		    #cube([chiBraceThickness, .1, chiBraceHeight + .1]);
 	  }
 	  // Right Brace
 	  hull() {
 	       // Horizontal
-	       translate([chiMountR,-xDepth - chiBraceLength,chiMountUD])
-		    cube([chiBraceThickness,chiBraceLength + .1,.1]);
+	       translate([chiMountR, (chiMountDepth - chiBraceLength), 0])
+		    cube([chiBraceThickness, chiBraceLength + .1, .1]);
+
 	       // Vertical
-	       translate([chiMountR,-xDepth,(chiMountUD - chiBraceHeight)])
-		    cube([chiBraceThickness,.1,chiBraceHeight + .1]);
+	       translate([chiMountR, chiMountDepth, -chiBraceHeight])
+		    cube([chiBraceThickness, .1, chiBraceHeight + .1]);
 	  }	  
      }
 }
 
 // Holes for Chimera Cold End Mount and Bowden tubes.
-module chimera_holes() {
+module chimera_mount_holes() {
      // Create the holes, which will be remove from the top plate. Could place screw holes in back plane too,
      // but only useful if mount is rotated 90 degrees in Z. This might be tested as it has advantages for fan placement.
      for(i = chiScrewLocs) {
 	  // Create the screw hole and move it to the correct location.
-	  translate([i[0],-i[1],chiMountUD - .1])
+	  translate([i[0], i[1], -.1])
 	       #cylinder(r=(chiScrewHole /2),h=chiScrewHoleHeight, $fn=100);
 
 	  // Create an space for the screw head, used to clear space from the fan tab.
-	  translate([i[0],-i[1],chiMountUD + chiMountThickness])
+	  translate([i[0], i[1], chiMountThickness])
 	       cylinder(r=3,
 			 h= (chiMountThickness < (fanTabHole + (fanTabHoleMat * 2))) ? ((fanTabHole + (fanTabHoleMat * 2)) - chiMountThickness) + .1 :
 			 0,
@@ -570,7 +608,7 @@ module chimera_holes() {
      
      for(i = chiBowdenLocs) {
 	  // Create the screw hole and move it to the correct location.
-	  translate([i[0],-i[1],chiMountUD - .1])
+	  translate([i[0], i[1], -.1])
 	       #cylinder(r=(chiBowdenHole /2),h=chiBowdenHoleHeight, $fn=100);
      }
 }
@@ -580,41 +618,41 @@ module fan_tab() {
      // Create the tab and screw hole to hang the fan off of.
      hull() {
 	  // Hull from the backplane where the cold end mount connects. Works for both left and right mount configurations.
-	  translate([chiMountL, -xDepth +.1, chiMountUD])
+	  translate([fanSide == "left" ? 0 :
+		     -chiMountWidth,
+		     chiMountDepth, 0])
 	       cube([chiMountWidth, .1, chiMountThickness]);
 
 	  // Hull from the front of the cold end mount as well.
-	  translate([chiMountL, -xDepth - chiMountDepth, chiMountUD])
+	  translate([fanSide == "left" ? 0 :
+		     -chiMountWidth,
+		     0, 0])
 	       cube([chiMountWidth, .1, chiMountThickness]);
 
-	  translate(fanTabL)
-	       rotate([0,0,realFanTabAngle])
+	  rotate([0,0,realFanTabAngle])
 	       translate([-(fanTabWidth / 2), -fanTabDepth + 5, 0])
 	       cube([fanTabWidth, fanTabDepth + 5, chiMountThickness]);
      }
      
-     difference() {
-	  hull() {
-	       // Recreate the tab so we can hull to it without hull the whole front and side of Chimera Mount
-	       translate(fanTabL)
-		    rotate([0,0,realFanTabAngle])
-		    translate([-(fanTabWidth / 2), -fanTabDepth + 5, 0])
-		    cube([fanTabWidth, fanTabDepth + 5, chiMountThickness]);
-
-
-	       // Create the cylinder for the fan mount screw.
-	       translate(fanTabL)
-		    rotate([0,90,realFanTabAngle])
-		    translate([-fanScrewL[2],fanScrewL[1],fanScrewL[0]])
-			 cylinder(r=(fanTabHole / 2) + fanTabHoleMat, h=fanTabWidth, center=true, $fn=100);
-	  }
+     hull() {
+	  // Recreate the tab so we can hull to it without hull the whole front and side of Chimera Mount
+	  rotate([0,0,realFanTabAngle])
+	       translate([-(fanTabWidth / 2), -fanTabDepth + 5, 0])
+	       cube([fanTabWidth, fanTabDepth + 5, chiMountThickness]);
 	  
-	  // Carve the hole for the screw on the mount.
-	  translate(fanTabL)
-	       rotate([0,90,realFanTabAngle])
+	  
+	  // Create the cylinder for the fan mount screw.
+	  rotate([0,90,realFanTabAngle])
 	       translate([-fanScrewL[2],fanScrewL[1],fanScrewL[0]])
-	       #cylinder(r=(fanTabHole / 2), h=fanTabWidth + .2, center=true, $fn=100);
+	       cylinder(r=(fanTabHole / 2) + fanTabHoleMat, h=fanTabWidth, center=true, $fn=100);
      }
+}
+
+module fan_tab_holes() {
+     // Carve the hole for the screw on the mount.
+     rotate([0,90,realFanTabAngle])
+	  translate([-fanScrewL[2],fanScrewL[1],fanScrewL[0]])
+	  #cylinder(r=(fanTabHole / 2), h=fanTabWidth + .2, center=true, $fn=100);
 }
 
 // Servo probe extension
