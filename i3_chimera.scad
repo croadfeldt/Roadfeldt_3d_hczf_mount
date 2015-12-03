@@ -62,6 +62,9 @@ fanSide = "left"; // [left:Left side of hot end., right:Right side of hot end., 
 // Should the fan outlet point towards the left or the right? Be mindful of Z probe clearance.
 fanDirection = "right"; // [left:Fan outlet to the left, right:Fan outlet to right]
 
+// Which side should the z probe be on? Be mindful of clearance with fan mount.
+zProbeSide = "right"; // [right:Right of hot end., left:Left of hot end.]
+
 /* [Back Plane] */
 
 // Variables for X Carriage
@@ -160,9 +163,6 @@ fanDuctThickness = 1;
 fanDuctOutletOffset = 5;
 
 /* [Z Probe / Servo] */
-
-// Which side should the z probe be on? Be mindful of clearance with fan mount.
-zProbeSide = "right"; // [right:Right of hot end., left:Left of hot end.]
 
 // How much of a gap from the edge of the X Carriage back plane to the inside of the servo mount.
 probeExtWidth = 25;
@@ -356,15 +356,22 @@ if(which == "hotm" || which == "all") {
 
 	       // Servo Extension
 	       if(servo_mag == "servo") {
-		    // Place the Servo / Z Probe extension.
-		    probe_ext();
+		    // Place the servo extension.
+		    servo_ext();
 	  
 	       }
-	  }
 
+	       // Mag Sensor
+	       if(servo_mag == "mag") {
+		    // Place the Mag sensor
+		    translate(servoBracketL)
+			 mag_bracket();
+	       }
+	  }
+	  
 	  // Cut out the holes needed to mount the back plane to the X Carriage.
 	  xback_holes();
-
+	  
 	  // Cut the fan tab screw hole out if needed.
 	  if(fanSide != "none") {
 	       // Create the Fab Mount Tab.
@@ -372,21 +379,29 @@ if(which == "hotm" || which == "all") {
 		    // Create the hole for the fab tab screw.
 		    fan_tab_holes();
 	  }
-
+	  
 	  // Cut out the wholes for the appropriate cold / hot end.
 	  if(hotend == "chimera_v6") {
 	       // Cut out the wholes needed to mount and use the Chimera.
 	       translate(chiMountL)
 		    chimera_mount_holes();
 	  }
-
+	  
 	  // Servo Extension Holes
 	  if(servo_mag == "servo") {
 	       // Cut out the holes for the servo bracket.
-	       probe_ext_holes();
+	       servo_ext_holes();
 	  }
+	  
+	  // Mag Sensor
+	  if(servo_mag == "mag") {
+	       translate(servoBracketL)
+		    mag_bracket_holes();
+	  }
+	  
      }
 
+     // Display cold / hot end model.
      if(hotend == "chimera_v6") {
 	  // Place the E3D Chimera fron Jons.
 	  translate([(chiPosLR + (chiWidth /2)),
@@ -398,7 +413,7 @@ if(which == "hotm" || which == "all") {
 }
 
 // Fan Mount
-if(which == "fanm" || which == "all") {
+if((which == "fanm" || which == "all") && fanSide != "none") {
      // Spin up the Fan Mount.
      translate(fanTabL) // Use fanTabL here and then translate to correct position to avoid using sin/cos to determine position when rotated vertically
 	  rotate([0,0,realFanTabAngle])
@@ -408,7 +423,7 @@ if(which == "fanm" || which == "all") {
 }
 
 // Display fan if needed
-if(showFan == true && (which == "all" || which == "fanm")) {
+if(showFan == true && (which == "all" || which == "fanm") && fanSide != "none") {
      if(fanDirection == "right") {
 	  // Place the fan for reference..
 	  translate(fanTabL) // Use fanTabL here and then translate to correct position to avoid using sin/cos to determine position when rotated vertically
@@ -433,7 +448,7 @@ if(showFan == true && (which == "all" || which == "fanm")) {
 }
 
 // Fan Duct
-if(which == "duct" || which == "all") {
+if((which == "duct" || which == "all") && fanSide != "none") {
      // Place the fan duct.
      translate(fanTabL)
 	  rotate([0,0,realFanTabAngle])
@@ -471,7 +486,7 @@ if((which == "servo" || which == "all") && servo_mag == "servo") {
 }
 
 // Z Probe Arm
-if(which == "zarm" || which == "all") {
+if((which == "zarm" || which == "all") && servo_mag == "servo" && servo_mag != "none") {
      // Place the Z Probe Arm
      translate(zProbeTopL)
 	  difference() {
@@ -479,18 +494,6 @@ if(which == "zarm" || which == "all") {
 	  
 	       z_probe_arm_holes();
      }
-}
-
-// Mag Sensor
-if(servo_mag == "mag") {
-     // Place the Mag sensor
-     difference() {
-	  translate(servoBracketL)
-	       mag_bracket();
-
-	  translate(servoBracketL)
-	       mag_bracket_holes();
-	  }
 }
 
 // Start of code that creates the objects.
@@ -656,7 +659,7 @@ module fan_tab_holes() {
 }
 
 // Servo probe extension
-module probe_ext() {
+module servo_ext() {
      // Create the extension for the z Probe Servo.
      hull() {
 	  translate([ zProbeSide == "right" ?
@@ -698,7 +701,7 @@ module probe_ext() {
      }
 }
 
-module probe_ext_holes() {
+module servo_ext_holes() {
      // Create the holes needed for the z probe extension.
      // Bottom
      translate([servoBracketL[0],
