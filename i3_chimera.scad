@@ -124,7 +124,7 @@ prusai3FanTabMat = 2;
 // How wide the nubs on each side of the fan mount tab should be.
 prusai3FanTabNubWidth = 4;
 
-/* C Bot Carriage */
+/* [C Bot Carriage] */
 
 // Which C Botpart should be exported.
 cBotWhich = "all"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All] 
