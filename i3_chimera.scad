@@ -1,21 +1,21 @@
 // Roadfeldt - E3D Chimera / Cyclops - X Carriage Mount for Prusa i3 Rework
 //
 /*
-  Copyright (C)2015 Chris Roadfeldt <chris@roadfeldt.com>
+Copyright (C)2015 Chris Roadfeldt <chris@roadfeldt.com>
 
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 //
 // Includes E3D Chimera openscad design by Author: Professional 3D - Jons Collasius from Germany/Hamburg
@@ -36,25 +36,6 @@ use<e3d_v6_chimera.scad>;
 // Bring in the basic delta fan designs I created for visualization.
 use<delta_blower_fans.scad>;
 
-/* [Features] */
-
-// What type of Carriage do you use / need?
-carriage = "cbot"; // [cbot:C Bot style, prusai3:Prusa i3]
-
-// Should the mount and carrier be combined into one? Only applicable for cbot currently.
-carrierIntegration = true; // [true:Yes, false:No]
-
-// Which Z Probe type is in use. Select Servo here if you want to if you Servo Bracket selected above, otherwise it won't appear.
-servo_induct = "servo"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, none:Neither/None]
-
-// Which hot end is in use.
-hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_volcano:Chimera Dual Volcano, cyclops:Cyclops]
-
-// Vertical position of Hot End / Cold End. This position marks mm from bottom of backplane. Default 15mm for prusa, 20 for C Bot.
-hePosUD = 20;
-
-/* [Prusa i3] */
-
 // Which part should be displayed.
 // xcar = X Carriage mount
 // serv = Servo Bracket
@@ -64,99 +45,72 @@ hePosUD = 20;
 // zpro = Z Probe arm used with servo
 // all = All the parts
 
-// Which Prusa i3 part should be exported.
-prusai3Which = "all"; // [hotm:Back Plane & Cold / Hot End  Mount, servo:Servo Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All] 
+/* [Features] */
+
+// Which part should be exported.
+which = "all"; // [hotm:Back Plane & Cold / Hot End  Mount, servo:Servo Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, all:All] 
+
+// Which Z Probe type is in use. Select Servo here if you want to if you Servo Bracket selected above, otherwise it won't appear.
+servo_mag = "servo"; // [servo:Servo w/ Arm, mag:Magnetic Sensor, none:Neither/None]
+
+// Which hot end is in use.
+hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_volcano:Chimera Dual Volcano, cyclops:Cyclops]
 
 // Which side should the fan mount to? Be mindful of Z probe clearance.
-prusai3FanSide = "left"; // [left:Left side of hot end., right:Right side of hot end., none:No print cooling fan.]
+fanSide = "left"; // [left:Left side of hot end., right:Right side of hot end., none:No print cooling fan.]
 
 // Should the fan outlet point towards the left or the right? Be mindful of Z probe clearance.
-prusai3FanDirection = "right"; // [left:Fan outlet to the left, right:Fan outlet to right]
+fanDirection = "right"; // [left:Fan outlet to the left, right:Fan outlet to right]
 
 // Which side should the z probe be on? Be mindful of clearance with fan mount.
-prusai3ZProbeSide = "right"; // [right:Right of hot end., left:Left of hot end.]
+zProbeSide = "right"; // [right:Right of hot end., left:Left of hot end.]
 
-// How wide to make the X Carriage back plane.
-xMountWidth = 40;
+/* [Back Plane] */
+
+// Variables for X Carriage
+// How wide to make the X Carriage back plane. Servo mount width is separate and below.
+xWidth = 40;
 
 // How high to make the X Carriage back plane. Affects both X Carriage and servo mount.
-xMountHeight = 40;
+xHeight = 40;
 
 // How deep the overall X Back Plane should be.
-xMountDepth = 9;
+xDepth = 9;
 
 // The radius of the rounded X Back Plane corners.
-xMountCornerRadius = 4;
+xCornerRadius = 4;
 
 // How wide to make the X Carriage nut traps, point to point, not flat to flat.
-xMountNutDiameter = 8.8;
+nutDiameter = 8.8;
 
 // How deep to make the X Carriage nut traps.
-xMountNutDepth = 4.5;
+nutDepth = 4.5;
 
 // How wide to make the X Carriage bolt shaft holes.
-xMountBoltDiameter = 4.5;
+boltDiameter = 4.5;
 
 // Distance between mounting bolt holes in the horizontal direction
-xMountHoleWidth = 23;
+mountHoleWidth = 23;
 
 // Distance between mounting bolt holes in the vertical direction
-xMountHoleHeight = 23;
-
-// How wide to make the tab the cooling fan hangs off of.
-prusai3FanTabWidth = 8;
-
-// How far out should the tab the cooling fan hangs off of be. Must be above 0.
-prusai3FanTabDepth = 8;
-
-// Degrees the fan mount is rotated in the vertical.
-prusai3FanTabVerticalAngle = 0;
-
-// Degrees the fan mount is rotated in the horizontal. Affects fan duct only.
-prusai3FanTabHorizontalAngle = 0;
-
-// How large to make the bolt hole that the fan bracket will bolt to.
-prusai3FanTabHole = 3.5;
-
-// How much material should be around the fan bracket screw.
-prusai3FanTabMat = 2;
-
-// How wide the nubs on each side of the fan mount tab should be.
-prusai3FanTabNubWidth = 4;
-
-/* C Bot Carriage */
-
-// Which C Botpart should be exported.
-cBotWhich = "all"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All] 
-
-// Width of carriage.
-cBotCarriageWidth = 72;
-
-// Height of carriage.
-cBotCarriageHeight = 65;
-
-// Depth of carriage.
-cBotCarriageDepth = 5;
-
-// Diameter of screw holes for carriage idler wheels.
-cBotCarriageIdlerScrewDiameter = 5;
-
-// Amount of material around screw holes for carriage idler wheels.
-cBotCarriageIdlerScrewMat = 3.3;
-
-// Diameter of screw holes that mounts back plane to carriage.
-cBotCarriageMountScrewDiameter = 4;
-
-// Horizontal distance of screw holes for back plane mount. Not used if hot end mount is integrated.
-cBotCarriageMountScrewHorizontalDistance = 30;
-
-// Vertical distance of screw holes for back plane mount. Not used if hot end mount is integrated.
-cBotCarriageMountScrewVerticalDistance = 30;
-
-// Vertical position of back plane mount from bottom of carriage. Not used if hot end mount is integrated.
-cBotBackMountVertPosition = 40;
+mountHoleHeight = 23;
 
 /* [Chimera Mount] */
+
+// Width of Chimera is 30, use 31 to account for 3d printer material overage. Use 30.5 for cnc.
+chiWidth = 31;
+
+// Horizontal position of Chimera. This postion marks mm from left of backplane. Default middle, (xWidth - chiWidth) / 2
+chiPosLR = (xWidth - chiWidth) / 2;
+
+// Vertical position of Chimera. This position marks mm from bottom of backplane. Default 18mm
+chiPosUD = 15;
+
+// Height of Chimera cold end. Normally 30, change only if needed.
+chiColdHeight = 30;
+
+// Depth of Chimera cold end.
+chiColdDepth = 16;
 
 // Extra amount of space add to the rear of the Chimera cold mount. Accounts for 3d printing variances.
 chiColdDepthOffset = .5;
@@ -175,32 +129,29 @@ chiBowdenHole = 8.2;
 
 /* [Print Cooling Fan] */
 
+// How wide to make the tab the cooling fan hangs off of.
+fanTabWidth = 8;
+
+// How far out should the  tab the cooling fan hangs off of be. Must be above 0.
+fanTabDepth = 8;
+
+// Degrees the fan mount is rotated in the vertical.
+fanTabAngle = 0;
+
+// Degrees the fan mount is rotated in the horizontal. Affects fan duct only.
+fanTabHorizontalAngle = 0;
+
+// How large to make the bolt hole that the fan bracket will bolt to.
+fanTabHole = 3.5;
+
+// How much material should be around the fan bracket screw.
+fanTabHoleMat = 2;
+
 // How thick the fan mount should be.
 fanMountThickness = 4;
 
-// Diameter of the hole for the screws that hold the fan on to the mount.
-fanMountScrewDiameter = 4.5;
-
-// Amount of material around the fan screw holes.
-fanMountScrewMat = 3;
-
-// X,Y coordinates of holes for fan screw relative to the center of the fan. Top right, top left, bottom left. Leave the negative signs.
-fanMountScrews = [[21,20],[-22,20],[-22,-18]];
-
-// Dimensions of the fan. Width, depth, height when looking at it from the side.
-fanDimensions = [50,20,50];
-
-// Outside dimensions of fan outlet
-fanDuctConnectSize = [27, 20, 20];
-
-// Offset from center of fan body to center of fan tab. Left / Right, Forward / Back, Up / Down. Usually only need Left / Right.
-fanMountOffset = [2,0,0];
-
-// Offset the center of the fan blower in relation to the overall fan body. Usually negative value of fanMountOffset.
-fanCenterOffset = [-2,0,0];
-
-// Diameter of fan opening. If your fan has air intakes on both sides, enter the diameter of that opening here.
-fanIntakeDiameter = 20;
+// How wide the nubs on each side of the fan mount tab should be.
+fanTabNubWidth = 4;
 
 // How much clearance between the fan mount nubs and the fan tab. Too much of a gap and the fan mount will not snug up properly.
 fanTabNubClear = .1;
@@ -282,41 +233,22 @@ zProbeSwitchHeight = 7.5;
 // Distance below nozzle you want the switch to trigger, roughly, depends on switch activation point.
 zProbeSwitchActivationDistance = 5;
 
-/* Inductive / Capacitive Sensor */
-
-// Diameter of sensor.
-inductDiameter = 12;
-
-// Width of sensor mount, account for nut and washers.
-inductMountWidth = 22;
-
-// Height of sensor mount plate.
-inductMountHeight = 4;
-
-// Height of mount plate above nozzle tip.
-inductHeight = 20;
-
-// Height of sensor mount braces.
-inductBraceHeight = 20;
-
-// Width of braces.
-inductBraceWidth = 4;
-
 /* [Hidden] */
 
 // Variables used for calculations and not normally change variables..
-xMountBoltDepth = (xMountDepth - xMountNutDepth); // How deep the X Carriage bolt shafts hole are.
-xMountHoleWidthOffset = (xMountWidth - (xMountHoleWidth /2));
-xMountHoleHeightOffset = (xMountHeight - (xMountHoleHeight /2));
+boltDepth = (xDepth - nutDepth); // How deep the X Carriage bolt shafts hole are.
+mountHoleWidthOffset = (xWidth - (mountHoleWidth /2));
+mountHoleHeightOffset = (xHeight - (mountHoleHeight /2));
 
 // Variables for Chimera mount
-chiColdHeight = 30;
-chiColdDepth = 16;
 chiBraceLength = chiColdDepth; // Length of brace for chimera mount in the horizontal. From back plane towards the front.
-chiBraceHeight = (chiColdHeight / 2) > (hePosUD - xMountCornerRadius) ? (hePosUD - xMountCornerRadius) : (chiColdHeight / 2);
-chiWidth = 31; // Width of Chimera is 30, use 31 to account for 3d printer material overage. Use 30.5 for cnc.
+chiBraceHeight = (chiColdHeight / 2) > (chiPosUD - xCornerRadius) ? (chiPosUD - xCornerRadius) : (chiColdHeight / 2); // How long the brace should be in the vertical, from mount down.
 chiMountDepth = (chiColdDepthOffset + 20); // How far out the Chimera mount top plate should be.
 chiMountWidth = (chiBraceThickness * 2) + chiWidth; // The width of the Chimera mount top plate.
+chiMountL = [((xWidth / 2) - (chiMountWidth / 2)),
+	     - (xDepth + chiMountDepth),
+	     chiPosUD]; // Position of Chimera Mount.
+chiMountR = chiMountWidth - chiBraceThickness; // Right horizontal position of Chimera Mount.
 chiScrewHoleHeight = chiMountThickness + .2; // How tall to make the Chimera mount screw holes.
 chiScrewLocs = [[(chiMountWidth / 2) - 8.5, chiMountDepth - (chiColdDepthOffset + 15)],
 		[(chiMountWidth / 2), chiMountDepth - (chiColdDepthOffset + 3)],
@@ -327,45 +259,53 @@ chiBowdenLocs = [[(chiMountWidth / 2) - 9, chiMountDepth - (chiColdDepthOffset +
 chiV6NozzleL = [[6,-6,-49.6],[24,-6,-49.6]]; // Location of Chimera V6 Nozzles in relation to top rear left corner of cold end.
 chiVolNozzleL = []; // Location of Chimera Volcano nozzles in relation to the top rear left corner of cold end.
 cycNozzleL =[]; // Locatopm Cyclops nozzle in relation to the top rear left corner of cold end.
-
-// Carriage specific positioning variables.
-prusai3ChiMountL = [((xMountWidth / 2) - (chiMountWidth / 2)),
-		    - (xMountDepth + chiMountDepth),
-		    hePosUD]; // Position of Chimera Mount.
-prusai3ChiAnchorL = [((xMountWidth / 2) - (chiWidth / 2)),
-		    - (xMountDepth + chiColdDepthOffset),
-		    prusai3ChiMountL[2]]; // Position of Chimera Mount.
-
+	  
 // Variables for fan mount tab.
-prusai3FanBarWidth = prusai3FanTabWidth + (prusai3FanTabNubWidth * 2) + (fanTabNubClear * 2);
-prusai3RealFanTabVerticalAngle = prusai3FanSide == "left" ?
-     - prusai3FanTabVerticalAngle :
-     prusai3FanTabVerticalAngle;
-prusai3FanScrewL = [prusai3FanSide == "left" ?
-		    prusai3ChiMountL[0] + (sin(prusai3RealFanTabVerticalAngle) * ((prusai3FanTabHole / 2) + prusai3FanTabMat + prusai3FanTabDepth)) :
-		    prusai3ChiMountL[0] + chiMountWidth + (sin(prusai3RealFanTabVerticalAngle) * ((prusai3FanTabHole / 2) + prusai3FanTabMat + prusai3FanTabDepth)),
-		    prusai3ChiMountL[1] - (cos(prusai3RealFanTabVerticalAngle) * ((prusai3FanTabHole / 2) + prusai3FanTabMat + prusai3FanTabDepth)),
-		    prusai3ChiMountL[2] + (prusai3FanTabHole / 2) + prusai3FanTabMat]; // Offset of the center of the fan mount screw from prusai3FanTabL
-prusai3FanTabHeight = chiMountThickness;
-prusai3FanScrewOffset = (((prusai3FanTabHole / 2) + prusai3FanTabMat) - prusai3FanTabHeight);
+// Holds the x,y,z location for the start of fan tab.
+fanTabL = [ fanSide == "left" ?
+	    chiMountL[0] :
+	    chiMountL[0] + chiMountWidth,
+	    chiMountL[1],
+	    chiMountL[2]];
+
+// Variables for the fan mount.
+fanBarWidth = fanTabWidth + (fanTabNubWidth * 2) + (fanTabNubClear * 2);
+fanMountOffset = [2,0,0]; // Offset from center of fan body to center of fan tab. Allows absolute positioning of fan screw holes.
+fanCenterOffset = [-2,0,0]; // Offset the center of the fan blower in relation to the overall fan body.
+realFanTabAngle = fanSide == "left" ?
+     -fanTabAngle :
+     fanTabAngle;
+fanDimensions = [50,20,50]; // Dimensions of the fan.
+fanScrewL = [0,
+	     - ((fanTabHole / 2) + fanTabHoleMat + fanTabDepth),
+	     (fanTabHole / 2) + fanTabHoleMat]; // Offset of the center of the fan mount screw from fanTabL
 
 // Variables for Fan Duct
+fanDuctConnectSize = [[27, 20, 20], // Outside dimensions of fan outlet
+		      [23.8, 16.8, 20]]; // Inside dimensions of fan outlet
 fanDuctOverlap = 2.75; // How much to over lap the connection to the fan.
 fanDuctOutletNozzleOffsetL = [0,-18 - fanDuctThickness,5]; // Offset from the nozzles where the fan duct outlets should be placed.
 fanDuctOutletAngle = [- atan((fanDuctOutletNozzleOffsetL[2] + fanDuctOutletOffset) / abs(fanDuctOutletNozzleOffsetL[1])),0,0];
-fanDuctConnectRadius = fanDuctConnectSize[2] / 2; // Radius of the bottom of the fan duct below housing.
+fanDuctConnectRadius = fanDuctConnectSize[0][2] / 2; // Radius of the bottom of the fan duct below housing.
 fanDuctBowlDepth = 10; // How deep the bowl at the bottom of the fan duct should be.
-
-// Fan Duct starting location, left fan orientation in first vector, right in second. This is offset from prusai3FanScrewL. Does NOT take angles into account.
-prusai3DuctConnectL = fan_duct_connect(prusai3FanScrewL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, fanDimensions, fanCenterOffset, fanMountOffset, fanMountThickness, prusai3FanTabHole, prusai3FanTabMat, fanDuctConnectSize);
+// Fan Duct starting location, left fan orientation in first vector, right in second. This is offset from fanScrewL. Does NOT take angles into account.
+fanDuctConnectL = [[-((fanDimensions[0] / 2) + fanMountOffset[0]),
+		    - ((fanTabHole / 2) + fanTabHoleMat + fanDimensions[1] + fanMountOffset[1] + fanMountThickness),
+		    - (fanDimensions[2] / 2 ) + fanMountOffset[2]],
+		   [((fanDimensions[0] / 2) - fanDuctConnectSize[0][0] + fanMountOffset[0]),
+		    - ((fanTabHole / 2) + fanTabHoleMat + fanDimensions[1] + fanMountOffset[1] + fanMountThickness),
+		    - (fanDimensions[2] / 2 ) + fanMountOffset[2]]];
 fanDuctOutletSize = [15,1,3]; // Size of the fan duct outlets.
 
 // Variables for probe extension and servo bracket.
-servoBracketL = [ prusai3ZProbeSide == "right" ?
-		  (xMountWidth + probeExtWidth - (servoBracketNutDiameter / 2) - servoBracketMat) :
+// Which side is the probe to be on?
+servoBracketL = [ zProbeSide == "right" ?
+		  (xWidth + probeExtWidth - (servoBracketNutDiameter / 2) - servoBracketMat) :
 		  (-  probeExtWidth + (servoBracketNutDiameter / 2) + servoBracketMat),
-		  -xMountDepth,
-		  - (((servoScrewDistance + (servoBracketMat * 2) + (servoBracketNutDiameter * 2) + (servoBracketMat * 4) + (servoScrewDiameter * 2)) / 2) - (xMountHeight / 2))]; // Location of the bottom right corner of the z probe extension.
+		 -xDepth,
+		 - (((servoScrewDistance + (servoBracketMat * 2) + (servoBracketNutDiameter * 2) + (servoBracketMat * 4) + (servoScrewDiameter * 2)) / 2) -
+		    (xHeight / 2))]; // Location of the bottom right corner of the z probe extension.
+
 servoBottomLegStartL = [- (servoBracketScrewDiameter / 2) - servoBracketMat,
 			- servoBracketMat - servoBracketBaseDepth - servoWidth - .1,
 			servoBracketNutDiameter + (servoBracketMat * 2)];
@@ -377,337 +317,192 @@ servoBracketBotScrewL = [0, 0, (servoBracketNutDiameter / 2) + servoBracketMat];
 servoBracketTopScrewL = [0, 0, servoTopLegStartL[2] + servoLegHeight + servoBracketMat + (servoBracketNutDiameter / 2)];
 
 // Variables for Z Probe
-zProbeTopL = [prusai3ZProbeSide == "right" ?
+zProbeTopL = [zProbeSide == "right" ?
 	      servoBracketL[0] - (servoBracketNutDiameter / 2) - servoBracketMat - zProbeArmOffset:
 	      servoBracketL[0] + (servoBracketNutDiameter / 2) + servoBracketMat + zProbeArmOffset,
-	      - (xMountDepth + servoBracketBaseDepth + (servoWidth / 2)),
+	      - (xDepth + servoBracketBaseDepth + (servoWidth / 2)),
 	      servoBracketL[2] + servoBottomLegStartL[2] + servoLegHeight + servoCenterOffset];
-zProbeBottomL = - (zProbeTopL[2] - (prusai3ChiMountL[2] + chiV6NozzleL[0][2])) + (servoHatTopDiameter / 2) + zProbeArmMat + zProbeSwitchHeight - zProbeSwitchActivationDistance;
-
-// Variables for C Bot Carriage.
-cBotCarriageSideDistance = 20;
-cBotTopHoleLength = 2;
-cBotTopHoleAngle = 4.1;
-cBotTopHoleDepth = 6;
-cBotMountScrewDepth = cBotCarriageDepth - 2.5;
-cBotBeltDepth = 3;
-cBotBeltToothHeight = 1;
-cBotBeltToothSpacing = 2;
-cBotBeltToothLength = 10;
-cBotBeltLength = 13;
-cBotBeltHeight = 7;
-cBotBeltBottomPos = 7; // Distance from center of carriage side.
-cBotBeltTopPos = 6; // Distance from center of carriage side.
-cBotBeltScrewDiameter = 3.2;
-cBotBeltScrewDistance = 3;
-cBotBeltScrewNutDiameter = 6.5;
-cBotBeltScrewNutDepth = 2.4;
-cBotBeltHolderHeight = 19;
-cBotBeltHolderDepth = 3;
-cBotBeltHolderNubDepth = 2;
-cBotBeltHolderNubHeight = 6.2;
-cBotBeltHolderCornerRadius = 1;
-cBotCenterHoleDiameter = 36;
-cBotCenterHoleWidth = 20;
-cBotCarriageCornerRadius = (cBotCarriageIdlerScrewDiameter / 2) + cBotCarriageIdlerScrewMat;
-cBotFanDirection = "left";
-cBotFanSide = "left";
-cBotFanTabVerticalAngle = 0;
-cBotFanTabHorizontalAngle = 0;
-cBotRealFanTabVerticalAngle = cBotFanSide == "left" ?
-     cBotFanTabVerticalAngle :
-     - cBotFanTabVerticalAngle;
-cBotFanMountPos = 7;
-cBotFanMountDistance = 10;
-cBotFanBracketWidth = 20;
-cBotFanBracketHeight = 8;
-cBotFanBracketDepth = 3;
-cBotFanTabHeight = 8;
-cBotFanTabWidth = 5;
-cBotFanTabDepth = 5;
-cBotFanTabAngle = 0;
-cBotFanTabHole = 3.2;
-cBotFanTabMat = 2;
-cBotFanBarWidth = cBotFanTabWidth + (cBotFanTabWidth * 2) + (fanTabNubClear * 2);
-cBotFanScrewL = [(cBotCarriageWidth / 2) - cBotFanMountDistance,
-		 cBotCarriageSideDistance + cBotCarriageDepth + cBotFanBracketDepth + cBotFanTabDepth + (cBotFanTabHole / 2) + cBotFanTabMat,
-		 cBotFanMountPos + (cBotFanMountDistance * 2)];
-cBotFanScrewOffset = 0;
-cBotDuctConnectL = fan_duct_connect(cBotFanScrewL, cBotFanTabHorizontalAngle, cBotRealFanTabVerticalAngle, fanDimensions, fanCenterOffset, fanMountOffset, fanMountThickness, cBotFanTabHole, cBotFanTabMat, fanDuctConnectSize, true);
-cBotChiAnchorL = [((cBotCarriageWidth / 2) - (chiWidth / 2)),
-		    - (cBotCarriageDepth + chiColdDepthOffset),
-		    hePosUD]; // Position of Chimera Mount.
+zProbeBottomL = [servoBracketL[0] - (servoBracketNutDiameter / 2) - servoBracketMat,
+		 - (xDepth + servoBracketBaseDepth + (servoWidth / 2)),
+		 - (zProbeTopL[2] - (chiMountL[2] + chiV6NozzleL[0][2])) + (servoHatTopDiameter / 2) + zProbeArmMat + zProbeSwitchHeight - zProbeSwitchActivationDistance];
 
 // Toggle that controls if fan is shown.
 showFan = true;
 
-//////////// Prusa i3 Carriage //////////
-if (carriage == "prusai3") {
-     // X Carriage Mount     
-     if(prusai3Which == "hotm" || prusai3Which == "all") {
-	  // Spin up the Mount.
-	  difference () {
-	       union() {
-		    // Create the backplane.
-		    xback_plane();
-		    
-		    // Place the hot end mount, need to do here so holes are cut correctly.
-		    // Chimera Mount
-		    if(hotend == "chimera_v6") {
-			 // Place the Chimera mount
-			 translate(prusai3ChiMountL)
-			      chimera_mount("below",
-					    prusai3RealFanTabVerticalAngle, prusai3FanTabWidth, prusai3FanTabDepth,
-					    prusai3FanTabHeight, prusai3FanTabHole, prusai3FanTabMat, prusai3FanSide);
-		    }
-		    
-		    // Attach fan tab if needed.
-		    if(prusai3FanSide != "none") {
-			 translate(prusai3FanScrewL)
-			      rotate([0,0,prusai3RealFanTabVerticalAngle])
-			      fan_tab(prusai3FanScrewOffset,prusai3FanTabWidth,
-				      prusai3FanTabDepth,prusai3FanTabHeight,prusai3FanTabHole,prusai3FanTabMat);
-		    }
-		    
-		    // Servo Extension
-		    if(servo_induct == "servo") {
-			 // Place the servo extension.
-			 servo_ext(servoBracketL);
-			 
-		    }
-		    
-		    // Inductive / Capacitive Extension
-		    if(servo_induct == "induct") {
-			 // Place the Inductive / Capacitive Sensor extension.
-			 induct_ext();
-		    }
+// X Carriage Mount
+
+if(which == "hotm" || which == "all") {
+     // Spin up the Mount.
+     difference () {
+	  union() {
+	       // Create the backplane.
+	       xback_plane();
+
+	       // Place the fan tab if needed.
+	       if(fanSide != "none") {
+		    // Create the Fab Mount Tab.
+		    translate(fanTabL)
+			 // Place the Fan Tab.
+			 fan_tab();
 	       }
-	       
-	       // Cut out the holes needed to mount the back plane to the X Carriage.
-	       xback_holes();
-	       
-	       // Cut out the wholes for the appropriate cold / hot end.
+	  
+	       // Place the hot end mount, need to do here so holes are cut correctly.
+	       // Chimera Mount
 	       if(hotend == "chimera_v6") {
-		    // Cut out the wholes needed to mount and use the Chimera.
-		    translate(prusai3ChiMountL)
-			 chimera_mount_holes();
+		    // Place the Chimera mount
+		    translate(chiMountL)
+			 chimera_mount();
 	       }
 
-	       // Carve out fan tab holes if needed.
-	       if(prusai3FanSide != "none") {
-		    translate(prusai3FanScrewL)
-			 rotate([0,0,prusai3RealFanTabVerticalAngle])
-			 fan_tab_holes(prusai3FanTabWidth,
-				       prusai3FanTabDepth,prusai3FanTabHeight,prusai3FanTabHole,prusai3FanTabMat);
-	       }
+	       // Servo Extension
+	       if(servo_mag == "servo") {
+		    // Place the servo extension.
+		    servo_ext();
 	  
-	       // Servo Extension Holes
-	       if(servo_induct == "servo") {
-		    // Cut out the holes for the servo bracket.
-		    servo_ext_holes(servoBracketL);
 	       }
-	  
-	       // Inductive / Capacitive Extension
-	       if(servo_induct == "induct") {
-		    // Place the Inductive / Capacitive sensor holes.
-		    induct_ext_holes();
+
+	       // Mag Sensor
+	       if(servo_mag == "mag") {
+		    // Place the Mag sensor
+		    translate(servoBracketL)
+			 mag_bracket();
 	       }
 	  }
+	  
+	  // Cut out the holes needed to mount the back plane to the X Carriage.
+	  xback_holes();
+	  
+	  // Cut the fan tab screw hole out if needed.
+	  if(fanSide != "none") {
+	       // Create the Fab Mount Tab.
+	       translate(fanTabL)
+		    // Create the hole for the fab tab screw.
+		    fan_tab_holes();
+	  }
+	  
+	  // Cut out the wholes for the appropriate cold / hot end.
+	  if(hotend == "chimera_v6") {
+	       // Cut out the wholes needed to mount and use the Chimera.
+	       translate(chiMountL)
+		    chimera_mount_holes();
+	  }
+	  
+	  // Servo Extension Holes
+	  if(servo_mag == "servo") {
+	       // Cut out the holes for the servo bracket.
+	       servo_ext_holes();
+	  }
+	  
+	  // Mag Sensor
+	  if(servo_mag == "mag") {
+	       translate(servoBracketL)
+		    mag_bracket_holes();
+	  }
+	  
      }
-     
+
      // Display cold / hot end model.
      if(hotend == "chimera_v6") {
 	  // Place the E3D Chimera fron Jons.
-	  translate([((xMountWidth - chiWidth) / 2) + (chiWidth /2),
-		     - (xMountDepth + chiColdDepthOffset + 6), // 6 is there to offset the fan in the e3d model, used to line everything up properly
-		     hePosUD - chiColdHeight])
+	  translate([(chiPosLR + (chiWidth /2)),
+		     - (xDepth + chiColdDepthOffset + 6), // 6 is there to offset the fan in the e3d model, used to line everything up properly
+		     chiPosUD - chiColdHeight])
+	       rotate([0,0,0])
 	       %e3d();
-	  }
-     
-     // Fan Mount
-     if((prusai3Which == "fanm" || prusai3Which == "all") && prusai3FanSide != "none") {
-	  // Spin up the Fan Mount.
-	  translate(prusai3FanScrewL)
-	       rotate([prusai3FanTabHorizontalAngle,0,prusai3RealFanTabVerticalAngle])
-	       fan_mount(prusai3FanTabHole, prusai3FanTabMat, prusai3FanTabWidth, fanTabNubClear, fanMountThickness, prusai3FanBarWidth, fanMountOffset, fanCenterOffset, fanMountScrewDiameter, fanMountScrewMat, fanMountScrews, fanIntakeDiameter, prusai3FanDirection);
-     }
-     
-     // Display fan if needed
-     if(showFan == true && (prusai3Which == "all" || prusai3Which == "fanm")) {
-	  if(prusai3FanDirection == "left") {
-	       // Place the fan for reference.
-	       translate(prusai3FanScrewL)
-		    rotate([prusai3FanTabHorizontalAngle,0,prusai3RealFanTabVerticalAngle])
-		    rotate([0,-90,0])
-		    translate([fanMountOffset[2],
-			       -((prusai3FanTabHole / 2) + prusai3FanTabMat + fanMountThickness + fanMountOffset[1] + fanDimensions[1]),
-			       fanMountOffset[0]])
-		    %blower_fan_50_20();
-	  }
-	  else {
-	       translate(prusai3FanScrewL)
-		    rotate([-prusai3FanTabHorizontalAngle,0,180 + prusai3RealFanTabVerticalAngle])
-		    rotate([0,-90,0])
-		    translate([fanMountOffset[2],
-			       ((prusai3FanTabHole / 2) + prusai3FanTabMat + fanMountThickness + fanMountOffset[1]),
-			       fanMountOffset[0]])
-		    %blower_fan_50_20();
-	  }
-     }
-
-     // Display fan duct if needed
-     if((prusai3Which == "all" || prusai3Which == "duct") && prusai3FanSide != "none") {
-	  // Place the fan duct.
-	  translate(prusai3FanScrewL)
-	       rotate([prusai3FanTabHorizontalAngle,0,prusai3RealFanTabVerticalAngle])
-	       translate(prusai3FanDirection == "left" ? prusai3DuctConnectL[0] : prusai3DuctConnectL[1])
-	       difference() {
-	       fan_duct(prusai3FanDirection == "left" ? prusai3DuctConnectL[0] : prusai3DuctConnectL[1],
-			prusai3FanScrewL, prusai3ChiAnchorL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, false);
-	       
-	       fan_duct_holes(prusai3FanDirection == "left" ? prusai3DuctConnectL[0] : prusai3DuctConnectL[1],
-			      prusai3FanScrewL, prusai3ChiAnchorL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, false);
-	  }
-     }
-
-     // Servo Bracket
-     if((prusai3Which == "servo" || prusai3Which == "all") && servo_induct == "servo") {
-	  // Place the Servo Bracket.
-	  translate(servoBracketL)
-	       difference() {
-	       servo_bracket();
-	       
-	       servo_bracket_holes();
-	  }
-     }
-
-     // Z Probe Arm
-     if((prusai3Which == "zarm" || prusai3Which == "all") && servo_induct == "servo" && servo_induct != "none") {
-	  // Place the Z Probe Arm
-	  translate(zProbeTopL)
-	       difference() {
-	       z_probe_arm(zProbeBottomL);
-	       
-	       z_probe_arm_holes(zProbeBottomL);
-	  }
      }
 }
 
-////////// C Bot //////////
-if(carriage == "cbot") {
-     
-     // Carriage side with hot end mount.
-     if(cBotWhich == "hotm" || cBotWhich == "all") {
-	  // Display C Bot Hot End Carriage Side.
-	  cbot_carriage_side(true);
+// Fan Mount
+if((which == "fanm" || which == "all") && fanSide != "none") {
+     // Spin up the Fan Mount.
+     translate(fanTabL) // Use fanTabL here and then translate to correct position to avoid using sin/cos to determine position when rotated vertically
+	  rotate([0,0,realFanTabAngle])
+	  translate(fanScrewL)
+	  rotate([fanTabHorizontalAngle,0,0])
+	  fan_mount();
+}
 
-	  if(hotend == "chimera_v6") {
-	       // Place the hot end mount.
-	       translate([(cBotCarriageWidth / 2) - (chiMountWidth / 2),
-			  - (cBotCarriageDepth + chiMountDepth),
-			  hePosUD]) {
-		    
-		    // Replace material behind the mount.
-		    translate([0,chiMountDepth,0])
-			 cube([chiMountWidth, cBotCarriageDepth, chiMountThickness]);
-		    
-		    // Place the mount and carve out the wholes.
+// Display fan if needed
+if(showFan == true && (which == "all" || which == "fanm") && fanSide != "none") {
+     if(fanDirection == "right") {
+	  // Place the fan for reference..
+	  translate(fanTabL) // Use fanTabL here and then translate to correct position to avoid using sin/cos to determine position when rotated vertically
+	       rotate([0,-90,180 + realFanTabAngle])
+	       translate([fanScrewL[2],-fanScrewL[1],fanScrewL[0]])
+	       rotate([0,0,fanTabHorizontalAngle])
+	       translate([fanMountOffset[2],
+			  ((fanTabHole / 2) + fanTabHoleMat + fanMountThickness + fanMountOffset[1]),
+			  fanMountOffset[0]])
+	       %blower_fan_50_20();
+     }
+     else {
+	  translate(fanTabL) // Use fanTabL here and then translate to correct position to avoid using sin/cos to determine position when rotated vertically
+	       rotate([0,-90,realFanTabAngle])
+	       translate([fanScrewL[2],fanScrewL[1],fanScrewL[0]])
+	       rotate([0,0,-fanTabHorizontalAngle])
+	       translate([fanMountOffset[2],
+			  -((fanTabHole / 2) + fanTabHoleMat + fanMountThickness + fanMountOffset[1] + fanDimensions[1]),
+			  fanMountOffset[0]])
+	       %blower_fan_50_20();
+     }
+}
+
+// Fan Duct
+if((which == "duct" || which == "all") && fanSide != "none") {
+     // Place the fan duct.
+     translate(fanTabL)
+	  rotate([0,0,realFanTabAngle])
+	  if(fanDirection == "left") {
+	       translate(fanScrewL)
+		    rotate([fanTabHorizontalAngle,0,0])
+		    translate(fanDuctConnectL[0])
 		    difference() {
-			 chimera_mount();
-			 
-			 chimera_mount_holes();
-		    }
+		    fan_duct();
 		    
-		    // Display cold / hot end model.
-		    if(hotend == "chimera_v6") {
-			 // Place the E3D Chimera fron Jons.
-			 translate([(chiWidth / 2) + chiBraceThickness,
-				    chiColdDepth - 2, // 6 is there to offset the fan in the e3d model, used to line everything up properly
-				    -chiColdHeight])
-			      %e3d();
-		    }
+		    fan_duct_holes();
 	       }
 	  }
-     }
-
-     // Opposite side carriage plate.
-     if(cBotWhich == "carrside" || cBotWhich == "all") {
-	  // Non hot end carriage side.
-	  translate([cBotCarriageWidth, cBotCarriageSideDistance, 0])
-	       rotate([0, 0, 180])
-	       cbot_carriage_side(false);
-     }
-
-     // Fan Mount Bracket
-     if(cBotWhich == "fant" || cBotWhich == "all") {
-	  // Place the fan tab.
-	  translate(cBotFanScrewL)
-	       rotate([0, 0, 180])
-	       bracket_fan_tab(cBotFanBracketWidth, cBotFanBracketDepth, cBotFanBracketHeight, cBotBeltScrewDiameter,
-			       cBotFanMountDistance,
-			       cBotFanTabWidth, cBotFanTabDepth, cBotFanTabHeight,
-			       cBotFanTabHole, cBotFanTabMat, cBotFanScrewOffset);
-     }
-     
-     // Fan Mount
-     if(cBotWhich == "fanm" || cBotWhich == "all") {
-	  translate(cBotFanScrewL)
-	       rotate([0, 0, 180])
-	       fan_mount(cBotFanTabHole, cBotFanTabMat, cBotFanTabWidth, fanTabNubClear, fanMountThickness, cBotFanBarWidth, fanMountOffset, fanCenterOffset, fanMountScrewDiameter, fanMountScrewMat, fanMountScrews, fanIntakeDiameter);
-     }
-
-     // Display fan if needed
-     if(showFan == true && (cBotWhich == "all" || cBotWhich == "fanm")) {
-	  if(cBotFanDirection == "right") {
-	       // Place the fan for reference..
-	       rotate([0,-90,cBotRealFanTabVerticalAngle])
-		    translate([cBotFanScrewL[2],cBotFanScrewL[1],-cBotFanScrewL[0]])
-		    rotate([0,0,-cBotFanTabHorizontalAngle])
-		    translate([fanMountOffset[2],
-			       ((cBotFanTabHole / 2) + cBotFanTabMat + fanMountThickness + fanMountOffset[1]),
-			       fanMountOffset[0]])
-		    %blower_fan_50_20();
-	  }
 	  else {
-	       rotate([0,-90,180 + cBotRealFanTabVerticalAngle])
-		    translate([cBotFanScrewL[2],-cBotFanScrewL[1],cBotFanScrewL[0]])
-		    rotate([0,0,cBotFanTabHorizontalAngle])
-		    translate([fanMountOffset[2],
-			       -((cBotFanTabHole / 2) + cBotFanTabMat + fanMountThickness + fanMountOffset[1] + fanDimensions[1]),
-			       fanMountOffset[0]])
-		    %blower_fan_50_20();
+	       translate(fanScrewL)
+		    rotate([fanTabHorizontalAngle,0,0])
+		    translate(fanDuctConnectL[1])
+		    difference() {
+		    fan_duct();
+		    
+		    fan_duct_holes();
+	       }
 	  }
-     }
+}
 
-     // Display fan duct if needed
-     if((cBotWhich == "all" || cBotWhich == "duct") && cBotFanSide != "none") {
-	  // Place the fan duct.
-	  translate(cBotFanScrewL)
-	       rotate([cBotFanTabHorizontalAngle,0,cBotFanTabVerticalAngle])
-	       translate(cBotFanDirection == "left" ? cBotDuctConnectL[1] : cBotDuctConnectL[0])
-	       difference() {
-	       fan_duct(cBotFanDirection == "left" ? cBotDuctConnectL[1] : cBotDuctConnectL[0],
-			cBotFanScrewL, cBotChiAnchorL, cBotFanTabHorizontalAngle, cBotRealFanTabVerticalAngle, true);
-	       
-	       fan_duct_holes(cBotFanDirection == "left" ? cBotDuctConnectL[1] : cBotDuctConnectL[0],
-			      cBotFanScrewL, cBotChiAnchorL, cBotFanTabHorizontalAngle, cBotRealFanTabVerticalAngle, true);
-	  }
-     }
-     
-     // Belt holders.
-     if(cBotWhich == "belth" || cBotWhich == "all") {
-	  translate([-15,0,0])
-	       cbot_belt_holder();
+// Servo Bracket
+if((which == "servo" || which == "all") && servo_mag == "servo") {
+     // Place the Servo Bracket.
+     translate(servoBracketL)
+	  difference() {
+	       servo_bracket();
+	  
+	       servo_bracket_holes();
      }
 }
 
-//////// Component Modules /////////
+// Z Probe Arm
+if((which == "zarm" || which == "all") && servo_mag == "servo" && servo_mag != "none") {
+     // Place the Z Probe Arm
+     translate(zProbeTopL)
+	  difference() {
+	       z_probe_arm();
+	  
+	       z_probe_arm_holes();
+     }
+}
 
-// Prusa i3 X Carriage back plane for the mount.
-module xback_plane(xw=xMountWidth,
-		   xh=xMountHeight,
-		   xd=xMountDepth,
-		   xc=xMountCornerRadius) {
+// Start of code that creates the objects.
+
+// Create module for the X Carriage Mount portion of the back plane.
+module xback_plane(xw=xWidth,
+		  xh=xHeight,
+		  xd=xDepth,
+		  xc=xCornerRadius) {
      // Round out the corners, smoothly
      $fn=100;
 
@@ -715,31 +510,31 @@ module xback_plane(xw=xMountWidth,
      hull() {
 	  // Create the round edges on left edge. Will take care of round corners on right side later.
 	  // Bottom Left
-	  translate([xMountCornerRadius,0,xMountCornerRadius])
+	  translate([xCornerRadius,0,xCornerRadius])
 	       rotate([90,0,0])
-	       cylinder(r=xMountCornerRadius,h=xMountDepth);
+	       cylinder(r=xCornerRadius,h=xDepth);
 	  // Top Left
-	  translate([xMountCornerRadius,0,xMountHeight-xMountCornerRadius])
+	  translate([xCornerRadius,0,xHeight-xCornerRadius])
 	       rotate([90,0,0])
-	       cylinder(r=xMountCornerRadius,h=xMountDepth);
+	       cylinder(r=xCornerRadius,h=xDepth);
 	  // Bottom Right
-	  translate([xMountWidth - xMountCornerRadius,0,xMountCornerRadius])
+	  translate([xWidth - xCornerRadius,0,xCornerRadius])
 	       rotate([90,0,0])
-	       cylinder(r=xMountCornerRadius,h=xMountDepth);
+	       cylinder(r=xCornerRadius,h=xDepth);
 	  // Top Right
-	  translate([xMountWidth - xMountCornerRadius,0,xMountHeight-xMountCornerRadius])
+	  translate([xWidth - xCornerRadius,0,xHeight-xCornerRadius])
 	       rotate([90,0,0])
-	       cylinder(r=xMountCornerRadius,h=xMountDepth);
-	  translate([xMountCornerRadius,-xMountDepth,0])
-	       cube([xMountWidth - (xMountCornerRadius * 2),xMountDepth,xMountHeight]);
+	       cylinder(r=xCornerRadius,h=xDepth);
+	  translate([xCornerRadius,-xDepth,0])
+	       cube([xWidth - (xCornerRadius * 2),xDepth,xHeight]);
      }
 }
 
 module xback_holes() {
-     lrVec = [(xMountWidth / 2) - (xMountHoleWidth / 2),
-	      xMountWidth - ((xMountWidth / 2) - (xMountHoleWidth / 2))];
-     udVec = [(xMountHeight / 2) - (xMountHoleHeight / 2),
-	      xMountHeight - ((xMountHeight / 2) - (xMountHoleHeight / 2))];
+     lrVec = [(xWidth / 2) - (mountHoleWidth / 2),
+	      xWidth - ((xWidth / 2) - (mountHoleWidth / 2))];
+     udVec = [(xHeight / 2) - (mountHoleHeight / 2),
+	      xHeight - ((xHeight / 2) - (mountHoleHeight / 2))];
      
      // Insert the X Carriage bolt holes and nut traps.
      for(lr = lrVec) {
@@ -752,64 +547,46 @@ module xback_holes() {
 }
 
 // Create module for the bolt hole and nut trap.
-module bolt_hole(bdia=xMountBoltDiameter,
-		 bdep=xMountBoltDepth,
-		 ndia=xMountNutDiameter,
-		 ndep=xMountNutDepth) {
+module bolt_hole(bdia=boltDiameter,
+		 bdep=boltDepth,
+		 ndia=nutDiameter,
+		 ndep=nutDepth) {
      union() {
 	  // Note we shift the cylinders in the z axis by .1 and make then .2 bigger to avoid coincident faces.
 	  // Screw hole
 	  translate([0,0,-.1])
-	       cylinder(d=bdia,h=bdep + .2,$fn=100);
+	       #cylinder(d=bdia,h=bdep + .2,$fn=100);
 	  // Nut Trap
-	  translate([0,0,bdep])
-	       cylinder(d=ndia,h=ndep + .1,$fn=6);
+	  translate([0,0,bdep - .1])
+	       #cylinder(d=ndia,h=ndep + .2,$fn=6);
      }
 }
 
 // Chimera Cold End Mount
-module chimera_mount(bracePos="below", fanTabAngle, fanTabWidth, fanTabDepth, fanTabHeight, fanTabHole, fanTabHoleMat, fanSide) {
+module chimera_mount() {
      // Create the mount top plate and braces for the Chimera mount plate.
      union() {
 	  // Create the top plate to hang the Chimera from.
-	  hull() {
-	       cube([chiMountWidth, chiMountDepth + .1, chiMountThickness]);
+	  cube([chiMountWidth, chiMountDepth + .1, chiMountThickness]);
 
-	       // Attach fan tab if needed.
-	       if(carriage == "prusai3" && prusai3FanSide != "none") {
-		    translate([fanSide == "left" ? 0 : chiMountWidth, 0, 0])
-			 rotate([0, 0, fanTabAngle])
-			 translate([- (fanTabWidth / 2), - fanTabDepth, 0])
-			 cube([fanTabWidth, fanTabDepth, fanTabHeight]);
-		    
-	       }
-	  }	       
 	  // Left Brace
 	  hull() {
 	       // Horizontal
-	       translate([0,
-			  (chiMountDepth - chiBraceLength),
-			  bracePos == "below" ? 0 : chiMountThickness - .1])
+	       translate([0, (chiMountDepth - chiBraceLength), 0])
 		    cube([chiBraceThickness, chiBraceLength + .1, .1]);
 
 	       // Vertical
-	       translate([0,
-			  chiMountDepth,
-			  bracePos == "below" ? -chiBraceHeight : chiMountThickness - .1])
-		    cube([chiBraceThickness, .1, chiBraceHeight + .1]);
+	       translate([0, chiMountDepth, -chiBraceHeight])
+		    #cube([chiBraceThickness, .1, chiBraceHeight + .1]);
 	  }
 	  // Right Brace
 	  hull() {
 	       // Horizontal
-	       translate([chiMountWidth - chiBraceThickness,
-			  (chiMountDepth - chiBraceLength),
-			  bracePos == "below" ? 0 : chiMountThickness - .1])
+	       translate([chiMountR, (chiMountDepth - chiBraceLength), 0])
 		    cube([chiBraceThickness, chiBraceLength + .1, .1]);
 
 	       // Vertical
-	       translate([chiMountWidth - chiBraceThickness,
-			  chiMountDepth,
-			  bracePos == "below" ? -chiBraceHeight : chiMountThickness - .1])
+	       translate([chiMountR, chiMountDepth, -chiBraceHeight])
 		    cube([chiBraceThickness, .1, chiBraceHeight + .1]);
 	  }	  
      }
@@ -822,425 +599,368 @@ module chimera_mount_holes() {
      for(i = chiScrewLocs) {
 	  // Create the screw hole and move it to the correct location.
 	  translate([i[0], i[1], -.1])
-	       cylinder(r=(chiScrewHole /2),h=chiScrewHoleHeight, $fn=100);
+	       #cylinder(r=(chiScrewHole /2),h=chiScrewHoleHeight, $fn=100);
 
 	  // Create an space for the screw head, used to clear space from the fan tab.
 	  translate([i[0], i[1], chiMountThickness])
-	       cylinder(r=3, h=5, 0, $fn=100);
+	       cylinder(r=3,
+			 h= (chiMountThickness < (fanTabHole + (fanTabHoleMat * 2))) ? ((fanTabHole + (fanTabHoleMat * 2)) - chiMountThickness) + .1 :
+			 0,
+	                 $fn=100);
      }
      
      for(i = chiBowdenLocs) {
 	  // Create the screw hole and move it to the correct location.
 	  translate([i[0], i[1], -.1])
-	       cylinder(r=(chiBowdenHole /2),h=chiBowdenHoleHeight, $fn=100);
+	       #cylinder(r=(chiBowdenHole /2),h=chiBowdenHoleHeight, $fn=100);
      }
 }
 
-// Fan tab items.
-module bracket_fan_tab(bracketWidth, bracketDepth, bracketHeight, bracketScrewDiameter, screwDistance,
-		       tabWidth, tabDepth, tabHeight, tabHole, tabHoleMat, screwOffset) {
-     difference() {
-	  union() {
-	       // Create the bracket.
-	       translate([-(bracketWidth / 2), (tabHole / 2) + tabHoleMat + tabDepth, - (bracketHeight / 2)])
-	       cube([bracketWidth, bracketDepth, bracketHeight]);
-	       
-	       // Add the fan tab.
-	       fan_tab(screwOffset, tabWidth, tabDepth + .1, tabHeight, tabHole, tabHoleMat);
-	  }
+// Create the fan mount tab
+module fan_tab() {
+     // Create the tab and screw hole to hang the fan off of.
+     hull() {
+	  // Hull from the backplane where the cold end mount connects. Works for both left and right mount configurations.
+	  translate([fanSide == "left" ? 0 :
+		     -chiMountWidth,
+		     chiMountDepth, 0])
+	       cube([chiMountWidth, .1, chiMountThickness]);
 
-	  // Carve out the holes for the fan tab.
-	  fan_tab_holes(tabWidth, tabDepth, tabHeight, tabHole, tabHoleMat);
+	  // Hull from the front of the cold end mount as well.
+	  translate([fanSide == "left" ? 0 :
+		     -chiMountWidth,
+		     0, 0])
+	       cube([chiMountWidth, .1, chiMountThickness]);
 
-	  // Carve hole the mount holes.
-	  translate([- (screwDistance / 2), (tabHole / 2) + tabHoleMat + tabDepth + bracketDepth + .1, 0])
-	       rotate([90,0,0])
-	       cylinder(d=bracketScrewDiameter, h=bracketDepth + .2, $fn=100);
-
-	  translate([(screwDistance / 2), (tabHole / 2) + tabHoleMat + tabDepth + bracketDepth + .1, 0])
-	       rotate([90,0,0])
-	       cylinder(d=bracketScrewDiameter, h=bracketDepth + .2, $fn=100);
+	  rotate([0,0,realFanTabAngle])
+	       translate([-(fanTabWidth / 2), -fanTabDepth + 5, 0])
+	       cube([fanTabWidth, fanTabDepth + 5, chiMountThickness]);
      }
-}
-
-module fan_tab(screwOffset, tabWidth, tabDepth, tabHeight, tabHole, tabHoleMat) {
+     
      hull() {
 	  // Recreate the tab so we can hull to it without hull the whole front and side of Chimera Mount
-	  translate([-(tabWidth / 2), (tabHole / 2) + tabHoleMat, - (tabHeight / 2) + screwOffset])
-	       cube([tabWidth, tabDepth +.1, tabHeight]);
+	  rotate([0,0,realFanTabAngle])
+	       translate([-(fanTabWidth / 2), -fanTabDepth + 5, 0])
+	       cube([fanTabWidth, fanTabDepth + 5, chiMountThickness]);
+	  
 	  
 	  // Create the cylinder for the fan mount screw.
-	  rotate([0,90,0])
-	       translate([0, 0, -(tabWidth / 2)])
-	       cylinder(r=(tabHole / 2) + tabHoleMat, h=tabWidth, $fn=100);
+	  rotate([0,90,realFanTabAngle])
+	       translate([-fanScrewL[2],fanScrewL[1],fanScrewL[0]])
+	       cylinder(r=(fanTabHole / 2) + fanTabHoleMat, h=fanTabWidth, center=true, $fn=100);
      }
 }
 
-module fan_tab_holes(tabWidth, tabDepth, tabHeight, tabHole, tabHoleMat) {
-     // Create the cylinder for the fan mount screw.
-     rotate([0,90,0])
-	  translate([0, 0, -((tabWidth / 2) + .1)])
-	  cylinder(d=tabHole, h=tabWidth + .2, $fn=100);
-     
-     // Carve out the sides of the screw nub.
-     rotate([0,90,0])
-	  translate([0, 0, - ((tabWidth / 2) + 10)])
-	  cylinder(d=tabHole + (tabHoleMat * 2), h=10, $fn=100);
-     
-     rotate([0,90,0])
-	  translate([0, 0, (tabWidth / 2)])
-	  cylinder(d=tabHole + (tabHoleMat * 2), h=10, $fn=100);
+module fan_tab_holes() {
+     // Carve the hole for the screw on the mount.
+     rotate([0,90,realFanTabAngle])
+	  translate([-fanScrewL[2],fanScrewL[1],fanScrewL[0]])
+	  #cylinder(r=(fanTabHole / 2), h=fanTabWidth + .2, center=true, $fn=100);
 }
 
 // Servo probe extension
-module servo_ext(servoBracketL) {
+module servo_ext() {
      // Create the extension for the z Probe Servo.
      hull() {
-	  translate([ prusai3ZProbeSide == "right" ?
-		      servoBracketL[0] - xMountCornerRadius :
-		      servoBracketL[0] + xMountCornerRadius,
-		      0,xMountCornerRadius])
+	  translate([ zProbeSide == "right" ?
+		      servoBracketL[0] - xCornerRadius :
+		      servoBracketL[0] + xCornerRadius,
+		      0,xCornerRadius])
 	       rotate([90,0,0])
-	       cylinder(r=xMountCornerRadius, h=xMountDepth, $fn=100);
+	       cylinder(r=xCornerRadius,h=xDepth);
 	  
-	  translate([ prusai3ZProbeSide == "right" ?
-		      servoBracketL[0] - xMountCornerRadius :
-		      servoBracketL[0] + xMountCornerRadius,
-		      0,xMountHeight-xMountCornerRadius])
+	  translate([ zProbeSide == "right" ?
+		      servoBracketL[0] - xCornerRadius :
+		      servoBracketL[0] + xCornerRadius,
+		      0,xHeight-xCornerRadius])
 	       rotate([90,0,0])
-	       cylinder(r=xMountCornerRadius, h=xMountDepth, $fn=100);
+	       cylinder(r=xCornerRadius,h=xDepth);
 	  
-	  translate([ prusai3ZProbeSide == "right" ?
-		      xMountWidth - probeExtWidth - .1 :
+	  translate([ zProbeSide == "right" ?
+		      xWidth - probeExtWidth - .1 :
 		      -probeExtWidth - .1,
-		      -xMountDepth, 0])
-	       cube([probeExtWidth + xMountCornerRadius + .1, xMountDepth, xMountHeight]);
+		      -xDepth, 0])
+	  cube([probeExtWidth + xCornerRadius + .1, xDepth, xHeight]);
      }
      
      // Create the servo bracket tabs.
      hull () {
 	  // Bottom
 	  translate([servoBracketL[0],
-		     servoBracketL[1] + xMountDepth,
+		     servoBracketL[1] + xDepth,
 		     servoBracketL[2] + servoBracketBotScrewL[2]])
 	       rotate([90,0,0])
-	       cylinder(r=(servoBracketNutDiameter / 2) + servoBracketMat, h=xMountDepth, $fn=100);
+	       cylinder(r=(servoBracketNutDiameter / 2) + servoBracketMat, h=xDepth, $fn=100);
 
 	  // Top
 	  translate([servoBracketL[0],
-		     servoBracketL[1] + xMountDepth,
+		     servoBracketL[1] + xDepth,
 		     servoBracketL[2] + servoBracketTopScrewL[2]])
 	       rotate([90,0,0])
-	       cylinder(r=(servoBracketNutDiameter / 2) + servoBracketMat, h=xMountDepth, $fn=100);
+	       cylinder(r=(servoBracketNutDiameter / 2) + servoBracketMat, h=xDepth, $fn=100);
      }
 }
 
-module servo_ext_holes(servoBracketL) {
+module servo_ext_holes() {
      // Create the holes needed for the z probe extension.
      // Bottom
      translate([servoBracketL[0],
 		servoBracketL[1],
 		servoBracketL[2] + servoBracketBotScrewL[2]])
 	  rotate([-90,0,0])
-	  bolt_hole(servoBracketScrewDiameter, xMountDepth - servoBracketNutDepth, servoBracketNutDiameter, servoBracketNutDepth);
+	  bolt_hole(servoBracketScrewDiameter, xDepth - servoBracketNutDepth, servoBracketNutDiameter, servoBracketNutDepth);
 
      // Top
      translate([servoBracketL[0],
 		servoBracketL[1],
 		servoBracketL[2] + servoBracketTopScrewL[2]])
 	  rotate([-90,0,0])
-	  bolt_hole(servoBracketScrewDiameter, xMountDepth - servoBracketNutDepth, servoBracketNutDiameter, servoBracketNutDepth);
+	  bolt_hole(servoBracketScrewDiameter, xDepth - servoBracketNutDepth, servoBracketNutDiameter, servoBracketNutDepth);
 }
 
-// Fan Mount for Blower / Centrifugal Fan
-module fan_mount(tabHole, tabHoleMat, tabWidth, tabClear, thickness, barWidth, mountOffset, centerOffset, fanScrewDiameter, fanScrewMat, fanScrews, intakeDiameter, fanDirection) {
+// Fan Mount for 50x20mm Blower / Centrifugal Fan
+module fan_mount() {
      difference() {
 	  union() {
 	       // Create mount nub and connection to fan mount.
-	       fan_mount_nub(tabHole, tabHoleMat, thickness, barWidth);
+	       fan_mount_nub();
 	       
 	       // Spin up the base..
 	       if(fanDirection == "right") {
-		    fan_mount_base(tabHole, tabHoleMat, thickness, barWidth, mountOffset, fanScrewDiameter, fanScrewMat, fanScrews);
+		    fan_mount_base();
 	       }
 	       else {
-		    translate([0,- (tabHole + (tabHoleMat * 2) + thickness),0])
-			 rotate([0,0,180])
-			 fan_mount_base(tabHole, tabHoleMat, thickness, barWidth, mountOffset, fanScrewDiameter, fanScrewMat, fanScrews);
+		    translate([0,- (fanTabHole + (fanTabHoleMat * 2) + fanMountThickness),0])
+		    rotate([0,0,180])
+			 fan_mount_base();
 	       }
 	  }
 	  // Remove the center of the nub.
-	  fan_mount_nub_holes(tabHole, tabHoleMat, tabWidth, tabClear, barWidth);
+	  fan_mount_nub_holes();
 	  
 	  // Remove the holes and gaps.
 	  if(fanDirection == "right") {
-	       fan_mount_holes(tabHole, tabHoleMat, thickness, mountOffset, centerOffset, fanScrewDiameter, fanScrewMat, fanScrews, intakeDiameter);
+	       fan_mount_holes();
 	  }
 	  else {
-	       translate([0,- (tabHole + (tabHoleMat * 2) + thickness),0])
+	       translate([0,- (fanTabHole + (fanTabHoleMat * 2) + fanMountThickness),0])
 		    rotate([0,0,180])
-		    fan_mount_holes(tabHole, tabHoleMat, thickness, mountOffset, centerOffset, fanScrewDiameter, fanScrewMat, fanScrews, intakeDiameter);
+		    fan_mount_holes();
 	  }
      }
 }
 
-module fan_mount_nub(tabHole, tabHoleMat, thickness, barWidth) {
+module fan_mount_nub() {
      // Create the cylinder and cube that we hull with so have something to have the mount off of.
      hull() {
 	  // Create the nub cylinder.
 	  rotate([0,90,0])
-	       cylinder(r=(tabHole / 2) + tabHoleMat, h=barWidth, center=true, $fn=100);
+	       cylinder(r=(fanTabHole / 2) + fanTabHoleMat, h=fanBarWidth, center=true, $fn=100);
 	  
 	  // This is what we will hull to, to merge the nubs to the rest of the fan mount.
 	  translate([0,
-		     -((tabHole / 2) + tabHoleMat + (thickness / 2)),
+		     -((fanTabHole / 2) + fanTabHoleMat + (fanMountThickness / 2)),
 		     0])
-	       cube([barWidth,thickness,tabHole + (tabHoleMat * 2)], center=true);
+	       cube([fanBarWidth,fanMountThickness,fanTabHole + (fanTabHoleMat * 2)], center=true);
      }
 }
     
-module fan_mount_base(tabHole, tabHoleMat, thickness, barWidth, mountOffset, fanScrewDiameter, fanScrewMat, fanScrews) {
+module fan_mount_base() { ///////// TO DO: NEED TO PARAMETIZE THE FAN SCREW LOCATIONS BELOW ///////////////
      hull() {
+	  // Need to recreate the cube in the middle of the mount and hull to the fan mount holes to ensure solid contact. Otherwise fan mount to nub contact isn't complete.
 	  translate([0,
-		     -((tabHole / 2) + tabHoleMat + (thickness / 2)),
+		     -((fanTabHole / 2) + fanTabHoleMat + (fanMountThickness / 2)),
 		     0])
-	       cube([barWidth,thickness,tabHole + (tabHoleMat * 2)], center=true);
+	       cube([fanBarWidth,fanMountThickness,fanTabHole + (fanTabHoleMat * 2)], center=true);
 
-	  // Create the fan mount.
-	  fan_screw_hole_single(tabHole,
-				tabHoleMat,
-				fanScrewDiameter + fanScrewMat,
-				thickness,
-				thickness,
-				fanScrews[0][0] + .1 + mountOffset[0],
-				mountOffset[1],
-				fanScrews[0][1] + mountOffset[2]);
-	  fan_screw_hole_single(tabHole,
-				tabHoleMat,
-				fanScrewDiameter + fanScrewMat,
-				thickness,
-				thickness,
-				- abs(fanScrews[1][0] + .1) + mountOffset[0],
-				mountOffset[1],
-				fanScrews[1][1] + mountOffset[2]);
-	  fan_screw_hole_single(tabHole,
-				tabHoleMat,
-				fanScrewDiameter + fanScrewMat,
-				thickness,
-				thickness,
-				- abs(fanScrews[2][0] + .1) + mountOffset[0],
-				mountOffset[1],
-				- abs(fanScrews[2][1]) + mountOffset[2]);
+	  fan_screw_hole_single(5.25,fanMountThickness,21.1 + fanMountOffset[0], 0 + fanMountOffset[1], 20 + fanMountOffset[2]);
+	  fan_screw_hole_single(5.25,fanMountThickness,-22.1 + fanMountOffset[0], 0 + fanMountOffset[1], 20 + fanMountOffset[2]);
+	  fan_screw_hole_single(5.25,fanMountThickness,-22.1 + fanMountOffset[0], 0 + fanMountOffset[1], -18 + fanMountOffset[2]);
      }
 }
 
-module fan_mount_nub_holes(tabHole, tabHoleMat, tabWidth, tabClear, barWidth) {
+module fan_mount_nub_holes() {
      // Remove the fan tab to create the separate nubs.
      rotate([0,90,0])
-	  cylinder(r=(tabHole / 2) + tabHoleMat + tabClear, h=tabWidth + (tabClear * 2), center=true, $fn=100);
+	  cylinder(r=(fanTabHole / 2) + fanTabHoleMat + fanTabNubClear, h=fanTabWidth + (fanTabNubClear * 2), center=true, $fn=100);
 
      // Carve out the screw / bolt hole.
      rotate([0,90,0])
-	  cylinder(d=tabHole, h=(barWidth + .2), center=true, $fn=100);
+	  #cylinder(r=(fanTabHole / 2), h=(fanBarWidth + .2), center=true, $fn=100);
 }
 
-module fan_mount_holes(tabHole, tabHoleMat, thickness, mountOffset, centerOffset, fanScrewDiameter, fanScrewMat, fanScrews, intakeDiameter) {
+module fan_mount_holes() {
      // Carve out the fan mounting holes
-     fan_screw_hole_single(tabHole,
-			   tabHoleMat,
-			   fanScrewDiameter,
-			   thickness,
-			   thickness + .2,
-			   fanScrews[0][0] + .1 + mountOffset[0],
-			   mountOffset[1],
-			   fanScrews[0][1] + mountOffset[2]);
-     fan_screw_hole_single(tabHole,
-			   tabHoleMat,
-			   fanScrewDiameter,
-			   thickness,
-			   thickness + .2,
-			   - abs(fanScrews[1][0] + .1) + mountOffset[0],
-			   mountOffset[1],
-			   fanScrews[1][1] + mountOffset[2]);
-     fan_screw_hole_single(tabHole,
-			   tabHoleMat,
-			   fanScrewDiameter,
-			   thickness,
-			   thickness + .2,
-			   - abs(fanScrews[2][0] + .1) + mountOffset[0],
-			   mountOffset[1],
-			   - abs(fanScrews[2][1]) + mountOffset[2]);
+     #fan_screw_hole_single(2.25,fanMountThickness + .2,21.1 + fanMountOffset[0], 0 + fanMountOffset[1], 20 + fanMountOffset[2]);
+     #fan_screw_hole_single(2.25,fanMountThickness + .2,-22.1 + fanMountOffset[0], 0 + fanMountOffset[1], 20 + fanMountOffset[2]);
+     #fan_screw_hole_single(2.25,fanMountThickness + .2,-22.1 + fanMountOffset[0], 0 + fanMountOffset[1], -18 + fanMountOffset[2]);
 
      // Cut out opening for air intake. Leave legs for securing mount to fan tab.
-     translate([centerOffset[0] + mountOffset[0],
-		-((tabHole / 2) + tabHoleMat) + centerOffset[1] + mountOffset[1] +.1,
-		centerOffset[2] + mountOffset[2]])
+     translate([0 + fanCenterOffset[0] + fanMountOffset[0],
+		-((fanTabHole / 2) + fanTabHoleMat) + fanCenterOffset[1] + fanMountOffset[1] +.1,
+		fanCenterOffset[2] + fanMountOffset[2]])
 	  difference() {
-	  rotate([90,0,0])
-	       rotate_extrude($fn=200) {
+	  #rotate([90,0,0])
+	  rotate_extrude($fn=200) {
 	       translate([9,0,0])
 		    difference() {
-		    square([(intakeDiameter / 2), thickness + .2]);
+		    square([10, fanMountThickness + .2]);
 		    
 		    translate([-2,2,0])
 			 circle(r=3);
 		    
-		    translate([(intakeDiameter / 2) + 2,2,0])
+		    translate([12,2,0])
 			 circle(r=3);
 	       }
 	  }
 
 	  // Need to move the legs back, otherwise they end up twice as far as they should be
 	  // fan_screw_hole_single moves them as well as the translate above.
-	  translate([0, (tabHole / 2) + tabHoleMat, 0]) {
+	  translate([0, (fanTabHole / 2) + fanTabHoleMat, 0]) {
 	       hull() {
-		    fan_screw_hole_single(tabHole,
-					  tabHoleMat,
-					  fanScrewDiameter + fanScrewMat,
-					  thickness,
-					  thickness + .2,
-					  0,
-					  -.1,
-					  0);
-		    fan_screw_hole_single(tabHole,
-					  tabHoleMat,
-					  fanScrewDiameter + fanScrewMat,
-					  thickness,
-					  thickness + .2,
-					  fanScrews[0][0] + mountOffset[0],
-					  mountOffset[1],
-					  fanScrews[0][1] + mountOffset[2]);
+		    fan_screw_hole_single(2.25,fanMountThickness + .2, 0, -.1, 0);
+		    fan_screw_hole_single(2.25,fanMountThickness + .2,21 + fanMountOffset[0], fanMountOffset[1], 20 + fanMountOffset[2]);
 	       }
 	       hull() {
-		    fan_screw_hole_single(tabHole,
-					  tabHoleMat,
-					  fanScrewDiameter + fanScrewMat,
-					  thickness,
-					  thickness + .2,
-					  0,
-					  -.1,
-					  0);
-		    fan_screw_hole_single(tabHole,
-					  tabHoleMat,
-					  fanScrewDiameter + fanScrewMat,
-					  thickness,
-					  thickness + .2,
-					  - abs(fanScrews[1][0]) + mountOffset[0],
-					  mountOffset[1],
-					  fanScrews[1][1] + mountOffset[2]);
+		    fan_screw_hole_single(2.25,fanMountThickness + .2, 0, -.1, 0);
+		    fan_screw_hole_single(2.25,fanMountThickness + .2,-22 + fanMountOffset[0], fanMountOffset[1], 20 + fanMountOffset[2]);
 	       }
 	       hull() {
-		    fan_screw_hole_single(tabHole,
-					  tabHoleMat,
-					  fanScrewDiameter + fanScrewMat,
-					  thickness,
-					  thickness + .2,
-					  0,
-					  -.1,
-					  0);
-		    fan_screw_hole_single(tabHole,
-					  tabHoleMat,
-					  fanScrewDiameter + fanScrewMat,
-					  thickness,
-					  thickness + .2,
-					  - abs(fanScrews[2][0]) + mountOffset[0],
-					  mountOffset[1],
-					  - abs(fanScrews[2][1]) + mountOffset[2]);
+		    fan_screw_hole_single(2.25,fanMountThickness + .2, 0, -.1, 0);
+		    fan_screw_hole_single(2.25,fanMountThickness + .2,-22 + fanMountOffset[0], fanMountOffset[1], -18 + fanMountOffset[2]);
 	       }
 	  }
      }
 }
 
-module fan_screw_hole_single(tabHole, tabHoleMat, diameter, thickness, height, x, y, z) {
+module fan_screw_hole_single(radius,height,x,y,z) {
      rotate([90,0,0])
 	  translate([x,
 		     z,
-		     (tabHole / 2) + tabHoleMat + (thickness / 2) + y])
-	  cylinder(d=diameter,h=height,$fn=100,center=true);
+		     (fanTabHole / 2) + fanTabHoleMat + (fanMountThickness / 2) + y])
+	  cylinder(r=radius,h=height,$fn=100,center=true);
 }
 
 // Fan Duct
-module fan_duct(ductConnectL, fanScrewL, chiAnchorL, tabHorizontalAngle, tabVerticalAngle, reverseY=false) {
+module fan_duct() {
      // Simple fan duct to get something working for now.
      // Create the connection to the fan.
      translate([-fanDuctThickness, -fanDuctThickness, - (fanDuctBowlDepth - fanDuctConnectRadius)])
-	  cube([fanDuctConnectSize[0] + (fanDuctThickness * 2),
-		fanDuctConnectSize[1] + (fanDuctThickness * 2),
-		fanDuctBowlDepth - fanDuctConnectRadius + fanDuctOverlap]);
+     cube([fanDuctConnectSize[0][0] + (fanDuctThickness * 2),
+	   fanDuctConnectSize[0][1] + (fanDuctThickness * 2),
+	   fanDuctBowlDepth - fanDuctConnectRadius + fanDuctOverlap]);
 
      hull() {
 	  // Recreate the body of the fan shroud so we can hull to it.
 	  translate([-fanDuctThickness, -fanDuctThickness, - (fanDuctBowlDepth - fanDuctConnectRadius) - .1])
-	       cube([fanDuctConnectSize[0] + (fanDuctThickness * 2),
-		     fanDuctConnectSize[1] + (fanDuctThickness * 2),
-		     .1]);
+	  cube([fanDuctConnectSize[0][0] + (fanDuctThickness * 2),
+		fanDuctConnectSize[0][1] + (fanDuctThickness * 2),
+		.1]);
 
 	  // Round out the bottom a bit
 	  translate([-fanDuctThickness,
 		     fanDuctConnectRadius,
 		     - (fanDuctBowlDepth - fanDuctConnectRadius) - fanDuctConnectRadius - fanDuctThickness])
 	       rotate([0,90,0])
-	       cylinder(r=(fanDuctConnectRadius + fanDuctThickness), h=fanDuctConnectSize[0] + (fanDuctThickness * 2),$fn=100);
+	       cylinder(r=(fanDuctConnectRadius + fanDuctThickness), h=fanDuctConnectSize[0][0] + (fanDuctThickness * 2),$fn=200);
 
 	  // Create the outlets.
 	  // First determine which hot end is in use.
 	  if(hotend == "chimera_v6") {
-	       chimera_v6_fan_duct(ductConnectL, fanScrewL, chiAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, false, reverseY);
+	       chimera_v6_fan_duct(fanDuctThickness);
 	  }
      }
 }
 
-module fan_duct_holes(ductConnectL, fanScrewL, chiAnchorL, tabHorizontalAngle, tabVerticalAngle, reverseY=false) {
+module fan_duct_holes() {
      // Carve out the inside part of connection to the fan.
      translate([0,0, - (fanDuctBowlDepth - fanDuctConnectRadius) - .1])
-	  cube([fanDuctConnectSize[0],
-		fanDuctConnectSize[1],
-		fanDuctBowlDepth - fanDuctConnectRadius + fanDuctOverlap + .2]);
+     #cube([fanDuctConnectSize[0][0],
+	   fanDuctConnectSize[0][1],
+	   fanDuctBowlDepth - fanDuctConnectRadius + fanDuctOverlap + .2]);
 
-     hull() {
+     #hull() {
 	  // Recreate the body of the fan shroud so we can hull to it.
 	  translate([0,0, - (fanDuctBowlDepth - fanDuctConnectRadius) - .1])
-	       cube([fanDuctConnectSize[0],
-		     fanDuctConnectSize[1],
-		     .2]);
+	  cube([fanDuctConnectSize[0][0],
+		fanDuctConnectSize[0][1],
+		.2]);
 
 	  // Round out the bottom a bit
 	  translate([0,
 		     fanDuctConnectRadius,
 		     - (fanDuctBowlDepth - fanDuctConnectRadius) - fanDuctConnectRadius])
 	       rotate([0,90,0])
-	       cylinder(r=(fanDuctConnectRadius), h=fanDuctConnectSize[0],$fn=100);
+	       cylinder(r=(fanDuctConnectRadius), h=fanDuctConnectSize[0][0],$fn=200);
 
 	  // Create the outlets.
 	  // First determine which hot end is in use.
 	  if(hotend == "chimera_v6") {
-	       chimera_v6_fan_duct(ductConnectL, fanScrewL, chiAnchorL, tabHorizontalAngle, tabVerticalAngle, 0, true, reverseY);
+	       chimera_v6_fan_duct(0, true);
 	  }
      }
 }
 
-module chimera_v6_fan_duct(ductConnectL, fanScrewL, chiAnchorL, tabHorizontalAngle, tabVerticalAngle, wallThickness, interior=false, reverseY=false) {
+module chimera_v6_fan_duct(wallThickness,interior=false) {
      // Chimera V6 - Nozzle 1 - Both Nozzles
      for(a=[0:1]) {
-	  // Start the process of placing the nozzles in the correct place. Split up to keep things simpler to understand for now.
-	  echo("ductConnectL", ductConnectL);
-	  echo("chiAnchorL", chiAnchorL);
-	  echo("fanDuctOutletNozzleOffsetL", fanDuctOutletNozzleOffsetL);
-	  echo("reverseY", reverseY);
-	  translate(-ductConnectL)
-	       rotate([-tabHorizontalAngle,0,0])
-	       rotate([0,0,-tabVerticalAngle])
-	       translate(-fanScrewL)
-	       translate(chiAnchorL)
-	       translate(chiV6NozzleL[a])
-	       translate([fanDuctOutletNozzleOffsetL[0],
-			 reverseY == false ? fanDuctOutletNozzleOffsetL[1] : - fanDuctOutletNozzleOffsetL[1],
-			 fanDuctOutletNozzleOffsetL[2]]) { // Offset from the nozzle where the outlet should be.
-	       // Rotate the duct outlets to point to the correct spot.
-	       rotate(reverseY == false ? fanDuctOutletAngle : - fanDuctOutletAngle)
-		    cube([fanDuctOutletSize[0] + (wallThickness * 2),
-			  fanDuctOutletSize[1] + (interior ? .1 : 0),
-			  fanDuctOutletSize[2] + (wallThickness * 2)], center=true);
+	  if(fanDirection == "left") {
+	       // Reset position to 0,0,0 so we can properly place the nozzle outlets everytime.
+	       translate(-fanDuctConnectL[0]) {
+		    rotate([-fanTabHorizontalAngle,0,0]) {
+			 translate(-fanScrewL) {
+			      rotate([0,0,-realFanTabAngle]) {
+				   translate(-fanTabL) {
+					// Start the process of placing the nozzles in the correct place. Split up to keep things simpler to understand for now.
+					translate([chiPosLR + (chiWidth - 30) / 2, // Account for difference in chiWidth and actual cold end width, reset to left edge
+						   -xDepth -chiColdDepthOffset, // reset to rear of cold end
+						   chiPosUD]) { // reset to top of cold end
+					     translate([chiV6NozzleL[a][0],
+							chiV6NozzleL[a][1],
+							chiV6NozzleL[a][2]]) {
+						  translate(fanDuctOutletNozzleOffsetL) { // Offset from the nozzle where the outlet should be.
+						       // Rotate the duct outlets to point to the correct spot.
+						       rotate(fanDuctOutletAngle) {
+							    cube([fanDuctOutletSize[0] + (wallThickness * 2),
+								  fanDuctOutletSize[1] + (interior ? .1 : 0),
+								  fanDuctOutletSize[2] + (wallThickness * 2)], center=true);
+						       }
+						  }
+					     }
+					}
+				   }
+			      }
+			 }
+		    }
+	       }
+	  }
+	  else {
+	       translate(-fanDuctConnectL[1]) {
+		    rotate([-fanTabHorizontalAngle,0,0]) {
+			 translate(-fanScrewL) {
+			      rotate([0,0,-realFanTabAngle]) {
+				   translate(-fanTabL) {
+					// Start the process of placing the nozzles in the correct place. Split up to keep things simpler to understand for now.
+					translate([chiPosLR + (chiWidth - 30) / 2, // Account for difference in chiWidth and actual cold end width, reset to left edge
+						   -xDepth -chiColdDepthOffset, // reset to rear of cold end
+						   chiPosUD]) { // reset to top of cold end
+					     translate([chiV6NozzleL[a][0],
+							chiV6NozzleL[a][1],
+							chiV6NozzleL[a][2]]) {
+						  translate(fanDuctOutletNozzleOffsetL) // Offset from the nozzle where the outlet should be.
+						       // Rotate the duct outlets to point to the correct spot.
+						       rotate(fanDuctOutletAngle) {
+						       cube([fanDuctOutletSize[0] + (wallThickness * 2),
+							     fanDuctOutletSize[1] + (interior ? .1 : 0),
+							     fanDuctOutletSize[2] + (wallThickness * 2)], center=true);
+						  }
+					     }
+					}
+				   }
+			      }
+			 }
+		    }
+	       }
 	  }
      }
 }
@@ -1277,22 +997,22 @@ module servo_bracket_holes() {
 		servoBracketBotScrewL[1] +.1,
 		servoBracketBotScrewL[2]])
 	  rotate([90,0,0])
-	  cylinder(d=servoBracketScrewDiameter, h=servoBracketBaseDepth + .2, $fn=100);
+	  #cylinder(d=servoBracketScrewDiameter, h=servoBracketBaseDepth + .2, $fn=100);
 
      // Top
      translate([servoBracketTopScrewL[0],
 		servoBracketTopScrewL[1] +.1,
 		servoBracketTopScrewL[2]])
 	  rotate([90,0,0])
-	  cylinder(d=servoBracketScrewDiameter, h=servoBracketBaseDepth + .2, $fn=100);
+	  #cylinder(d=servoBracketScrewDiameter, h=servoBracketBaseDepth + .2, $fn=100);
 
      // Servo hole
      translate([servoBottomLegStartL[0] - .1,
 		servoBottomLegStartL[1] + servoBracketMat,
 		servoBottomLegStartL[2] + servoLegHeight])
-	  cube([(servoBracketMat * 2) + servoBracketScrewDiameter + .2,
-		servoWidth,
-		servoHeight]);
+	  #cube([(servoBracketMat * 2) + servoBracketScrewDiameter + .2,
+		 servoWidth,
+		 servoHeight]);
 
      // Servo Screw Holes
      // Bottom
@@ -1300,18 +1020,18 @@ module servo_bracket_holes() {
 		servoBottomLegStartL[1] + servoBracketMat + (servoWidth / 2),
 		servoBottomLegStartL[2] + servoLegHeight - ((servoScrewDistance - servoHeight) / 2)])
 	  rotate([-90,0,-90])
-	  cylinder(d=servoScrewDiameter,h=((servoBracketMat * 2) + servoBracketScrewDiameter + .2), $fn=100);
+	  #cylinder(d=servoScrewDiameter,h=((servoBracketMat * 2) + servoBracketScrewDiameter + .2), $fn=100);
 
      // Top
      translate([servoTopLegStartL[0] - .1,
 		servoTopLegStartL[1] + servoBracketMat + (servoWidth / 2),
 		servoTopLegStartL[2] + ((servoScrewDistance - servoHeight) / 2)])
 	  rotate([-90,0,-90])
-	  cylinder(d=servoScrewDiameter,h=((servoBracketMat * 2) + servoBracketScrewDiameter + .2), $fn=100);
+	  #cylinder(d=servoScrewDiameter,h=((servoBracketMat * 2) + servoBracketScrewDiameter + .2), $fn=100);
 }
 
 // Z Probe Arm
-module z_probe_arm(zpl) {
+module z_probe_arm() { //////// WARNING: NEED TO MAKE THIS NOZZLE AWARE, ASSUMES CHIMERA V6 FOR NOW//////////
      // Create a couple of cylinders, hull them together to create the servo arm.
      hull() {
 	  // Create the top of the Z Probe Arm
@@ -1320,15 +1040,15 @@ module z_probe_arm(zpl) {
 	       cylinder(r=(servoHatTopDiameter / 2) + zProbeArmMat, h=zProbeThickness, $fn=100);
 	  
 	  // Create the bottom of the Z Probe Arm
-	  translate([-(zProbeThickness / 2),0,zpl])
-	       rotate([0,90,0])
-	       cylinder(r=(servoHatTopDiameter / 2) + zProbeArmMat, h=zProbeThickness, $fn=100);
+          translate([-(zProbeThickness / 2),0,zProbeBottomL[2]])
+		  rotate([0,90,0])
+		  cylinder(r=(servoHatTopDiameter / 2) + zProbeArmMat, h=zProbeThickness, $fn=100);
      }
 
      // Create the switch mount.
      hull() {
 	  // Recreate the bottom of the Z Probe Arm so we can hull to it.
-	  translate([-(zProbeThickness / 2),0,zpl])
+	  translate([-(zProbeThickness / 2),0,zProbeBottomL[2]])
 	       rotate([0,90,0])
 	       cylinder(r=(servoHatTopDiameter / 2) + zProbeArmMat, h=zProbeThickness, $fn=100);
 
@@ -1337,30 +1057,30 @@ module z_probe_arm(zpl) {
 	       translate([-(zProbeThickness / 2),
 			  b==0 ? -(zProbeScrewDistance / 2) :
 			  (zProbeScrewDistance / 2),
-			  zpl - (servoHatTopDiameter / 2)])
+			  zProbeBottomL[2] - (servoHatTopDiameter / 2)])
 		    rotate([0,90,0])
 		    cylinder(r=(zProbeScrewDiameter / 2) + zProbeArmMat, h=zProbeThickness, $fn=100);
-	  }
+	       }
      }	       
 }
 
-module z_probe_arm_holes(zpl) {
+module z_probe_arm_holes() {
      // Create the servo shaft whole.
      translate([- (zProbeThickness / 2) - .1,0,0])
-	  rotate([0,90,0])
-	  cylinder(r=(servoShaftDiameter / 2), h=zProbeThickness + .2, $fn=100);
+     rotate([0,90,0])
+	  #cylinder(r=(servoShaftDiameter / 2), h=zProbeThickness + .2, $fn=100);
      
      // Create the servo hat recess.
-     hull() {
+     #hull() {
 	  // Create the servo hat recess, top first.
-	  translate([prusai3ZProbeSide == "right" ? - servoHatRecessDepth - .1 :
+	  translate([zProbeSide == "right" ? - servoHatRecessDepth - .1 :
 		     (zProbeThickness / 2) - servoHatRecessDepth,
 		     0,0])
-	       rotate([0,90,0])
+	  rotate([0,90,0])
 	       cylinder(r=(servoHatTopDiameter / 2), h=servoHatRecessDepth + .1, $fn=100);
 	  
 	  // Create the bottom of servo hat recess.
-	  translate([prusai3ZProbeSide == "right" ? - servoHatRecessDepth - .1 :
+	  translate([zProbeSide == "right" ? - servoHatRecessDepth - .1 :
 		     (zProbeThickness / 2) - servoHatRecessDepth,
 		     0,- (servoHatLength - (servoHatTopDiameter / 2) - (servoHatTipDiameter / 2))])
 	       rotate([0,90,0])
@@ -1368,343 +1088,13 @@ module z_probe_arm_holes(zpl) {
      }
 
      // Create the holes that mount the switch.
-     // Create the cylinders for the switch mount.
+     	  // Create the cylinders for the switch mount.
      for(b=[0:1]) {
 	  translate([-(zProbeThickness / 2) - .1,
 		     b==0 ? -(zProbeScrewDistance / 2) :
 		     (zProbeScrewDistance / 2),
-		     zpl - (servoHatTopDiameter / 2)])
+		     zProbeBottomL[2] - (servoHatTopDiameter / 2)])
 	       rotate([0,90,0])
-	       cylinder(r=(zProbeScrewDiameter / 2), h=zProbeThickness + .2, $fn=100);
+	       #cylinder(r=(zProbeScrewDiameter / 2), h=zProbeThickness + .2, $fn=100);
      }
-}
-
-// Inductive / Capacitive extension
-module induct_ext() {
-     // Create the extension for the inductive / capacitive sensor.
-     hull() {
-	  translate([ prusai3ZProbeSide == "right" ?
-		      servoBracketL[0] - xMountCornerRadius + (inductMountWidth + inductBraceWidth):
-		      servoBracketL[0] + xMountCornerRadius - (inductMountWidth + inductBraceWidth),
-		      0,xMountCornerRadius])
-	       rotate([90,0,0])
-	       cylinder(r=xMountCornerRadius, h=xMountDepth, $fn=100);
-	  
-	  translate([ prusai3ZProbeSide == "right" ?
-		      servoBracketL[0] - xMountCornerRadius :
-		      servoBracketL[0] + xMountCornerRadius,
-		      0,xMountHeight-xMountCornerRadius])
-	       rotate([90,0,0])
-	       cylinder(r=xMountCornerRadius, h=xMountDepth, $fn=100);
-	  
-	  translate([ prusai3ZProbeSide == "right" ?
-		      xMountWidth - probeExtWidth - .1 :
-		      -probeExtWidth - .1,
-		      -xMountDepth, 0])
-	       cube([probeExtWidth + xMountCornerRadius + .1, xMountDepth, xMountHeight]);
-     }
-}
-
-module induct_ext_holes() {
-     // Create the holes needed for the z probe extension.
-     // Bottom
-     translate([servoBracketL[0],
-		servoBracketL[1],
-		servoBracketL[2] + servoBracketBotScrewL[2]])
-	  rotate([-90,0,0])
-	  bolt_hole(servoBracketScrewDiameter, xMountDepth - servoBracketNutDepth, servoBracketNutDiameter, servoBracketNutDepth);
-
-     // Top
-     translate([servoBracketL[0],
-		servoBracketL[1],
-		servoBracketL[2] + servoBracketTopScrewL[2]])
-	  rotate([-90,0,0])
-	  bolt_hole(servoBracketScrewDiameter, xMountDepth - servoBracketNutDepth, servoBracketNutDiameter, servoBracketNutDepth);
-}
-
-// Cable tie hole creator.
-module cable_tie(height, width, radius) {
-     rotate_extrude()
-	  translate([radius, 0, 0])
-	  square([width, height]);
-}
-
-// Functions to return position variables.
-function fan_duct_connect(tabScrewL, horizontalAngle, verticalAngle, dimensions, centerOffset, mountOffset, mountThickness, tabHole, tabHoleMat, ductConnectSize, reverseY=false)
-= [[- (dimensions[0] * .25) - (ductConnectSize[0] / 2) - fanDuctThickness - centerOffset[0] - mountOffset[0],
-    reverseY == false ? - ((tabHole / 2) + tabHoleMat + dimensions[1] + centerOffset[1] + mountOffset[1] + mountThickness) :
-			   ((tabHole / 2) + tabHoleMat + centerOffset[1] + mountOffset[1] + mountThickness),
-    - (dimensions[2] / 2) + centerOffset[2] + mountOffset[2]],
-   [(dimensions[0] * .25) - (ductConnectSize[0] / 2) + fanDuctThickness + centerOffset[0] + mountOffset[0],
-    reverseY == false ? - ((tabHole / 2) + tabHoleMat + dimensions[1] + centerOffset[1] + mountOffset[1] + mountThickness) :
-			   ((tabHole / 2) + tabHoleMat + centerOffset[1] + mountOffset[1] + mountThickness),
-    - (dimensions[2] / 2) + centerOffset[2] + mountOffset[2]]];
-     
-/*
-     [[- ((tabHole / 2) + tabHoleMat + ((dimensions[0] / 2) + mountOffset[0])),
-    - ((tabHole / 2) + tabHoleMat + dimensions[1] + mountOffset[1] + mountThickness),
-    - (dimensions[2] / 2 ) + mountOffset[2]],
-   [- ((tabHole / 2) + tabHoleMat + ((dimensions[0] / 2) - ductConnectSize[0] + mountOffset[0])),
-    - ((tabHole / 2) + tabHoleMat + dimensions[1] + mountOffset[1] + mountThickness),
-    - (dimensions[2] / 2 ) + mountOffset[2]]];
-*/
-// C Bot modules
-
-module cbot_carriage_side(heSide=false) {
-echo("heSide", heSide);
-     // Create the base, then remove the holes.
-     difference() {
-	  cbot_carriage_base(heSide);
-
-	  cbot_carriage_holes(heSide);
-     }
-}
-
-module cbot_carriage_base(heSide=false) {
-     // Base C Bot XY Carriage side.
-     translate([cBotCarriageCornerRadius, 0, cBotCarriageCornerRadius])
-	  hull() {
-	  // Create the top left corner.
-	  translate([0, 0, cBotCarriageHeight - (cBotCarriageCornerRadius * 2)])
-	       rotate([90,0,0])
-	       cylinder(r=cBotCarriageCornerRadius, h=cBotCarriageDepth, $fn=100);
-
-	  // Create the top right Corner
-	  translate([cBotCarriageWidth - (cBotCarriageCornerRadius * 2), 0, cBotCarriageHeight - (cBotCarriageCornerRadius * 2)])
-	       rotate([90,0,0])
-	       cylinder(r=cBotCarriageCornerRadius, h=cBotCarriageDepth, $fn=100);
-
-	  // Create the bottom left corner.
-	  rotate([90,0,0])
-	       cylinder(r=cBotCarriageCornerRadius, h=cBotCarriageDepth, $fn=100);
-		
-	  // Create the bottom right corner
-	  translate([cBotCarriageWidth - (cBotCarriageCornerRadius * 2), 0, 0])
-	       rotate([90,0,0])
-	       cylinder(r=cBotCarriageCornerRadius, h=cBotCarriageDepth, $fn=100);
-     }
-
-     // Create angle portion of top left corner.
-     translate([cBotCarriageCornerRadius, 0, cBotCarriageHeight - cBotCarriageCornerRadius])
-	  difference() {
-	  hull() {
-	       rotate([90,0,0])
-		    cylinder(r=cBotCarriageCornerRadius, h=cBotTopHoleDepth, $fn=100);
-	       
-	       translate([0, 0, -cBotTopHoleLength])
-		    rotate([90,0,0])
-		    cylinder(r=cBotCarriageCornerRadius, h=cBotTopHoleDepth, $fn=100);
-	  }
-	       
-	  hull() {
-	       translate([-cBotCarriageCornerRadius, -cBotTopHoleDepth - (cBotTopHoleDepth - cBotCarriageDepth) - .1, cBotCarriageCornerRadius])
-		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - cBotCarriageDepth) + .1, .1]);
-		    
-	       translate([-cBotCarriageCornerRadius, -cBotCarriageDepth - (cBotTopHoleDepth - cBotCarriageDepth) - .1, -cBotCarriageCornerRadius - cBotTopHoleLength])
-		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - cBotCarriageDepth) + .1, .1]);
-	  }
-     }
-     
-     // Create angle portion of top right corner
-     translate([cBotCarriageWidth - cBotCarriageCornerRadius, 0, cBotCarriageHeight - cBotCarriageCornerRadius])
-	  difference() {
-	  hull() {
-	       rotate([90,0,0])
-		    cylinder(r=cBotCarriageCornerRadius, h=cBotTopHoleDepth, $fn=100);
-		    
-	       translate([0, 0, -cBotTopHoleLength])
-		    rotate([90,0,0])
-		    cylinder(r=cBotCarriageCornerRadius, h=cBotTopHoleDepth, $fn=100);
-	  }
-
-	  hull() {
-	       translate([-cBotCarriageCornerRadius, -cBotTopHoleDepth - (cBotTopHoleDepth - cBotCarriageDepth) - .1, cBotCarriageCornerRadius])
-		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - cBotCarriageDepth) + .1, .1]);
-		    
-	       translate([-cBotCarriageCornerRadius, -cBotCarriageDepth - (cBotTopHoleDepth - cBotCarriageDepth) - .1, -cBotCarriageCornerRadius - cBotTopHoleLength])
-		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - cBotCarriageDepth) + .1, .1]);
-	  }
-     }
-}
-
-module cbot_carriage_holes(heSide=false) {
-     // Remove the holes for the corners.
-     // Bottom left.
-     translate([cBotCarriageCornerRadius, .1, cBotCarriageCornerRadius])
-	  rotate([90, 0, 0])
-	  cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotCarriageDepth + .2, $fn=100);
-
-     // Bottom right.
-     translate([cBotCarriageWidth - cBotCarriageCornerRadius, .1, cBotCarriageCornerRadius])
-	  rotate([90, 0, 0])
-	  cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotCarriageDepth + .2, $fn=100);
-
-     // Top left.
-     translate([cBotCarriageCornerRadius, .1, cBotCarriageHeight - cBotCarriageCornerRadius])
-	  hull() {
-	  rotate([90,0,0])
-	       cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotTopHoleDepth + .2, $fn=100);
-	  
-	  translate([0, 0, -cBotTopHoleLength])
-	       rotate([90,0,0])
-	       cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotTopHoleDepth + .2, $fn=100);
-     }
-
-     // Top right.
-     translate([cBotCarriageWidth - cBotCarriageCornerRadius, .1, cBotCarriageHeight - cBotCarriageCornerRadius])
-	  hull() {
-	  rotate([90,0,0])
-	       cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotTopHoleDepth + .2, $fn=100);
-	  
-	  translate([0, 0, -cBotTopHoleLength])
-	       rotate([90,0,0])
-	       cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotTopHoleDepth + .2, $fn=100);
-     }
-
-     // Cut out the big oval in the middle.
-     difference() {
-	  translate([(cBotCarriageWidth / 2), .1, (cBotCarriageHeight / 2)])
-	       rotate([90, 0, 0])
-	       resize([cBotCenterHoleWidth,0,0])
-	       cylinder(d=cBotCenterHoleDiameter, cBotCarriageDepth + .2, $fn=100);
-
-	  // Leave a bar for the fan mount if needed.
-	  translate([0, -cBotCarriageDepth, cBotFanMountPos + (cBotFanMountDistance * 2) - (cBotFanBracketHeight * .75)])
-	       cube([cBotCarriageWidth, cBotCarriageDepth, (cBotFanBracketHeight * 1.5)]);
-     }
-     
-     // Cut out the belt holder and holes.
-     // Top belt cutout
-     translate([-.1, -cBotBeltDepth, ((cBotCarriageHeight / 2) + cBotBeltTopPos)])
-	  cbot_belt_cutout();
-
-     // Bottom belt cutout
-     translate([cBotCarriageWidth + .1, -cBotBeltDepth, ((cBotCarriageHeight / 2) - cBotBeltBottomPos)])
-	  rotate([0, 180, 0])
-	  cbot_belt_cutout();
-
-     // Don't cut out fan holes on side with hot end.
-     if(heSide == false) {
-	  // Cutout mounting holes for the fan mount. This can be easily made repeatable by replace the multipliers with j and i.
-	  // Left side
-	  translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * 0)), -cBotCarriageDepth, cBotFanMountPos + (cBotFanMountDistance * 2)])
-	       rotate([-90,0,0])
-	       bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
-	  
-	  // Right side
-	  translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * 1)), -cBotCarriageDepth, cBotFanMountPos + (cBotFanMountDistance * 2)])
-	       rotate([-90,0,0])
-	       bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
-     }
-
-     // Carve out some cable tie locations.
-     for(j=[(cBotCarriageWidth / 4) : (cBotCarriageWidth / 4) : cBotCarriageWidth - (cBotCarriageWidth / 4)]) {
-	  for(i=[(cBotCarriageHeight / 4) : (cBotCarriageHeight / 4) :  cBotCarriageHeight]) {
-	       translate([j, -8, i - (cBotCarriageHeight / 16)])
-		    cable_tie(3,1.2,4.5);
-	  }
-     }
-}
-
-module cbot_belt_cutout() {
-     // Belt cutout
-     linear_extrude(height=cBotBeltHeight) {
-	  for(i=[0 : cBotBeltToothSpacing : (cBotBeltToothLength - cBotBeltToothSpacing)]) {
-	       translate([i +.1, 0, 0])
-		    polygon([[-cBotBeltToothHeight, - (cBotBeltToothHeight * 2)],[0, 0],[cBotBeltToothSpacing, - (cBotBeltToothHeight * 2)]]);
-	       translate([i + .1 + (cBotBeltToothSpacing / 2), 0, 0])
-		    polygon([[-cBotBeltToothHeight, - (cBotBeltToothHeight * 2)],[(cBotBeltToothSpacing / 2), 0], [cBotBeltToothSpacing, - (cBotBeltToothHeight * 2)]]);
-	  }
-	  
-	  translate([cBotBeltToothLength + .1, 0, 0])
-	       polygon([[0,0],[(cBotBeltLength - cBotBeltToothLength) + .1,-(cBotCarriageDepth - cBotBeltDepth + .1)],[-1,-(cBotCarriageDepth - cBotBeltDepth)]]);
-     }
-     
-     translate([-.1, - (cBotCarriageDepth - cBotBeltDepth +.1), 0])
-	  cube([cBotBeltToothLength, (cBotCarriageDepth - cBotBeltDepth - cBotBeltToothHeight) + .1, cBotBeltHeight]);
-	  
-     // Belt holder mounting holes.
-     translate([(cBotBeltToothLength / 2), -(cBotCarriageDepth - cBotBeltDepth), -cBotBeltScrewDistance])
-	  rotate([-90,0,0])
-	  bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
-
-     translate([(cBotBeltToothLength / 2), -(cBotCarriageDepth - cBotBeltDepth),  cBotBeltHeight + cBotBeltScrewDistance])
-	  rotate([-90,0,0])
-	  bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
-}
-
-module cbot_belt_holder() {
-     difference() {
-	  // Create the base
-	  cbot_belt_holder_base();
-
-	  // Create the holes
-	  cbot_belt_holder_holes();
-     }
-}
-
-module cbot_belt_holder_base() {
-     // Create the base object
-     translate([cBotBeltHolderCornerRadius, 0, cBotBeltHolderCornerRadius])
-	  hull() {
-	  // Bottom left
-	  rotate([90,0,0])
-	       cylinder(r=cBotBeltHolderCornerRadius, h=cBotBeltHolderDepth, $fn=100);
-
-	  // Bottom right
-	  translate([cBotBeltToothLength - (cBotBeltHolderCornerRadius * 2), 0, 0])
-	       rotate([90,0,0])
-	       cylinder(r=cBotBeltHolderCornerRadius, h=cBotBeltHolderDepth, $fn=100);
-
-	  // Top Left
-	  translate([0, 0, cBotBeltHolderHeight - (cBotBeltHolderCornerRadius * 2)])
-	       rotate([90,0,0])
-	       cylinder(r=cBotBeltHolderCornerRadius, h=cBotBeltHolderDepth, $fn=100);
-
-	  // Top right
-	  translate([cBotBeltToothLength - (cBotBeltHolderCornerRadius * 2), 0, cBotBeltHolderHeight - (cBotBeltHolderCornerRadius * 2)])
-	       rotate([90,0,0])
-	       cylinder(r=cBotBeltHolderCornerRadius, h=cBotBeltHolderDepth, $fn=100);
-     }
-
-     // Create the nub that holds the belt.
-     translate([cBotBeltHolderCornerRadius,
-		-cBotBeltHolderDepth + .1,
-		(cBotBeltHolderHeight / 2)])
-	  hull() {
-	  // Bottom left
-	  translate([0, 0, - (cBotBeltHolderNubHeight / 2) + cBotBeltHolderCornerRadius])
-	       rotate([90, 0, 0])
-	       cylinder(r=cBotBeltHolderCornerRadius, h=cBotBeltHolderNubDepth + .1, $fn=100);
-		    
-	  // Bottom right
-	  translate([cBotBeltToothLength - (cBotBeltHolderCornerRadius * 2), 0, - (cBotBeltHolderNubHeight / 2) + cBotBeltHolderCornerRadius])
-	       rotate([90, 0, 0])
-	       cylinder(r=cBotBeltHolderCornerRadius, h=cBotBeltHolderNubDepth + .1, $fn=100);
-		    
-	  // Top left
-	  translate([0, 0, (cBotBeltHolderNubHeight / 2) - cBotBeltHolderCornerRadius])
-	       rotate([90, 0, 0])
-	       cylinder(r=cBotBeltHolderCornerRadius, h=cBotBeltHolderNubDepth + .1, $fn=100);
-		    
-	  // Top right
-	  translate([cBotBeltToothLength - (cBotBeltHolderCornerRadius * 2), 0, (cBotBeltHolderNubHeight / 2) - cBotBeltHolderCornerRadius])
-	       rotate([90, 0, 0])
-	       cylinder(r=cBotBeltHolderCornerRadius, h=cBotBeltHolderNubDepth + .1, $fn=100);
-     }
-}
-
-module cbot_belt_holder_holes() {
-     // Belt holder mounting holes.
-     translate([(cBotBeltToothLength / 2),
-		+.1,
-		(cBotBeltHolderHeight / 2) - ((cBotBeltHeight / 2) + cBotBeltScrewDistance)])
-	  rotate([90,0,0])
-	  cylinder(d=cBotBeltScrewDiameter, h=cBotBeltHolderDepth + .2, $fn=100);
-     
-     translate([(cBotBeltToothLength / 2),
-		+.1,
-		(cBotBeltHolderHeight / 2) + ((cBotBeltHeight / 2) + cBotBeltScrewDistance)])
-	  rotate([90,0,0])
-	  cylinder(d=cBotBeltScrewDiameter, h=cBotBeltHolderDepth + .2, $fn=100);
 }
