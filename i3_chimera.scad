@@ -48,7 +48,7 @@ carrierIntegration = true; // [true:Yes, false:No]
 servo_induct = "servo"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, none:Neither/None]
 
 // Which hot end is in use.
-hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_volcano:Chimera Dual Volcano, cyclops:Cyclops]
+hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops]
 
 // Vertical position of Hot End / Cold End. This position marks mm from bottom of backplane. Default 15mm for prusa, 20 for C Bot.
 hePosUD = 20;
@@ -325,8 +325,9 @@ chiBowdenHoleHeight = chiMountThickness + .2; // How tall to make the Bowden tub
 chiBowdenLocs = [[(chiMountWidth / 2) - 9, chiMountDepth - (chiColdDepthOffset + 6)],
 		 [(chiMountWidth / 2) + 9, chiMountDepth - (chiColdDepthOffset + 6)]]; // X,Y locations for Bowden tube fitting holes.
 chiV6NozzleL = [[6,-6,-49.6],[24,-6,-49.6]]; // Location of Chimera V6 Nozzles in relation to top rear left corner of cold end.
-chiVolNozzleL = []; // Location of Chimera Volcano nozzles in relation to the top rear left corner of cold end.
-cycNozzleL =[]; // Locatopm Cyclops nozzle in relation to the top rear left corner of cold end.
+chiVolNozzleL = [[6,-6,-59.6],[24,-6,-59.6]]; // Location of Chimera Volcano nozzles in relation to the top rear left corner of cold end.
+cycNozzleL = [15,-6,-50.1]; // Locatopm Cyclops nozzle in relation to the top rear left corner of cold end.
+chiNozzleL = (hotend == "chimera_v6" ? chiV6NozzleL : (hotend == "chimera_vol" ? chiVolNozzleL : (hotend == "cyclops" ? [cycNozzleL,cycNozzleL] : 0)));
 
 // Carriage specific positioning variables.
 prusai3ChiMountL = [((xMountWidth / 2) - (chiMountWidth / 2)),
@@ -382,7 +383,7 @@ zProbeTopL = [prusai3ZProbeSide == "right" ?
 	      servoBracketL[0] + (servoBracketNutDiameter / 2) + servoBracketMat + zProbeArmOffset,
 	      - (xMountDepth + servoBracketBaseDepth + (servoWidth / 2)),
 	      servoBracketL[2] + servoBottomLegStartL[2] + servoLegHeight + servoCenterOffset];
-zProbeBottomL = - (zProbeTopL[2] - (prusai3ChiMountL[2] + chiV6NozzleL[0][2])) + (servoHatTopDiameter / 2) + zProbeArmMat + zProbeSwitchHeight - zProbeSwitchActivationDistance;
+zProbeBottomL = - (zProbeTopL[2] - (prusai3ChiMountL[2] + chiNozzleL[0][2])) + (servoHatTopDiameter / 2) + zProbeArmMat + zProbeSwitchHeight - zProbeSwitchActivationDistance;
 
 // Variables for C Bot Carriage.
 cBotCarriageSideDistance = 20;
@@ -453,7 +454,7 @@ if (carriage == "prusai3") {
 		    
 		    // Place the hot end mount, need to do here so holes are cut correctly.
 		    // Chimera Mount
-		    if(hotend == "chimera_v6") {
+		    if(hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") {
 			 // Place the Chimera mount
 			 translate(prusai3ChiMountL)
 			      chimera_mount("below",
@@ -487,7 +488,7 @@ if (carriage == "prusai3") {
 	       xback_holes();
 	       
 	       // Cut out the wholes for the appropriate cold / hot end.
-	       if(hotend == "chimera_v6") {
+	       if(hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") {
 		    // Cut out the wholes needed to mount and use the Chimera.
 		    translate(prusai3ChiMountL)
 			 chimera_mount_holes();
@@ -516,13 +517,13 @@ if (carriage == "prusai3") {
      }
      
      // Display cold / hot end model.
-     if(hotend == "chimera_v6") {
+     if(hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") {
 	  // Place the E3D Chimera fron Jons.
 	  translate([((xMountWidth - chiWidth) / 2) + (chiWidth /2),
 		     - (xMountDepth + chiColdDepthOffset + 6), // 6 is there to offset the fan in the e3d model, used to line everything up properly
 		     hePosUD - chiColdHeight])
 	       %e3d();
-	  }
+     }
      
      // Fan Mount
      if((prusai3Which == "fanm" || prusai3Which == "all") && prusai3FanSide != "none") {
@@ -601,7 +602,7 @@ if(carriage == "cbot") {
 	  // Display C Bot Hot End Carriage Side.
 	  cbot_carriage_side(true);
 
-	  if(hotend == "chimera_v6") {
+	  if(hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") {
 	       // Place the hot end mount.
 	       translate([(cBotCarriageWidth / 2) - (chiMountWidth / 2),
 			  - (cBotCarriageDepth + chiMountDepth),
@@ -619,7 +620,7 @@ if(carriage == "cbot") {
 		    }
 		    
 		    // Display cold / hot end model.
-		    if(hotend == "chimera_v6") {
+		    if(hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") {
 			 // Place the E3D Chimera fron Jons.
 			 translate([(chiWidth / 2) + chiBraceThickness,
 				    chiColdDepth - 2, // 6 is there to offset the fan in the e3d model, used to line everything up properly
@@ -1184,8 +1185,8 @@ module fan_duct(ductConnectL, fanScrewL, chiAnchorL, tabHorizontalAngle, tabVert
 
 	  // Create the outlets.
 	  // First determine which hot end is in use.
-	  if(hotend == "chimera_v6") {
-	       chimera_v6_fan_duct(ductConnectL, fanScrewL, chiAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, false, reverseY);
+	  if(hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") {
+	       chimera_fan_duct(ductConnectL, fanScrewL, chiAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, false, reverseY);
 	  }
      }
 }
@@ -1213,14 +1214,14 @@ module fan_duct_holes(ductConnectL, fanScrewL, chiAnchorL, tabHorizontalAngle, t
 
 	  // Create the outlets.
 	  // First determine which hot end is in use.
-	  if(hotend == "chimera_v6") {
-	       chimera_v6_fan_duct(ductConnectL, fanScrewL, chiAnchorL, tabHorizontalAngle, tabVerticalAngle, 0, true, reverseY);
+	  if(hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") {
+	       chimera_fan_duct(ductConnectL, fanScrewL, chiAnchorL, tabHorizontalAngle, tabVerticalAngle, 0, true, reverseY);
 	  }
      }
 }
 
-module chimera_v6_fan_duct(ductConnectL, fanScrewL, chiAnchorL, tabHorizontalAngle, tabVerticalAngle, wallThickness, interior=false, reverseY=false) {
-     // Chimera V6 - Nozzle 1 - Both Nozzles
+module chimera_fan_duct(ductConnectL, fanScrewL, chiAnchorL, tabHorizontalAngle, tabVerticalAngle, wallThickness, interior=false, reverseY=false) {
+     // Chimera V6 and Volcano - Both Nozzles
      for(a=[0:1]) {
 	  // Start the process of placing the nozzles in the correct place. Split up to keep things simpler to understand for now.
 	  echo("ductConnectL", ductConnectL);
@@ -1232,7 +1233,7 @@ module chimera_v6_fan_duct(ductConnectL, fanScrewL, chiAnchorL, tabHorizontalAng
 	       rotate([0,0,-tabVerticalAngle])
 	       translate(-fanScrewL)
 	       translate(chiAnchorL)
-	       translate(chiV6NozzleL[a])
+	       translate(chiNozzleL[a])
 	       translate([fanDuctOutletNozzleOffsetL[0],
 			 reverseY == false ? fanDuctOutletNozzleOffsetL[1] : - fanDuctOutletNozzleOffsetL[1],
 			 fanDuctOutletNozzleOffsetL[2]]) { // Offset from the nozzle where the outlet should be.
