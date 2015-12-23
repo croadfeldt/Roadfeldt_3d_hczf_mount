@@ -71,7 +71,7 @@ hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual 
 // all = All the parts
 
 // Which Prusa i3 part should be exported.
-prusai3Which = "all"; // [hotm:Back Plane & Cold / Hot End  Mount, v6_col: E3D V6 Collar, servo:Servo Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All] 
+prusai3Which = "all"; // [hotm:Back Plane & Cold / Hot End  Mount, v6_col: E3D V6 Collar, servo:Servo Bracket, fanm:Fan Mount, fant:Fan Bracket, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All] 
 
 // Which side should the fan mount to? Be mindful of Z probe clearance.
 prusai3FanSide = "left"; // [left:Left side of hot end., right:Right side of hot end., none:No print cooling fan.]
