@@ -35,11 +35,11 @@
 
 // Which hotend are we importing? Can only use one at a time, Jons uses the same variable
 // and module names and openscad doesn't support conditionally import as far as I can tell.
-use<e3d_v6_chimera.scad>;
+//use<e3d_v6_chimera.scad>;
 //use<e3d_vulcano_chimera.scad>;
 //use<e3d_cyclops.scad>;
 //use<e3d_v6_all_metall_hotend.scad>;
-//use<e3d_v6_volcano_all_metall_hotend.scad>;
+use<e3d_v6_volcano_all_metall_hotend.scad>;
 
 // Bring in the basic delta fan designs I created for visualization.
 use<delta_blower_fans.scad>;
@@ -56,7 +56,7 @@ carrierIntegration = true; // [true:Yes, false:No]
 servo_induct = "servo"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, none:Neither/None]
 
 // Which hot end is in use.
-hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano]
+hotend = "jhead_mkv"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V]
 
 /* [Prusa i3] */
 
@@ -341,24 +341,29 @@ chiV6NozzleL = [[6,-6,-49.6],[24,-6,-49.6]]; // Location of Chimera V6 Nozzles i
 chiVolNozzleL = [[6,-6,-59.6],[24,-6,-59.6]]; // Location of Chimera Volcano nozzles in relation to the top rear left corner of cold end.
 cycNozzleL = [[15,-6,-50.1]]; // Location of Cyclops nozzle in relation to the top rear left corner of cold end.
 
+// Variables for J Head Mount
+jHeadWidth = 26;
+jHeadHEPosUD = 14;
+jHeadUpperCollarDiameter = 16;
+jHeadUpperCollarHeight = 3.7;
+jHeadInnerCollarDiameter = 12;
+jHeadInnerCollarHeight = 6;
+jHeadLowerCollarDiameter = 16;
+jHeadLowerCollarHeight = 3;
+jHeadMountWidth = 36;
+jHeadMountHeight = jHeadUpperCollarHeight + jHeadInnerCollarHeight + jHeadLowerCollarHeight;
+jHeadMountDepth = 20;
+jHeadCollarCornerRadius = 3;
+jHeadMountBoltDiameter = 3.2;
+jHeadMountNutDiameter = 6.5;
+jHeadMountNutDepth = 2.4;
+
 // Variables for E3D V6
-v6Width = 26;
-v6HEPosUD = 14;
-v6JHeadUpperCollarDiameter = 16;
-v6JHeadUpperCollarHeight = 3.7;
-v6JHeadInnerCollarDiameter = 12;
-v6JHeadInnerCollarHeight = 6;
-v6JHeadLowerCollarDiameter = 16;
-v6JHeadLowerCollarHeight = 3;
-v6MountWidth = 36;
-v6MountHeight = v6JHeadUpperCollarHeight + v6JHeadInnerCollarHeight + v6JHeadLowerCollarHeight;
-v6MountDepth = 20;
-v6CollarCornerRadius = 3;
-v6MountBoltDiameter = 3.2;
-v6MountNutDiameter = 6.5;
-v6MountNutDepth = 2.4;
 v6NozzleL = [[0, 0, -62.3]]; // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
 v6VolNozzleL = [[0,0,-72.3]]; // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
+
+// Variables for J Head Mark V
+jheadMkVNozzleL = [[0, 0, -51]]; // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
 
 // Generic Hot End Variables
 heNozzleL = (hotend == "chimera_v6" ? chiV6NozzleL
@@ -366,7 +371,8 @@ heNozzleL = (hotend == "chimera_v6" ? chiV6NozzleL
 		: (hotend == "cyclops" ? cycNozzleL
 		   : (hotend == "e3d_v6" ? v6NozzleL
 		      : (hotend == "e3d_v6_vol" ? v6VolNozzleL
-			 : [[0]]))))); // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
+			 : (hotend == "jhead_mkv" ? jheadMkVNozzleL
+			    : [[0]])))))); // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
 
 // Prusa i3 variant carriage specific positioning variables.
 prusai3FanBracketDepth = 3;
@@ -382,34 +388,35 @@ prusai3ChiMountL = [((xMountWidth / 2) - (chiMountWidth / 2)),
 prusai3ChiAnchorL = [((xMountWidth / 2) - (chiWidth / 2)),
 		    - (xMountDepth + chiColdDepthOffset),
 		    prusai3ChiMountL[2]]; // Position of Chimera Mount Anchor point.
-prusai3V6MountL =  [((xMountWidth / 2) - (v6MountWidth / 2)),
-		    - (xMountDepth + v6MountDepth),
-		    v6HEPosUD + prusai3HEOffset]; // Position of E3D V6 Mount.
-prusai3V6AnchorL = [(xMountWidth / 2),
-		    - (xMountDepth + (v6MountDepth / 2)),
-		    prusai3V6MountL[2] + v6MountHeight]; // Position of E3D V6 Mount Anchor point..
+prusai3JHeadMountL =  [((xMountWidth / 2) - (jHeadMountWidth / 2)),
+		    - (xMountDepth + jHeadMountDepth),
+		    jHeadHEPosUD + prusai3HEOffset]; // Position of J Head Mount.
+prusai3JHeadAnchorL = [(xMountWidth / 2),
+		    - (xMountDepth + (jHeadMountDepth / 2)),
+		    prusai3JHeadMountL[2] + jHeadMountHeight]; // Position of J Head Anchor point..
+
 prusai3HEMountL = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
      ? prusai3ChiMountL
-     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol")
-     ? prusai3V6MountL
+     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv")
+     ? prusai3JHeadMountL
      : 0;
 prusai3HEAnchorL = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
      ? prusai3ChiAnchorL
-     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol")
-     ? prusai3V6AnchorL
+     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv")
+     ? prusai3JHeadAnchorL
      : 0;
 prusai3ChiFanScrewL = [prusai3FanSide == "left" ?
 		       prusai3ChiMountL[0] + (sin(prusai3RealFanTabVerticalAngle) * ((prusai3FanTabHole / 2) + prusai3FanTabMat + prusai3FanTabDepth)) :
 		       prusai3ChiMountL[0] + chiMountWidth + (sin(prusai3RealFanTabVerticalAngle) * ((prusai3FanTabHole / 2) + prusai3FanTabMat + prusai3FanTabDepth)),
 		       prusai3ChiMountL[1] - (cos(prusai3RealFanTabVerticalAngle) * ((prusai3FanTabHole / 2) + prusai3FanTabMat + prusai3FanTabDepth)),
 		       prusai3ChiMountL[2] + (prusai3FanTabHole / 2) + prusai3FanTabMat]; // Offset of the center of the fan mount screw from prusai3FanTabL
-prusai3V6FanScrewL = [prusai3V6MountL[0] + (v6MountWidth / 2) + (sin(prusai3RealFanTabVerticalAngle) * ((prusai3FanTabHole / 2) + prusai3FanTabMat + prusai3FanTabDepth)),
-		      prusai3V6MountL[1] - prusai3FanBracketDepth - (cos(prusai3RealFanTabVerticalAngle) * ((prusai3FanTabHole / 2) + prusai3FanTabMat + prusai3FanTabDepth)),
-		      prusai3V6MountL[2] + (v6MountHeight / 2) + ((prusai3FanTabHeight / 2) + prusai3FanScrewOffset)]; // Offset of the center of the fan mount screw from prusai3FanTabL
+prusai3JHeadFanScrewL = [prusai3JHeadMountL[0] + (jHeadMountWidth / 2) + (sin(prusai3RealFanTabVerticalAngle) * ((prusai3FanTabHole / 2) + prusai3FanTabMat + prusai3FanTabDepth)),
+		      prusai3JHeadMountL[1] - prusai3FanBracketDepth - (cos(prusai3RealFanTabVerticalAngle) * ((prusai3FanTabHole / 2) + prusai3FanTabMat + prusai3FanTabDepth)),
+		      prusai3JHeadMountL[2] + (jHeadMountHeight / 2) + ((prusai3FanTabHeight / 2) + prusai3FanScrewOffset)]; // Offset of the center of the fan mount screw from prusai3FanTabL
 prusai3FanScrewL = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
      ? prusai3ChiFanScrewL
-     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol")
-     ? prusai3V6FanScrewL
+     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv")
+     ? prusai3JHeadFanScrewL
      : 0;
 prusai3DuctConnectL = fan_duct_connect(prusai3FanScrewL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, fanDimensions, fanCenterOffset, fanMountOffset, fanMountThickness, prusai3FanTabHole, prusai3FanTabMat, fanDuctConnectSize);
 
@@ -470,21 +477,21 @@ cBotChiMountL = [(cBotCarriageWidth / 2) - (chiMountWidth / 2),
 cBotChiAnchorL = [((cBotCarriageWidth / 2) - (chiWidth / 2)),
 		    - (cBotCarriageDepth + chiColdDepthOffset),
 		    cBotChiMountL[2]]; // Position of Chimera Mount.
-cBotV6MountL = [(cBotCarriageWidth / 2) - (v6MountWidth / 2),
-		- (cBotCarriageDepth + v6MountDepth),
-		v6HEPosUD + cBotHEOffset];
-cBotV6AnchorL = [(cBotCarriageWidth / 2),
-		 - (cBotCarriageDepth + (v6MountDepth / 2)),
-		 cBotV6MountL[2] + v6MountHeight]; // Position of E3D V6 Mount.
+cBotJHeadMountL = [(cBotCarriageWidth / 2) - (jHeadMountWidth / 2),
+		   - (cBotCarriageDepth + jHeadMountDepth),
+		   jHeadHEPosUD + cBotHEOffset];
+cBotJHeadAnchorL = [(cBotCarriageWidth / 2),
+		    - (cBotCarriageDepth + (jHeadMountDepth / 2)),
+		    cBotJHeadMountL[2] + jHeadMountHeight]; // Position of E3D V6 Mount.
 cBotHEMountL = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
      ? cBotChiMountL
-     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol")
-     ? cBotV6MountL
+     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv")
+     ? cBotJHeadMountL
      : 0;
 cBotHEAnchorL = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
      ? cBotChiAnchorL
-     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol")
-     ? cBotV6AnchorL
+     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv")
+     ? cBotJHeadAnchorL
      : 0;
 
 // Generic variables that are hot end and carriage dependent.
@@ -550,15 +557,15 @@ if (carriage == "prusai3") {
 					    prusai3FanTabHeight, prusai3FanTabHole, prusai3FanTabMat, prusai3FanSide);
 		    }
 
-		    // E3D V6 Mount
-		    if(hotend == "e3d_v6" || hotend == "e3d_v6_vol") {
+		    // J Head style mount
+		    if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv") {
 			 // Place the E3d V6 mount
 			 translate(heMountL)
-			      e3d_v6_mount(xMountDepth);
+			      jhead_mount(xMountDepth);
 		    }
 		    
 		    // Attach fan tab if needed.
-		    if((prusai3FanSide != "none") && (hotend != "e3d_v6" || hotend != "e3d_v6_vol")) {
+		    if((prusai3FanSide != "none") && (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")) {
 			 translate(fanScrewL)
 			      rotate([0,0,prusai3RealFanTabVerticalAngle])
 			      fan_tab(prusai3FanScrewOffset,prusai3FanTabWidth,
@@ -589,11 +596,10 @@ if (carriage == "prusai3") {
 			 chimera_mount_holes();
 	       }
 	       
-	       // Carve E3D V6 Mount Holes, if needed.
+	       // Carve J Head style mount holes, if needed.
 	       if(hotend == "e3d_v6" || hotend == "e3d_v6_vol") {
-		    // Place the E3d V6 mount
 		    translate(heMountL)
-			 e3d_v6_holes(xMountDepth);
+			 jhead_holes(xMountDepth);
 	       }
 	       
 	       // Servo Extension Holes
@@ -610,11 +616,11 @@ if (carriage == "prusai3") {
 	  }
      }
 
-     // E3D V6 Mount
-     if((hotend == "e3d_v6" || hotend == "e3d_v6_vol") && (prusai3Which == "v6_col" || prusai3Which == "all")) {
-	  // place the E3D V6 collar as well.
+     // J Head style mount
+     if((hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv") && (prusai3Which == "v6_col" || prusai3Which == "all")) {
+	  // Place the J Head collar as well.
 	  translate(heMountL)
-	       e3d_v6_collar(xMountDepth);
+	       jhead_collar(xMountDepth);
      }
      
      // Display cold / hot end model.
@@ -628,19 +634,19 @@ if (carriage == "prusai3") {
 
      if((prusai3Which == "hotm" || prusai3Which == "all") && (hotend == "e3d_v6" || hotend == "e3d_v6_vol")) {
 	  // Place the E3D V6.
-	  translate([heMountL[0] + (v6MountWidth / 2),
-		     heMountL[1] + (v6MountDepth / 2),
+	  translate([heMountL[0] + (jHeadMountWidth / 2),
+		     heMountL[1] + (jHeadMountDepth / 2),
 		     heMountL[2] + 12.7])
 	       rotate([0,180,0])
 	       %e3d();
      }
 
      // Fan Bracket, if needed.
-     if((prusai3Which == "fant" || prusai3Which == "all") && (hotend == "e3d_v6" || hotend == "e3d_v6_vol"))  {
+     if((prusai3Which == "fant" || prusai3Which == "all") && (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv"))  {
 	  // Place the fan tab.
 	  translate(fanScrewL)
-	       bracket_fan_tab(v6MountWidth - (v6CollarCornerRadius * 2), prusai3FanBracketDepth, v6MountHeight, v6MountBoltDiameter,
-			       (v6MountWidth / 2),
+	       bracket_fan_tab(jHeadMountWidth - (jHeadCollarCornerRadius * 2), prusai3FanBracketDepth, jHeadMountHeight, jHeadMountBoltDiameter,
+			       (jHeadMountWidth / 2),
 			       prusai3FanTabWidth, prusai3FanTabDepth, prusai3FanTabHeight,
 			       prusai3FanTabHole, prusai3FanTabMat, prusai3FanScrewOffset);
      }
@@ -726,20 +732,20 @@ if(carriage == "cbot") {
 			 translate([0,chiMountDepth,0])
 			      cube([chiMountWidth, cBotCarriageDepth, chiMountHeight]);
 		    }
-		    
-		    if(hotend == "e3d_v6" || hotend == "e3d_v6_vol") {
+
+		    // Replace material behind the mount.
+		    if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv") {
 			 translate([heMountL[0],
-				    heMountL[1] + v6MountDepth,
+				    heMountL[1] + jHeadMountDepth,
 				    heMountL[2]])
-			      cube([v6MountWidth, cBotCarriageDepth, v6MountHeight]);
+			      cube([jHeadMountWidth, cBotCarriageDepth, jHeadMountHeight]);
 		    }
 	       }
 
-	       // Carve E3D V6 Mount Holes, if needed.
-	       if(hotend == "e3d_v6" || hotend == "e3d_v6_vol") {
-		    // Place the E3d V6 mount
+	       // Carve J Head style mount holes, if needed.
+	       if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv") {
 		    translate(heMountL)
-			 e3d_v6_holes(cBotCarriageDepth);
+			 jhead_holes(cBotCarriageDepth);
 	       }
 	  }
 		    
@@ -765,15 +771,15 @@ if(carriage == "cbot") {
 	       }
 	  }
 	  
-	  // E3D V6 Mount
-	  if(hotend == "e3d_v6" || hotend == "e3d_v6_vol") {
-	       // Place the E3d V6 mount
+	  // J Head style mount
+	  if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv") {
+	       // Place the J Head style mount
 	       translate(heMountL)
-		    e3d_v6_mount(cBotCarriageDepth);
+		    jhead_mount(cBotCarriageDepth);
 	  
 	       // Place the E3D V6.
-	       translate([heMountL[0] + (v6MountWidth / 2),
-			  heMountL[1] + (v6MountDepth / 2),
+	       translate([heMountL[0] + (jHeadMountWidth / 2),
+			  heMountL[1] + (jHeadMountDepth / 2),
 			  heMountL[2] + 12.7])
 		    rotate([0,180,0])
 		    %e3d();
@@ -781,11 +787,10 @@ if(carriage == "cbot") {
      }
      
 
-     // E3D V6 Mount
-     if((hotend == "e3d_v6" || hotend == "e3d_v6_vol") && (cBotWhich == "v6_col" || cBotWhich == "all")) {
-	  // place the E3D V6 collar as well.
+     // J Head style mount collar
+     if((hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv") && (cBotWhich == "v6_col" || cBotWhich == "all")) {
 	  translate(heMountL)
-	       e3d_v6_collar(cBotCarriageDepth);
+	       jhead_collar(cBotCarriageDepth);
      }
 
      // Opposite side carriage plate.
@@ -992,72 +997,72 @@ module chimera_mount_holes() {
      }
 }
 
-// E3D V6 Cold end mount
-module e3d_v6_mount(carriageDepth) {
+// J Head style mount
+module jhead_mount(carriageDepth) {
      difference() {
 	  // Create the base block which the holes will be carved out of.
-	  e3d_v6_base();
+	  jhead_base();
 
-	  e3d_v6_holes(carriageDepth);
+	  jhead_holes(carriageDepth);
      }
 }
 
 
-module e3d_v6_base() {
+module jhead_base() {
      // Create the base block which the holes will be carved out of.
-     translate([0, (v6MountDepth / 2), 0])
-	  cube([v6MountWidth, (v6MountDepth / 2) + .1, v6MountHeight]);
+     translate([0, (jHeadMountDepth / 2), 0])
+	  cube([jHeadMountWidth, (jHeadMountDepth / 2) + .1, jHeadMountHeight]);
 }
 
-module e3d_v6_collar(carriageDepth) {
+module jhead_collar(carriageDepth) {
      difference() {
 	  hull() {
 	       // Create the base collar which the holes will be carved out of.
-	       translate([v6CollarCornerRadius, v6CollarCornerRadius, 0])
-		    cylinder(r=v6CollarCornerRadius, h=v6MountHeight, $fn=100);
+	       translate([jHeadCollarCornerRadius, jHeadCollarCornerRadius, 0])
+		    cylinder(r=jHeadCollarCornerRadius, h=jHeadMountHeight, $fn=100);
 
-	       translate([v6MountWidth - v6CollarCornerRadius, v6CollarCornerRadius, 0])
-		    cylinder(r=v6CollarCornerRadius, h=v6MountHeight, $fn=100);
+	       translate([jHeadMountWidth - jHeadCollarCornerRadius, jHeadCollarCornerRadius, 0])
+		    cylinder(r=jHeadCollarCornerRadius, h=jHeadMountHeight, $fn=100);
 	       
-	       translate([0,(v6MountDepth / 4),0])
-		    cube([v6MountWidth, (v6MountDepth / 4), v6MountHeight]);
+	       translate([0,(jHeadMountDepth / 4),0])
+		    cube([jHeadMountWidth, (jHeadMountDepth / 4), jHeadMountHeight]);
 	  }
 	  
 	  // Carve out the holes.
-	  e3d_v6_holes(carriageDepth);
+	  jhead_holes(carriageDepth);
      }
 }
 	  
-module e3d_v6_holes(carriageDepth) {
+module jhead_holes(carriageDepth) {
      // Carve out the holes for the mount.
      // Upper collar hole
-     translate([(v6MountWidth / 2), (v6MountDepth / 2), v6MountHeight - v6JHeadUpperCollarHeight])
-	  cylinder(d=v6JHeadUpperCollarDiameter, h=v6JHeadUpperCollarHeight + .1, $fn=100);
+     translate([(jHeadMountWidth / 2), (jHeadMountDepth / 2), jHeadMountHeight - jHeadUpperCollarHeight])
+	  cylinder(d=jHeadUpperCollarDiameter, h=jHeadUpperCollarHeight + .1, $fn=100);
 
      // Inner collar hole.
-     translate([(v6MountWidth / 2), (v6MountDepth / 2), v6MountHeight - v6JHeadUpperCollarHeight - v6JHeadInnerCollarHeight - .1])
-	  cylinder(d=v6JHeadInnerCollarDiameter, h=v6JHeadInnerCollarHeight + .2, $fn=100);
+     translate([(jHeadMountWidth / 2), (jHeadMountDepth / 2), jHeadMountHeight - jHeadUpperCollarHeight - jHeadInnerCollarHeight - .1])
+	  cylinder(d=jHeadInnerCollarDiameter, h=jHeadInnerCollarHeight + .2, $fn=100);
 
      // Lower collar hole.
-     translate([(v6MountWidth / 2),
-		(v6MountDepth / 2),
-		v6MountHeight - v6JHeadUpperCollarHeight - v6JHeadInnerCollarHeight - v6JHeadLowerCollarHeight - .1])
-	  cylinder(d=v6JHeadLowerCollarDiameter, h=v6JHeadLowerCollarHeight + .1, $fn=100);
+     translate([(jHeadMountWidth / 2),
+		(jHeadMountDepth / 2),
+		jHeadMountHeight - jHeadUpperCollarHeight - jHeadInnerCollarHeight - jHeadLowerCollarHeight - .1])
+	  cylinder(d=jHeadLowerCollarDiameter, h=jHeadLowerCollarHeight + .1, $fn=100);
      
 
      // Left Mounting Screw
-     translate([(v6MountWidth / 4),
+     translate([(jHeadMountWidth / 4),
 		-.1,
-		(v6MountHeight / 2)])
+		(jHeadMountHeight / 2)])
 	  rotate([-90,0,0])
-	  bolt_hole(v6MountBoltDiameter, v6MountDepth + carriageDepth - v6MountNutDepth, v6MountNutDiameter, v6MountNutDepth + .1);
+	  bolt_hole(jHeadMountBoltDiameter, jHeadMountDepth + carriageDepth - jHeadMountNutDepth, jHeadMountNutDiameter, jHeadMountNutDepth + .1);
 
      // Right Mount Screw
-     translate([v6MountWidth - (v6MountWidth / 4),
+     translate([jHeadMountWidth - (jHeadMountWidth / 4),
 		-.1,
-		(v6MountHeight / 2)])
+		(jHeadMountHeight / 2)])
 	  rotate([-90,0,0])
-	  bolt_hole(v6MountBoltDiameter, v6MountDepth + carriageDepth - v6MountNutDepth, v6MountNutDiameter, v6MountNutDepth + .1);
+	  bolt_hole(jHeadMountBoltDiameter, jHeadMountDepth + carriageDepth - jHeadMountNutDepth, jHeadMountNutDiameter, jHeadMountNutDepth + .1);
 		
 }
 
