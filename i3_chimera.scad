@@ -35,10 +35,10 @@
 
 // Which hotend are we importing? Can only use one at a time, Jons uses the same variable
 // and module names and openscad doesn't support conditionally import as far as I can tell.
-//use<e3d_v6_chimera.scad>;
+use<e3d_v6_chimera.scad>;
 //use<e3d_vulcano_chimera.scad>;
 //use<e3d_cyclops.scad>;
-use<e3d_v6_all_metall_hotend.scad>;
+//use<e3d_v6_all_metall_hotend.scad>;
 //use<e3d_v6_volcano_all_metall_hotend.scad>;
 
 // Bring in the basic delta fan designs I created for visualization.
@@ -56,7 +56,7 @@ carrierIntegration = true; // [true:Yes, false:No]
 servo_induct = "servo"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, none:Neither/None]
 
 // Which hot end is in use.
-hotend = "e3d_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol: E3D V6 w/ Volcano]
+hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano]
 
 /* [Prusa i3] */
 
@@ -339,7 +339,7 @@ chiBowdenLocs = [[(chiMountWidth / 2) - 9, chiMountDepth - (chiColdDepthOffset +
 		 [(chiMountWidth / 2) + 9, chiMountDepth - (chiColdDepthOffset + 6)]]; // X,Y locations for Bowden tube fitting holes.
 chiV6NozzleL = [[6,-6,-49.6],[24,-6,-49.6]]; // Location of Chimera V6 Nozzles in relation to top rear left corner of cold end.
 chiVolNozzleL = [[6,-6,-59.6],[24,-6,-59.6]]; // Location of Chimera Volcano nozzles in relation to the top rear left corner of cold end.
-cycNozzleL = [15,-6,-50.1]; // Locatopm Cyclops nozzle in relation to the top rear left corner of cold end.
+cycNozzleL = [[15,-6,-50.1]]; // Location of Cyclops nozzle in relation to the top rear left corner of cold end.
 
 // Variables for E3D V6
 v6Width = 26;
@@ -365,7 +365,7 @@ heNozzleL = (hotend == "chimera_v6" ? chiV6NozzleL
 	     : (hotend == "chimera_vol" ? chiVolNozzleL
 		: (hotend == "cyclops" ? cycNozzleL
 		   : (hotend == "e3d_v6" ? v6NozzleL
-		      : (hotend == "e3d_v6_vol" ? v6VoleNozzleL
+		      : (hotend == "e3d_v6_vol" ? v6VolNozzleL
 			 : [[0]]))))); // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
 
 // Prusa i3 variant carriage specific positioning variables.
