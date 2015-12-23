@@ -56,7 +56,7 @@ carrierIntegration = true; // [true:Yes, false:No]
 servo_induct = "servo"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, none:Neither/None]
 
 // Which hot end is in use.
-hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano]
+hotend = "e3d_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano]
 
 /* [Prusa i3] */
 
@@ -71,7 +71,7 @@ hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual 
 // all = All the parts
 
 // Which Prusa i3 part should be exported.
-prusai3Which = "all"; // [hotm:Back Plane & Cold / Hot End  Mount, v6_col: E3D V6 Collar, servo:Servo Bracket, fanm:Fan Mount, fant:Fan Bracket, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All] 
+prusai3Which = "v6_col"; // [hotm:Back Plane & Cold / Hot End  Mount, v6_col: E3D V6 Collar, servo:Servo Bracket, fanm:Fan Mount, fant:Fan Bracket, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All] 
 
 // Which side should the fan mount to? Be mindful of Z probe clearance.
 prusai3FanSide = "left"; // [left:Left side of hot end., right:Right side of hot end., none:No print cooling fan.]
@@ -136,7 +136,7 @@ prusai3FanTabNubWidth = 4;
 /* [C Bot Carriage] */
 
 // Which C Botpart should be exported.
-cBotWhich = "all"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All] 
+cBotWhich = "all"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, v6_col:E3D V6 Collar, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All] 
 
 // Width of carriage.
 cBotCarriageWidth = 72;
@@ -555,12 +555,6 @@ if (carriage == "prusai3") {
 			 // Place the E3d V6 mount
 			 translate(heMountL)
 			      e3d_v6_mount(xMountDepth);
-
-			 if(prusai3Which == "v6_col" || prusai3Which == "all") {
-			      // place the E3D V6 collar as well.
-			      translate(heMountL)
-			      e3d_v6_collar(xMountDepth);
-			 }
 		    }
 		    
 		    // Attach fan tab if needed.
@@ -615,6 +609,13 @@ if (carriage == "prusai3") {
 	       }
 	  }
      }
+
+     // E3D V6 Mount
+     if((hotend == "e3d_v6" || hotend == "e3d_v6_vol") && (prusai3Which == "v6_col" || prusai3Which == "all")) {
+	  // place the E3D V6 collar as well.
+	  translate(heMountL)
+	       e3d_v6_collar(xMountDepth);
+     }
      
      // Display cold / hot end model.
      if(hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") {
@@ -625,7 +626,7 @@ if (carriage == "prusai3") {
 	       %e3d();
      }
 
-     if(hotend == "e3d_v6" || hotend == "e3d_v6_vol") {
+     if((prusai3Which == "hotm" || prusai3Which == "all") && (hotend == "e3d_v6" || hotend == "e3d_v6_vol")) {
 	  // Place the E3D V6.
 	  translate([heMountL[0] + (v6MountWidth / 2),
 		     heMountL[1] + (v6MountDepth / 2),
@@ -769,13 +770,7 @@ if(carriage == "cbot") {
 	       // Place the E3d V6 mount
 	       translate(heMountL)
 		    e3d_v6_mount(cBotCarriageDepth);
-	       
-	       if(cBotWhich == "v6_col" || prusai3Which == "all") {
-		    // place the E3D V6 collar as well.
-		    translate(heMountL)
-			 e3d_v6_collar(cBotCarriageDepth);
-	       }
-	       
+	  
 	       // Place the E3D V6.
 	       translate([heMountL[0] + (v6MountWidth / 2),
 			  heMountL[1] + (v6MountDepth / 2),
@@ -785,6 +780,14 @@ if(carriage == "cbot") {
 	  }
      }
      
+
+     // E3D V6 Mount
+     if((hotend == "e3d_v6" || hotend == "e3d_v6_vol") && (cBotWhich == "v6_col" || cBotWhich == "all")) {
+	  // place the E3D V6 collar as well.
+	  translate(heMountL)
+	       e3d_v6_collar(cBotCarriageDepth);
+     }
+
      // Opposite side carriage plate.
      if(cBotWhich == "carrside" || cBotWhich == "all") {
 	  // Non hot end carriage side.
