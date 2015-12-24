@@ -729,7 +729,9 @@ if(carriage == "cbot") {
 
 		    // Replace material behind the mount.
 		    if(hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") {
-			 translate([0,chiMountDepth,0])
+			 translate([heMountL[0],
+				    heMountL[1] + chiMountDepth,
+				    heMountL[2]])
 			      cube([chiMountWidth, cBotCarriageDepth, chiMountHeight]);
 		    }
 
@@ -1829,6 +1831,22 @@ module cbot_carriage_holes(heSide=false) {
 	  for(i=[(cBotCarriageHeight / 4) : (cBotCarriageHeight / 4) :  cBotCarriageHeight]) {
 	       translate([j, -8, i - (cBotCarriageHeight / 16)])
 		    cable_tie(3,1.2,4.5);
+	  }
+     }
+
+     // Carve out some bolt holes for mounting various things.
+     for(j=[0 : 1 : ((cBotCarriageWidth / cBotFanMountDistance) / 2) -2]) {
+	  for(i=[0 : 1 : 1]) {
+
+	       // Left side
+	       translate([(cBotCarriageWidth / 2) - ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)), -cBotCarriageDepth, cBotFanMountPos + ((cBotCarriageHeight - cBotFanMountPos * 2) * i)])
+		    rotate([-90,0,0])
+		    bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
+
+	       // Right side
+	       translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)), -cBotCarriageDepth, cBotFanMountPos + ((cBotCarriageHeight - cBotFanMountPos * 2) * i)])
+		    rotate([-90,0,0])
+		    bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
 	  }
      }
 }
