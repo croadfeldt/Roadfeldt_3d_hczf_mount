@@ -32,6 +32,9 @@
 //
 // Includes E3D V6 w/ Volcano openscad design by Author: Professional 3D - Jons Collasius from Germany/Hamburg
 // URL Professional 3D: http://professional3d.de                                                                                                          // http://www.thingiverse.com/thing:862716
+//
+// Includes Hexagon Hot End openscad design by andreas.thorn@gmail.com
+// https://www.youmagine.com/designs/hexagon-hotend-visualization
 
 // Which hotend are we importing? Can only use one at a time, Jons uses the same variable
 // and module names and openscad doesn't support conditionally import as far as I can tell.
@@ -40,6 +43,7 @@ use<e3d_v6_chimera.scad>;
 //use<e3d_cyclops.scad>;
 //use<e3d_v6_all_metall_hotend.scad>;
 //use<e3d_v6_volcano_all_metall_hotend.scad>;
+use<Hexagon-102.scad>;
 
 // Bring in the basic delta fan designs I created for visualization.
 use<delta_blower_fans.scad>;
@@ -55,8 +59,8 @@ carrierIntegration = true; // [true:Yes, false:No]
 // Which Z Probe type is in use. Select Servo here if you want to if you Servo Bracket selected above, otherwise it won't appear.
 servo_induct = "servo"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, none:Neither/None]
 
-// Which hot end is in use.
-hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V]
+// Which hot end is in use. Ensure you enter height from top of mount to tip of nozzle if you select generic J Head.
+hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
 
 /* [Prusa i3] */
 
@@ -217,11 +221,25 @@ fanIntakeDiameter = 20;
 // How much clearance between the fan mount nubs and the fan tab. Too much of a gap and the fan mount will not snug up properly.
 fanTabNubClear = .1;
 
+// How far below the bottom of the fan should the bowl of the duct be.
+fanDuctBowlDepth = 5;
+
 // How thick should the wall of the fan duct be?
 fanDuctThickness = 1;
 
+// How far the fan duct should overlap the inside edge of the fan itself when connected.
+fanDuctOverlap = 2.75;
+
+// How far the fan duct should overlap the outside edge of the fan itself when connected.
+fanDuctOutsideOverlap = 6;
+
 // How far below the nozzle should the fan outlet point?
 fanDuctOutletOffset = 5;
+
+/* [Generic J Head] */
+
+// Enter height in millimeters from height from the top of the J Head mount, usually that is the top of the cold end itself. The top of the mount is 3.7 mm from the top of the inner groove of the J Head mount.
+genJHeadHeight = 0;
 
 /* [Z Probe / Servo] */
 
@@ -357,6 +375,7 @@ jHeadCollarCornerRadius = 3;
 jHeadMountBoltDiameter = 3.2;
 jHeadMountNutDiameter = 6.5;
 jHeadMountNutDepth = 2.4;
+jHeadFanScrewOffset = 5;
 
 // Variables for E3D V6
 v6NozzleL = [[0, 0, -62.3]]; // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
@@ -365,6 +384,12 @@ v6VolNozzleL = [[0,0,-72.3]]; // This must be a vector of vectors. If only one n
 // Variables for J Head Mark V
 jheadMkVNozzleL = [[0, 0, -51]]; // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
 
+// Variables for Hexagon Hot End
+hexagonNozzleL = [[0, 0, -55]]; // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
+
+// Variables for Generic J Head Hot End
+genericJHeadNozzleL = [[0, 0, -genJHeadHeight]]; // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
+
 // Generic Hot End Variables
 heNozzleL = (hotend == "chimera_v6" ? chiV6NozzleL
 	     : (hotend == "chimera_vol" ? chiVolNozzleL
@@ -372,7 +397,9 @@ heNozzleL = (hotend == "chimera_v6" ? chiV6NozzleL
 		   : (hotend == "e3d_v6" ? v6NozzleL
 		      : (hotend == "e3d_v6_vol" ? v6VolNozzleL
 			 : (hotend == "jhead_mkv" ? jheadMkVNozzleL
-			    : [[0]])))))); // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
+			    : (hotend == "hexagon" ? hexagonNozzleL
+			       : (hotend == "gen_jhead" ? genericJHeadNozzleL
+				  : [[0]])))))))); // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
 
 // Prusa i3 variant carriage specific positioning variables.
 prusai3FanBracketDepth = 3;
@@ -397,12 +424,12 @@ prusai3JHeadAnchorL = [(xMountWidth / 2),
 
 prusai3HEMountL = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
      ? prusai3ChiMountL
-     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv")
+     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead")
      ? prusai3JHeadMountL
      : 0;
 prusai3HEAnchorL = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
      ? prusai3ChiAnchorL
-     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv")
+     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead")
      ? prusai3JHeadAnchorL
      : 0;
 prusai3ChiFanScrewL = [prusai3FanSide == "left" ?
@@ -415,7 +442,7 @@ prusai3JHeadFanScrewL = [prusai3JHeadMountL[0] + (jHeadMountWidth / 2) + (sin(pr
 		      prusai3JHeadMountL[2] + (jHeadMountHeight / 2) + ((prusai3FanTabHeight / 2) + prusai3FanScrewOffset)]; // Offset of the center of the fan mount screw from prusai3FanTabL
 prusai3FanScrewL = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
      ? prusai3ChiFanScrewL
-     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv")
+     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead")
      ? prusai3JHeadFanScrewL
      : 0;
 prusai3DuctConnectL = fan_duct_connect(prusai3FanScrewL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, fanDimensions, fanCenterOffset, fanMountOffset, fanMountThickness, prusai3FanTabHole, prusai3FanTabMat, fanDuctConnectSize);
@@ -485,12 +512,12 @@ cBotJHeadAnchorL = [(cBotCarriageWidth / 2),
 		    cBotJHeadMountL[2] + jHeadMountHeight]; // Position of E3D V6 Mount.
 cBotHEMountL = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
      ? cBotChiMountL
-     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv")
+     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead")
      ? cBotJHeadMountL
      : 0;
 cBotHEAnchorL = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
      ? cBotChiAnchorL
-     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv")
+     : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead")
      ? cBotJHeadAnchorL
      : 0;
 
@@ -503,12 +530,11 @@ tempDuctConnectL = (carriage == "prusai3" ? prusai3DuctConnectL : (carriage == "
 ductConnectL = (printFanDirection == "left" ? tempDuctConnectL[0] : tempDuctConnectL[1]);
 
 // Variables for Fan Duct
-fanDuctOverlap = 2.75; // How much to over lap the connection to the fan.
 fanDuctOutletNozzleOffsetL = [0,-18 - fanDuctThickness,5]; // Offset from the nozzles where the fan duct outlets should be placed.
-fanDuctOutletAngle = [- atan((fanDuctOutletNozzleOffsetL[2] + fanDuctOutletOffset) / abs(fanDuctOutletNozzleOffsetL[1])),0,0];
-fanDuctConnectRadius = fanDuctConnectSize[2] / 2; // Radius of the bottom of the fan duct below housing.
-fanDuctBowlDepth = 10; // How deep the bowl at the bottom of the fan duct should be.
 fanDuctOutletSize = [15,1,3]; // Size of the fan duct outlets.
+fanDuctOutletAngle = [- atan((fanDuctOutletNozzleOffsetL[2] + fanDuctOutletOffset + fanDuctOutletSize[2]) / abs(fanDuctOutletNozzleOffsetL[1])),0,0];
+fanDuctConnectRadius = fanDuctConnectSize[2] / 2; // Radius of the bottom of the fan duct below housing.
+
 
 // Variables for probe extension and servo bracket.
 servoBracketL = [ prusai3ZProbeSide == "right" ?
@@ -558,7 +584,7 @@ if (carriage == "prusai3") {
 		    }
 
 		    // J Head style mount
-		    if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv") {
+		    if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead") {
 			 // Place the E3d V6 mount
 			 translate(heMountL)
 			      jhead_mount(xMountDepth);
@@ -597,7 +623,7 @@ if (carriage == "prusai3") {
 	       }
 	       
 	       // Carve J Head style mount holes, if needed.
-	       if(hotend == "e3d_v6" || hotend == "e3d_v6_vol") {
+	       if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead") {
 		    translate(heMountL)
 			 jhead_holes(xMountDepth);
 	       }
@@ -617,7 +643,7 @@ if (carriage == "prusai3") {
      }
 
      // J Head style mount
-     if((hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv") && (prusai3Which == "v6_col" || prusai3Which == "all")) {
+     if((hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead") && (prusai3Which == "v6_col" || prusai3Which == "all")) {
 	  // Place the J Head collar as well.
 	  translate(heMountL)
 	       jhead_collar(xMountDepth);
@@ -641,8 +667,18 @@ if (carriage == "prusai3") {
 	       %e3d();
      }
 
+     // Display Hexagon if needed.
+     if((prusai3Which == "hotm" || prusai3Which == "all") && (hotend == "hexagon")) {
+	  // Place the E3D V6.
+	  translate([heMountL[0] + (jHeadMountWidth / 2),
+		     heMountL[1] + (jHeadMountDepth / 2),
+		     heMountL[2] + hexagonNozzleL[0][2] + 12.7])
+	       rotate([0,0,0])
+	       %hexagon_hotend();
+     }
+
      // Fan Bracket, if needed.
-     if((prusai3Which == "fant" || prusai3Which == "all") && (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv"))  {
+     if((prusai3Which == "fant" || prusai3Which == "all") && (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead"))  {
 	  // Place the fan tab.
 	  translate(fanScrewL)
 	       bracket_fan_tab(jHeadMountWidth - (jHeadCollarCornerRadius * 2), prusai3FanBracketDepth, jHeadMountHeight, jHeadMountBoltDiameter,
@@ -689,9 +725,9 @@ if (carriage == "prusai3") {
 	       rotate([prusai3FanTabHorizontalAngle,0,prusai3RealFanTabVerticalAngle])
 	       translate(ductConnectL)
 	       difference() {
-	       fan_duct(ductConnectL, fanScrewL, heAnchorL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, false);
+	       fan_duct(ductConnectL, fanScrewL, heAnchorL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, prusai3FanDirection, false);
 	       
-	       fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, false);
+	       fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, prusai3FanDirection, false);
 	  }
      }
 
@@ -736,7 +772,7 @@ if(carriage == "cbot") {
 		    }
 
 		    // Replace material behind the mount.
-		    if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv") {
+		    if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead") {
 			 translate([heMountL[0],
 				    heMountL[1] + jHeadMountDepth,
 				    heMountL[2]])
@@ -745,7 +781,7 @@ if(carriage == "cbot") {
 	       }
 
 	       // Carve J Head style mount holes, if needed.
-	       if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv") {
+	       if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead") {
 		    translate(heMountL)
 			 jhead_holes(cBotCarriageDepth);
 	       }
@@ -774,7 +810,7 @@ if(carriage == "cbot") {
 	  }
 	  
 	  // J Head style mount
-	  if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv") {
+	  if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead") {
 	       // Place the J Head style mount
 	       translate(heMountL)
 		    jhead_mount(cBotCarriageDepth);
@@ -790,7 +826,7 @@ if(carriage == "cbot") {
      
 
      // J Head style mount collar
-     if((hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv") && (cBotWhich == "v6_col" || cBotWhich == "all")) {
+     if((hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead") && (cBotWhich == "v6_col" || cBotWhich == "all")) {
 	  translate(heMountL)
 	       jhead_collar(cBotCarriageDepth);
      }
@@ -851,9 +887,9 @@ if(carriage == "cbot") {
 	       rotate([cBotFanTabHorizontalAngle,0,cBotFanTabVerticalAngle])
 	       translate(ductConnectL)
 	       difference() {
-	       fan_duct(ductConnectL, fanScrewL, heAnchorL, cBotFanTabHorizontalAngle, cBotRealFanTabVerticalAngle, true);
+	       fan_duct(ductConnectL, fanScrewL, heAnchorL, cBotFanTabHorizontalAngle, cBotRealFanTabVerticalAngle, cBotFanDirection, true);
 	       
-	       fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, cBotFanTabHorizontalAngle, cBotRealFanTabVerticalAngle, true);
+	       fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, cBotFanTabHorizontalAngle, cBotRealFanTabVerticalAngle, cBotFanDirection, true);
 	  }
      }
      
@@ -1400,16 +1436,39 @@ module fan_screw_hole_single(tabHole, tabHoleMat, diameter, thickness, height, x
 }
 
 // Fan Duct
-module fan_duct(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, reverseY=false) {
+module fan_duct(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDirection, reverseY=false) {
      // Simple fan duct to get something working for now.
      // Create the connection to the fan.
-     translate([-fanDuctThickness, -fanDuctThickness, - (fanDuctBowlDepth - fanDuctConnectRadius)])
+echo("fanDirection:",fanDirection);
+echo("reverseY",reverseY);
+     translate([-fanDuctThickness, -fanDuctThickness, 0])
+	  difference() {
 	  cube([fanDuctConnectSize[0] + (fanDuctThickness * 2),
 		fanDuctConnectSize[1] + (fanDuctThickness * 2),
-		fanDuctBowlDepth - fanDuctConnectRadius + fanDuctOverlap]);
+		fanDuctOutsideOverlap]);
+
+	  hull() {
+	       translate([-.1,
+			  -.1,
+			  ((fanDirection == "left" && reverseY == true) || (fanDirection == "right" && reverseY == false)) ? fanDuctOverlap
+			      : fanDuctOutsideOverlap])
+		    cube([.1, fanDuctConnectSize[1] + (fanDuctThickness * 2) + .2,
+			  ((fanDirection == "left" && reverseY == true) || (fanDirection == "right" && reverseY == false)) ? fanDuctOutsideOverlap
+			  : fanDuctOverlap]);
+	       
+	       translate([(fanDuctConnectSize[0] + (fanDuctThickness * 2)),
+			  -.1,
+			  ((fanDirection == "left" && reverseY == true) || (fanDirection == "right" && reverseY == false)) ? fanDuctOutsideOverlap
+			  : fanDuctOverlap])
+		    cube([.1, fanDuctConnectSize[1] + (fanDuctThickness * 2) + .2,
+			  ((fanDirection == "left" && reverseY == true) || (fanDirection == "right" && reverseY == false)) ? fanDuctOverlap
+			  : fanDuctOutsideOverlap]);
+	  }
+     }
+     
      hull() {
 	  // Recreate the body of the fan shroud so we can hull to it.
-	  translate([-fanDuctThickness, -fanDuctThickness, - (fanDuctBowlDepth - fanDuctConnectRadius) - .1])
+	  translate([-fanDuctThickness, -fanDuctThickness, 0])
 	       cube([fanDuctConnectSize[0] + (fanDuctThickness * 2),
 		     fanDuctConnectSize[1] + (fanDuctThickness * 2),
 		     .1]);
@@ -1418,24 +1477,28 @@ module fan_duct(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerti
 	  translate([-fanDuctThickness,
 		     fanDuctConnectRadius,
 		     - (fanDuctBowlDepth - fanDuctConnectRadius) - fanDuctConnectRadius - fanDuctThickness])
+	       difference() {
 	       rotate([0,90,0])
-	       cylinder(r=(fanDuctConnectRadius + fanDuctThickness), h=fanDuctConnectSize[0] + (fanDuctThickness * 2),$fn=100);
+		    cylinder(r=(fanDuctConnectRadius + fanDuctThickness), h=fanDuctConnectSize[0] + (fanDuctThickness * 2),$fn=100);
+		    
+		    translate([- .1, - (fanDuctConnectRadius + 2.5), 0])
+		    cube([fanDuctConnectSize[0] + (fanDuctThickness * 2) + .2, (fanDuctConnectRadius * 2) + 5, fanDuctConnectRadius + fanDuctThickness + 5]);
+	  }
 
 	  // Create the outlets.
 	  fan_duct_nozzle(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, false, reverseY);
      }
 }
 
-module fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, reverseY=false) {
+module fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDirection, reverseY=false) {
      // Carve out the inside part of connection to the fan.
-     translate([0,0, - (fanDuctBowlDepth - fanDuctConnectRadius) - .1])
+     translate([0, 0, -.1])
 	  cube([fanDuctConnectSize[0],
 		fanDuctConnectSize[1],
-		fanDuctBowlDepth - fanDuctConnectRadius + fanDuctOverlap + .2]);
-
+		fanDuctOutsideOverlap + .2]);
      hull() {
 	  // Recreate the body of the fan shroud so we can hull to it.
-	  translate([0,0, - (fanDuctBowlDepth - fanDuctConnectRadius) - .1])
+	  translate([0,0, -.1])
 	       cube([fanDuctConnectSize[0],
 		     fanDuctConnectSize[1],
 		     .2]);
@@ -1444,9 +1507,14 @@ module fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, ta
 	  translate([0,
 		     fanDuctConnectRadius,
 		     - (fanDuctBowlDepth - fanDuctConnectRadius) - fanDuctConnectRadius])
+	       difference() {
 	       rotate([0,90,0])
-	       cylinder(r=(fanDuctConnectRadius), h=fanDuctConnectSize[0],$fn=100);
-
+		    cylinder(r=fanDuctConnectRadius, h=fanDuctConnectSize[0],$fn=100);
+	       
+	       translate([- .1, - (fanDuctConnectRadius + 2.5), 0])
+		    cube([fanDuctConnectSize[0] + .2, (fanDuctConnectRadius * 2) + 5, fanDuctConnectRadius + 5]);
+	  }
+	  
 	  // Create the outlets.
 	  fan_duct_nozzle(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, 0, true, reverseY);
      }
@@ -1468,14 +1536,16 @@ module fan_duct_nozzle(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, t
 	       translate(-fanScrewL)
 	       translate(heAnchorL)
 	       translate(heNozzleL[a])
+	       translate([0,0,3]) {
 	       translate([fanDuctOutletNozzleOffsetL[0],
 			 reverseY == false ? fanDuctOutletNozzleOffsetL[1] : - fanDuctOutletNozzleOffsetL[1],
-			 fanDuctOutletNozzleOffsetL[2]]) { // Offset from the nozzle where the outlet should be.
+			 fanDuctOutletNozzleOffsetL[2] - (fanDuctOutletSize[2]) ]) { // Offset from the nozzle where the outlet should be.
 	       // Rotate the duct outlets to point to the correct spot.
 	       rotate(reverseY == false ? fanDuctOutletAngle : - fanDuctOutletAngle)
 		    cube([fanDuctOutletSize[0] + (wallThickness * 2),
 			  fanDuctOutletSize[1] + (interior ? .1 : 0),
 			  fanDuctOutletSize[2] + (wallThickness * 2)], center=true);
+	       }
 	  }
      }
 }
