@@ -169,6 +169,12 @@ cBotCarriageMountScrewVerticalDistance = 30;
 // Vertical position of back plane mount from bottom of carriage. Not used if hot end mount is integrated.
 cBotBackMountVertPosition = 40;
 
+// Vertical position of fan bracket.
+cBotFanMountPos = 20;
+
+// Vertical position of accessory mount holes. Offset from top and bottom respectively.
+cBotAccessoryMountPos = 7;
+
 // Hot end mount offset. Positive number = higher, negative = lower.
 cBotHEOffset = 0;
 
@@ -480,7 +486,6 @@ cBotFanTabHorizontalAngle = 0;
 cBotRealFanTabVerticalAngle = cBotFanSide == "left" ?
      cBotFanTabVerticalAngle :
      - cBotFanTabVerticalAngle;
-cBotFanMountPos = 7;
 cBotFanMountDistance = 10;
 cBotFanBracketWidth = 20;
 cBotFanBracketHeight = 8;
@@ -494,7 +499,7 @@ cBotFanTabMat = 2;
 cBotFanBarWidth = cBotFanTabWidth + (cBotFanTabWidth * 2) + (fanTabNubClear * 2);
 cBotFanScrewL = [(cBotCarriageWidth / 2) - cBotFanMountDistance,
 		 cBotCarriageSideDistance + cBotCarriageDepth + cBotFanBracketDepth + cBotFanTabDepth + (cBotFanTabHole / 2) + cBotFanTabMat,
-		 cBotFanMountPos + (cBotFanMountDistance * 2)];
+		 cBotFanMountPos];
 cBotFanScrewOffset = 0;
 cBotTempDuctConnectL = fan_duct_connect(cBotFanScrewL, cBotFanTabHorizontalAngle, cBotRealFanTabVerticalAngle, fanDimensions, fanCenterOffset, fanMountOffset, fanMountThickness, cBotFanTabHole, cBotFanTabMat, fanDuctConnectSize, true);
 cBotDuctConnectL = [cBotTempDuctConnectL[1],cBotTempDuctConnectL[0]];
@@ -648,7 +653,7 @@ if (carriage == "prusai3") {
 	  translate(heMountL)
 	       jhead_collar(xMountDepth);
      }
-     
+    
      // Display cold / hot end model.
      if(hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") {
 	  // Place the E3D Chimera fron Jons.
@@ -662,7 +667,7 @@ if (carriage == "prusai3") {
 	  // Place the E3D V6.
 	  translate([heMountL[0] + (jHeadMountWidth / 2),
 		     heMountL[1] + (jHeadMountDepth / 2),
-		     heMountL[2] + 12.7])
+		     heMountL[2] + 16])
 	       rotate([0,180,0])
 	       %e3d();
      }
@@ -814,13 +819,27 @@ if(carriage == "cbot") {
 	       // Place the J Head style mount
 	       translate(heMountL)
 		    jhead_mount(cBotCarriageDepth);
-	  
+
+	  }
+
+	  // Display E3D V6 if needed.
+	  if(hotend == "e3d_v6" || hotend == "e3d_v6_vol") {
+	       // Place the E3D V6
+	       translate([heMountL[0] + (jHeadMountWidth / 2),
+			  heMountL[1] + (jHeadMountDepth / 2),
+			  heMountL[2] + 16])
+		    rotate([0,180,0])
+		    %e3d();
+	  }
+
+	  // Display Hexagon if needed.
+	  if((cBotWhich == "hotm" || cBotWhich == "all") && (hotend == "hexagon")) {
 	       // Place the E3D V6.
 	       translate([heMountL[0] + (jHeadMountWidth / 2),
 			  heMountL[1] + (jHeadMountDepth / 2),
-			  heMountL[2] + 12.7])
-		    rotate([0,180,0])
-		    %e3d();
+			  heMountL[2] + hexagonNozzleL[0][2] + 12.7])
+		    rotate([0,0,0])
+		    %hexagon_hotend();
 	  }
      }
      
@@ -1867,7 +1886,7 @@ module cbot_carriage_holes(heSide=false) {
 
 	  // Leave a bar for the fan mount if needed.
 	  if(! heSide) {
-	       translate([0, -cBotCarriageDepth, cBotFanMountPos + (cBotFanMountDistance * 2) - (cBotFanBracketHeight * .75)])
+	       translate([0, -cBotCarriageDepth, cBotFanMountPos - (cBotFanBracketHeight * .75)])
 		    cube([cBotCarriageWidth, cBotCarriageDepth, (cBotFanBracketHeight * 1.5)]);
 	  }
      }
@@ -1886,12 +1905,12 @@ module cbot_carriage_holes(heSide=false) {
      if(heSide == false) {
 	  // Cutout mounting holes for the fan mount. This can be easily made repeatable by replace the multipliers with j and i.
 	  // Left side
-	  translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * 0)), -cBotCarriageDepth, cBotFanMountPos + (cBotFanMountDistance * 2)])
+	  translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * 0)), -cBotCarriageDepth, cBotFanMountPos])
 	       rotate([-90,0,0])
 	       bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
 	  
 	  // Right side
-	  translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * 1)), -cBotCarriageDepth, cBotFanMountPos + (cBotFanMountDistance * 2)])
+	  translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * 1)), -cBotCarriageDepth, cBotFanMountPos])
 	       rotate([-90,0,0])
 	       bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
      }
@@ -1909,12 +1928,12 @@ module cbot_carriage_holes(heSide=false) {
 	  for(i=[0 : 1 : 1]) {
 
 	       // Left side
-	       translate([(cBotCarriageWidth / 2) - ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)), -cBotCarriageDepth, cBotFanMountPos + ((cBotCarriageHeight - cBotFanMountPos * 2) * i)])
+	       translate([(cBotCarriageWidth / 2) - ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)), -cBotCarriageDepth, cBotAccessoryMountPos + ((cBotCarriageHeight - cBotAccessoryMountPos * 2) * i)])
 		    rotate([-90,0,0])
 		    bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
 
 	       // Right side
-	       translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)), -cBotCarriageDepth, cBotFanMountPos + ((cBotCarriageHeight - cBotFanMountPos * 2) * i)])
+	       translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)), -cBotCarriageDepth, cBotAccessoryMountPos + ((cBotCarriageHeight - cBotAccessoryMountPos * 2) * i)])
 		    rotate([-90,0,0])
 		    bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
 	  }
