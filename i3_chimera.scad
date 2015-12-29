@@ -238,7 +238,7 @@ fanDuctOutletOffset = 5;
 
 /* [Generic J Head] */
 
-// Enter height in millimeters from height from the top of the J Head mount, usually that is the top of the cold end itself. The top of the mount is 3.7 mm from the top of the inner groove of the J Head mount.
+// Enter height in millimeters from the top of the J Head mount, usually that is the top of the cold end itself. The top of the mount is 3.7 mm from the top of the inner groove of the J Head mount.
 genJHeadHeight = 0;
 
 /* [Z Probe / Servo] */
