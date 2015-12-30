@@ -255,6 +255,12 @@ fanDuctOutsideOverlap = 6;
 // How far below the nozzle should the fan outlet point?
 fanDuctOutletOffset = 5;
 
+ // Offset from the nozzles where the fan duct outlets should be placed. Leave named variables in place.
+fanDuctOutletNozzleOffsetL = [0,-18 - fanDuctThickness,5];
+
+// Size of the fan duct outlets.
+fanDuctOutletSize = [15,1,3];
+
 /* [Z Probe / Servo] */
 
 // How much of a gap from the edge of the X Carriage back plane to the inside of the servo mount.
@@ -566,8 +572,6 @@ tempDuctConnectL = (carriage == "prusai3" ? prusai3DuctConnectL : (carriage == "
 ductConnectL = (printFanDirection == "left" ? tempDuctConnectL[0] : tempDuctConnectL[1]);
 
 // Variables for Fan Duct
-fanDuctOutletNozzleOffsetL = [0,-18 - fanDuctThickness,5]; // Offset from the nozzles where the fan duct outlets should be placed.
-fanDuctOutletSize = [15,1,3]; // Size of the fan duct outlets.
 fanDuctOutletAngle = [- atan((fanDuctOutletNozzleOffsetL[2] + fanDuctOutletOffset + fanDuctOutletSize[2]) / abs(fanDuctOutletNozzleOffsetL[1])),0,0];
 fanDuctConnectRadius = fanDuctConnectSize[2] / 2; // Radius of the bottom of the fan duct below housing.
 
