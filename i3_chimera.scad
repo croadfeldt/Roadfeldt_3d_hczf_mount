@@ -53,8 +53,8 @@ use<delta_blower_fans.scad>;
 // What type of Carriage do you use / need?
 carriage = "cbot"; // [cbot:C Bot style, prusai3:Prusa i3]
 
-// Should the mount and carrier be combined into one? Only applicable for cbot currently.
-carrierIntegration = true; // [true:Yes, false:No]
+// Should the mount and carrier be combined into one? Only applicable for cbot currently. FUTURE FEATURE, not active yet.
+carrierIntegration = 1; // [1:Yes, 0:No]
 
 // Which Z Probe type is in use. Select Servo here if you want to if you Servo Bracket selected above, otherwise it won't appear.
 servo_induct = "servo"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, none:Neither/None]
@@ -63,7 +63,7 @@ servo_induct = "servo"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Se
 hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
 
 // Should the parts be exploded, do this before producing the stl file. You will still receive a single STL file with all the parts, but they will be separated so you can split them up with Cura or NetFabb. Select no if you want to see the parts fit together as they would on the printer. Selecting no will NOT produce a valid STL for printing as the parts will be inseparable.
-explodeParts = true; // [true:Yes, false:No]
+explodeParts = 1; // [1:Yes, 0:No]
 
 /* [Prusa i3] */
 
@@ -681,7 +681,7 @@ if (carriage == "prusai3") {
      // J Head style mount collar
      if((hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead") && (prusai3Which == "v6_col" || prusai3Which == "all")) {
 	  // Place the J Head collar.
-	  translate(explodeParts == true ? (heMountL - partsOffset) : heMountL)
+	  translate(explodeParts == 1 ? (heMountL - partsOffset) : heMountL)
 	       jhead_collar(xMountDepth);
      }
     
@@ -717,7 +717,7 @@ if (carriage == "prusai3") {
      // Fan Bracket, if needed.
      if((prusai3Which == "fant" || prusai3Which == "all") && (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead"))  {
 	  // Place the fan tab.
-	  translate(explodeParts == true ? (fanScrewL - (partsOffset * 2)) : fanScrewL)
+	  translate(explodeParts == 1 ? (fanScrewL - (partsOffset * 2)) : fanScrewL)
 	       bracket_fan_tab(jHeadMountWidth - (jHeadCollarCornerRadius * 2), prusai3FanBracketDepth, jHeadMountHeight, jHeadMountBoltDiameter,
 			       (jHeadMountWidth / 2),
 			       prusai3FanTabWidth, prusai3FanTabDepth, prusai3FanTabHeight,
@@ -727,7 +727,7 @@ if (carriage == "prusai3") {
      // Fan Mount
      if((prusai3Which == "fanm" || prusai3Which == "all") && prusai3FanSide != "none") {
 	  // Spin up the Fan Mount.
-	  translate(explodeParts == true ? (fanScrewL - (partsOffset * 3)) : fanScrewL)
+	  translate(explodeParts == 1 ? (fanScrewL - (partsOffset * 3)) : fanScrewL)
 	       rotate([prusai3FanTabHorizontalAngle,0,prusai3RealFanTabVerticalAngle])
 	       fan_mount(prusai3FanTabHole, prusai3FanTabMat, prusai3FanTabWidth, fanTabNubClear, fanMountThickness, prusai3FanBarWidth, fanMountOffset, fanCenterOffset, fanMountScrewDiameter, fanMountScrewMat, fanMountScrews, fanIntakeDiameter, printFanDirection);
      }
@@ -736,7 +736,7 @@ if (carriage == "prusai3") {
      if(showFan == true && (prusai3Which == "all" || prusai3Which == "fanm")) {
 	  if(printFanDirection == "left") {
 	       // Place the fan for reference.
-	       translate(explodeParts == true ? (fanScrewL - (partsOffset * 3)) : fanScrewL)
+	       translate(explodeParts == 1 ? (fanScrewL - (partsOffset * 3)) : fanScrewL)
 		    rotate([prusai3FanTabHorizontalAngle,0,prusai3RealFanTabVerticalAngle])
 		    rotate([0,-90,0])
 		    translate([fanMountOffset[2],
@@ -745,7 +745,7 @@ if (carriage == "prusai3") {
 		    %blower_fan_50_20();
 	  }
 	  else {
-	       translate(explodeParts == true ? (fanScrewL - (partsOffset * 3)) : fanScrewL)
+	       translate(explodeParts == 1 ? (fanScrewL - (partsOffset * 3)) : fanScrewL)
 		    rotate([-prusai3FanTabHorizontalAngle,0,180 + prusai3RealFanTabVerticalAngle])
 		    rotate([0,-90,0])
 		    translate([fanMountOffset[2],
@@ -758,7 +758,7 @@ if (carriage == "prusai3") {
      // Display fan duct if needed
      if((prusai3Which == "all" || prusai3Which == "duct") && prusai3FanSide != "none") {
 	  // Place the fan duct.
-	  translate(explodeParts == true ? (fanScrewL - (partsOffset * 3)) : fanScrewL)
+	  translate(explodeParts == 1 ? (fanScrewL - (partsOffset * 3)) : fanScrewL)
 	       rotate([prusai3FanTabHorizontalAngle,0,prusai3RealFanTabVerticalAngle])
 	       translate(ductConnectL)
 	       difference() {
@@ -771,7 +771,7 @@ if (carriage == "prusai3") {
      // Servo Bracket
      if((prusai3Which == "servo" || prusai3Which == "all") && servo_induct == "servo") {
 	  // Place the Servo Bracket.
-	  translate(explodeParts == true ? (servoBracketL - partsOffset) : servoBracketL)
+	  translate(explodeParts == 1 ? (servoBracketL - partsOffset) : servoBracketL)
 	       difference() {
 	       servo_bracket();
 	       
@@ -782,7 +782,7 @@ if (carriage == "prusai3") {
      // Z Probe Arm
      if((prusai3Which == "zarm" || prusai3Which == "all") && servo_induct == "servo" && servo_induct != "none") {
 	  // Place the Z Probe Arm
-	  translate(explodeParts == true ? (zProbeTopL - partsOffset) : zProbeTopL)
+	  translate(explodeParts == 1 ? (zProbeTopL - partsOffset) : zProbeTopL)
 	       difference() {
 	       z_probe_arm(zProbeBottomL);
 	       
@@ -878,7 +878,7 @@ if(carriage == "cbot") {
 
      // J Head style mount collar
      if((hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead") && (cBotWhich == "v6_col" || cBotWhich == "all")) {
-	  translate(explodeParts == true ? (heMountL - partsOffset) : heMountL)
+	  translate(explodeParts == 1 ? (heMountL - partsOffset) : heMountL)
 	       jhead_collar(cBotCarriageDepth);
      }
 
@@ -893,7 +893,7 @@ if(carriage == "cbot") {
      // Fan Mount Bracket
      if(cBotWhich == "fant" || cBotWhich == "all") {
 	  // Place the fan tab.
-	  translate(explodeParts == true ? (fanScrewL + partsOffset) : fanScrewL)
+	  translate(explodeParts == 1 ? (fanScrewL + partsOffset) : fanScrewL)
 	       rotate([0, 0, 180])
 	       bracket_fan_tab(cBotFanBracketWidth, cBotFanBracketDepth, cBotFanBracketHeight, cBotBeltScrewDiameter,
 			       cBotFanMountDistance,
@@ -903,7 +903,7 @@ if(carriage == "cbot") {
      
      // Fan Mount
      if(cBotWhich == "fanm" || cBotWhich == "all") {
-	  translate(explodeParts == true ? (fanScrewL + (partsOffset * 2)) : fanScrewL)
+	  translate(explodeParts == 1 ? (fanScrewL + (partsOffset * 2)) : fanScrewL)
 	       rotate([0, 0, 180])
 	       fan_mount(cBotFanTabHole, cBotFanTabMat, cBotFanTabWidth, fanTabNubClear, fanMountThickness, cBotFanBarWidth, fanMountOffset, fanCenterOffset, fanMountScrewDiameter, fanMountScrewMat, fanMountScrews, fanIntakeDiameter);
      }
@@ -913,9 +913,9 @@ if(carriage == "cbot") {
 	  if(printFanDirection == "left") {
 	       // Place the fan for reference..
 	       rotate([0,-90,180 + cBotRealFanTabVerticalAngle])
-		    translate([explodeParts == true ? (fanScrewL[2] + partsOffset[2]) : fanScrewL[2],
-			       explodeParts == true ? -(fanScrewL[1] + partsOffset[1]) : -fanScrewL[1],
-			       explodeParts == true ? (fanScrewL[0] + partsOffset[0]) : fanScrewL[0]])
+		    translate([explodeParts == 1 ? (fanScrewL[2] + partsOffset[2]) : fanScrewL[2],
+			       explodeParts == 1 ? -(fanScrewL[1] + partsOffset[1]) : -fanScrewL[1],
+			       explodeParts == 1 ? (fanScrewL[0] + partsOffset[0]) : fanScrewL[0]])
 		    rotate([0,0,cBotFanTabHorizontalAngle])
 		    translate([fanMountOffset[2],
 			       -((cBotFanTabHole / 2) + cBotFanTabMat + fanMountThickness + fanMountOffset[1] + fanDimensions[1]),
@@ -924,9 +924,9 @@ if(carriage == "cbot") {
 	  }
 	  else {
 	       rotate([0,-90,cBotRealFanTabVerticalAngle])
-		    translate([explodeParts == true ? (fanScrewL[2] + partsOffset[2]) : fanScrewL[2],
-			       explodeParts == true ? (fanScrewL[1] + partsOffset[1]) : fanScrewL[1],
-			       explodeParts == true ? -(fanScrewL[0] + partsOffset[0]) : -fanScrewL[0]])
+		    translate([explodeParts == 1 ? (fanScrewL[2] + partsOffset[2]) : fanScrewL[2],
+			       explodeParts == 1 ? (fanScrewL[1] + partsOffset[1]) : fanScrewL[1],
+			       explodeParts == 1 ? -(fanScrewL[0] + partsOffset[0]) : -fanScrewL[0]])
 		    rotate([0,0,-cBotFanTabHorizontalAngle])
 		    translate([fanMountOffset[2],
 			       ((cBotFanTabHole / 2) + cBotFanTabMat + fanMountThickness + fanMountOffset[1]),
@@ -938,7 +938,7 @@ if(carriage == "cbot") {
      // Display fan duct if needed
      if((cBotWhich == "all" || cBotWhich == "duct") && cBotFanSide != "none") {
 	  // Place the fan duct.
-	  translate(explodeParts == true ? (fanScrewL + partsOffset) : fanScrewL)
+	  translate(explodeParts == 1 ? (fanScrewL + partsOffset) : fanScrewL)
 	       rotate([cBotFanTabHorizontalAngle,0,cBotFanTabVerticalAngle])
 	       translate(ductConnectL)
 	       difference() {
