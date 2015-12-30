@@ -113,9 +113,6 @@ xMountHoleWidth = 23;
 // Distance between mounting bolt holes in the vertical direction
 xMountHoleHeight = 23;
 
-// Hot end mount offset. Positive number = higher, negative = lower.
-prusai3HEOffset = 0;
-
 // How wide to make the tab the cooling fan hangs off of.
 prusai3FanTabWidth = 8;
 
@@ -136,6 +133,9 @@ prusai3FanTabMat = 2;
 
 // How wide the nubs on each side of the fan mount tab should be.
 prusai3FanTabNubWidth = 4;
+
+// How deep the fan bracket should be.
+prusai3FanBracketDepth = 3;
 
 /* [C Bot Carriage] */
 
@@ -175,13 +175,13 @@ cBotFanMountPos = 20;
 // Vertical position of accessory mount holes. Offset from top and bottom respectively.
 cBotAccessoryMountPos = 7;
 
-// Hot end mount offset. Positive number = higher, negative = lower.
-cBotHEOffset = 0;
+/* [Hot End Settings] */
 
-/* [Chimera Mount] */
+// How far out to offset the Hot End from the rear of the mount.
+heDepthOffset = 0.1;
 
-// Extra amount of space add to the rear of the Chimera cold mount. Accounts for 3d printing variances.
-chiColdDepthOffset = .5;
+// Hot end mount height offset. Positive number = higher, negative = lower.
+heHeightOffset = 0;
 
 // Thickness of Chimera mount vertical brace.
 chiBraceThickness = 4;
@@ -189,11 +189,8 @@ chiBraceThickness = 4;
 // How thick the Chimera mount top plate should be.
 chiMountHeight = 5;
 
-// Size of hole for screws that mount the Chimera Cold End.
-chiScrewHole = 3.2;
-
-// Size of hole for bowden tube fittings.
-chiBowdenHole = 8.2;
+// Enter height in millimeters from the top of the J Head mount, usually that is the top of the cold end itself. The top of the mount is 3.7 mm from the top of the inner groove of the J Head mount.
+genJHeadHeight = 0;
 
 /* [Print Cooling Fan] */
 
@@ -241,11 +238,6 @@ fanDuctOutsideOverlap = 6;
 
 // How far below the nozzle should the fan outlet point?
 fanDuctOutletOffset = 5;
-
-/* [Generic J Head] */
-
-// Enter height in millimeters from the top of the J Head mount, usually that is the top of the cold end itself. The top of the mount is 3.7 mm from the top of the inner groove of the J Head mount.
-genJHeadHeight = 0;
 
 /* [Z Probe / Servo] */
 
@@ -318,7 +310,7 @@ zProbeSwitchHeight = 7.5;
 // Distance below nozzle you want the switch to trigger, roughly, depends on switch activation point.
 zProbeSwitchActivationDistance = 5;
 
-/* Inductive / Capacitive Sensor */
+/* [Inductive / Capacitive Sensor] */
 
 // Diameter of sensor.
 inductDiameter = 12;
@@ -338,32 +330,38 @@ inductBraceHeight = 20;
 // Width of braces.
 inductBraceWidth = 4;
 
-/* [Hidden] */
+/* [Prusa i3 Carriage Advanced] */
 
 // Variables used for calculations and not normally change variables..
 xMountBoltDepth = (xMountDepth - xMountNutDepth); // How deep the X Carriage bolt shafts hole are.
 xMountHoleWidthOffset = (xMountWidth - (xMountHoleWidth /2));
 xMountHoleHeightOffset = (xMountHeight - (xMountHoleHeight /2));
 
+/* [Chimera / Cyclops Advanced] */
+
 // Variables for E3D Chimera / Cyclops
 chiColdHeight = 30;
 chiColdDepth = 16;
+chiScrewHole = 3.2; // Size of hole for screws that mount the Chimera Cold End.
+chiBowdenHole = 8.2; // Size of hole for bowden tube fittings.
 chiHEPosUD = 15;
 chiBraceLength = chiColdDepth; // Length of brace for chimera mount in the horizontal. From back plane towards the front.
 chiBraceHeight = (chiColdHeight / 2);
 chiWidth = 31; // Width of Chimera is 30, use 31 to account for 3d printer material overage. Use 30.5 for cnc.
-chiMountDepth = (chiColdDepthOffset + 20); // How far out the Chimera mount top plate should be.
+chiMountDepth = (heDepthOffset + 20); // How far out the Chimera mount top plate should be.
 chiMountWidth = (chiBraceThickness * 2) + chiWidth; // The width of the Chimera mount top plate.
 chiScrewHoleHeight = chiMountHeight + .2; // How tall to make the Chimera mount screw holes.
-chiScrewLocs = [[(chiMountWidth / 2) - 8.5, chiMountDepth - (chiColdDepthOffset + 15)],
-		[(chiMountWidth / 2), chiMountDepth - (chiColdDepthOffset + 3)],
-		[(chiMountWidth / 2) + 8.5, chiMountDepth - (chiColdDepthOffset + 15)]]; // X,Y locations for Chimera mount screw holes.
+chiScrewLocs = [[(chiMountWidth / 2) - 8.5, chiMountDepth - (heDepthOffset + 15)],
+		[(chiMountWidth / 2), chiMountDepth - (heDepthOffset + 3)],
+		[(chiMountWidth / 2) + 8.5, chiMountDepth - (heDepthOffset + 15)]]; // X,Y locations for Chimera mount screw holes.
 chiBowdenHoleHeight = chiMountHeight + .2; // How tall to make the Bowden tube fitting holes.
-chiBowdenLocs = [[(chiMountWidth / 2) - 9, chiMountDepth - (chiColdDepthOffset + 6)],
-		 [(chiMountWidth / 2) + 9, chiMountDepth - (chiColdDepthOffset + 6)]]; // X,Y locations for Bowden tube fitting holes.
+chiBowdenLocs = [[(chiMountWidth / 2) - 9, chiMountDepth - (heDepthOffset + 6)],
+		 [(chiMountWidth / 2) + 9, chiMountDepth - (heDepthOffset + 6)]]; // X,Y locations for Bowden tube fitting holes.
 chiV6NozzleL = [[6,-6,-49.6],[24,-6,-49.6]]; // Location of Chimera V6 Nozzles in relation to top rear left corner of cold end.
 chiVolNozzleL = [[6,-6,-59.6],[24,-6,-59.6]]; // Location of Chimera Volcano nozzles in relation to the top rear left corner of cold end.
 cycNozzleL = [[15,-6,-50.1]]; // Location of Cyclops nozzle in relation to the top rear left corner of cold end.
+
+/* [J Head Mount Advanced */
 
 // Variables for J Head Mount
 jHeadWidth = 26;
@@ -376,25 +374,35 @@ jHeadLowerCollarDiameter = 16;
 jHeadLowerCollarHeight = 3;
 jHeadMountWidth = 36;
 jHeadMountHeight = jHeadUpperCollarHeight + jHeadInnerCollarHeight + jHeadLowerCollarHeight;
-jHeadMountDepth = 20;
+jHeadMountDepth = 25;
 jHeadCollarCornerRadius = 3;
 jHeadMountBoltDiameter = 3.2;
 jHeadMountNutDiameter = 6.5;
 jHeadMountNutDepth = 2.4;
 jHeadFanScrewOffset = 5;
 
+/* [E3D V6 Advanced] */
+
 // Variables for E3D V6
 v6NozzleL = [[0, 0, -62.3]]; // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
 v6VolNozzleL = [[0,0,-72.3]]; // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
 
+/* [J Head Mark V Advanced] */
+
 // Variables for J Head Mark V
 jheadMkVNozzleL = [[0, 0, -51]]; // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
+
+/* [Hexagon Advanced] */
 
 // Variables for Hexagon Hot End
 hexagonNozzleL = [[0, 0, -55]]; // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
 
+/* [Generic J Head Advanced] */
+
 // Variables for Generic J Head Hot End
 genericJHeadNozzleL = [[0, 0, -genJHeadHeight]]; // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
+
+/* [Hidden] */
 
 // Generic Hot End Variables
 heNozzleL = (hotend == "chimera_v6" ? chiV6NozzleL
@@ -408,7 +416,6 @@ heNozzleL = (hotend == "chimera_v6" ? chiV6NozzleL
 				  : [[0]])))))))); // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
 
 // Prusa i3 variant carriage specific positioning variables.
-prusai3FanBracketDepth = 3;
 prusai3FanBarWidth = prusai3FanTabWidth + (prusai3FanTabNubWidth * 2) + (fanTabNubClear * 2);
 prusai3FanTabHeight = chiMountHeight;
 prusai3FanScrewOffset = (((prusai3FanTabHole / 2) + prusai3FanTabMat) - prusai3FanTabHeight);
@@ -417,15 +424,15 @@ prusai3RealFanTabVerticalAngle = prusai3FanSide == "left" ?
      prusai3FanTabVerticalAngle;
 prusai3ChiMountL = [((xMountWidth / 2) - (chiMountWidth / 2)),
 		    - (xMountDepth + chiMountDepth),
-		    chiHEPosUD + prusai3HEOffset]; // Position of Chimera Mount.
+		    chiHEPosUD + heHeightOffset]; // Position of Chimera Mount.
 prusai3ChiAnchorL = [((xMountWidth / 2) - (chiWidth / 2)),
-		    - (xMountDepth + chiColdDepthOffset),
+		    - (xMountDepth + heDepthOffset),
 		    prusai3ChiMountL[2]]; // Position of Chimera Mount Anchor point.
 prusai3JHeadMountL =  [((xMountWidth / 2) - (jHeadMountWidth / 2)),
-		    - (xMountDepth + jHeadMountDepth),
-		    jHeadHEPosUD + prusai3HEOffset]; // Position of J Head Mount.
+		    - (xMountDepth + jHeadMountDepth + heDepthOffset),
+		    jHeadHEPosUD + heHeightOffset]; // Position of J Head Mount.
 prusai3JHeadAnchorL = [(xMountWidth / 2),
-		    - (xMountDepth + (jHeadMountDepth / 2)),
+		    - (xMountDepth + (jHeadMountDepth / 2) + heDepthOffset),
 		    prusai3JHeadMountL[2] + jHeadMountHeight]; // Position of J Head Anchor point..
 
 prusai3HEMountL = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
@@ -452,6 +459,8 @@ prusai3FanScrewL = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend 
      ? prusai3JHeadFanScrewL
      : 0;
 prusai3DuctConnectL = fan_duct_connect(prusai3FanScrewL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, fanDimensions, fanCenterOffset, fanMountOffset, fanMountThickness, prusai3FanTabHole, prusai3FanTabMat, fanDuctConnectSize);
+
+/* [C Bot Carriage Advanced] */
 
 // Variables for C Bot Carriage.
 cBotCarriageSideDistance = 20;
@@ -496,6 +505,9 @@ cBotFanTabDepth = 5;
 cBotFanTabAngle = 0;
 cBotFanTabHole = 3.2;
 cBotFanTabMat = 2;
+
+/* [Hidden] */
+
 cBotFanBarWidth = cBotFanTabWidth + (cBotFanTabWidth * 2) + (fanTabNubClear * 2);
 cBotFanScrewL = [(cBotCarriageWidth / 2) - cBotFanMountDistance,
 		 cBotCarriageSideDistance + cBotCarriageDepth + cBotFanBracketDepth + cBotFanTabDepth + (cBotFanTabHole / 2) + cBotFanTabMat,
@@ -505,15 +517,15 @@ cBotTempDuctConnectL = fan_duct_connect(cBotFanScrewL, cBotFanTabHorizontalAngle
 cBotDuctConnectL = [cBotTempDuctConnectL[1],cBotTempDuctConnectL[0]];
 cBotChiMountL = [(cBotCarriageWidth / 2) - (chiMountWidth / 2),
 		 - (cBotCarriageDepth + chiMountDepth),
-		 chiHEPosUD + cBotHEOffset];
+		 chiHEPosUD + heHeightOffset];
 cBotChiAnchorL = [((cBotCarriageWidth / 2) - (chiWidth / 2)),
-		    - (cBotCarriageDepth + chiColdDepthOffset),
+		    - (cBotCarriageDepth + heDepthOffset),
 		    cBotChiMountL[2]]; // Position of Chimera Mount.
 cBotJHeadMountL = [(cBotCarriageWidth / 2) - (jHeadMountWidth / 2),
-		   - (cBotCarriageDepth + jHeadMountDepth),
-		   jHeadHEPosUD + cBotHEOffset];
+		   - (cBotCarriageDepth + jHeadMountDepth + heDepthOffset),
+		   jHeadHEPosUD + heHeightOffset];
 cBotJHeadAnchorL = [(cBotCarriageWidth / 2),
-		    - (cBotCarriageDepth + (jHeadMountDepth / 2)),
+		    - (cBotCarriageDepth + (jHeadMountDepth / 2) + heDepthOffset),
 		    cBotJHeadMountL[2] + jHeadMountHeight]; // Position of E3D V6 Mount.
 cBotHEMountL = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
      ? cBotChiMountL
@@ -658,7 +670,7 @@ if (carriage == "prusai3") {
      if(hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") {
 	  // Place the E3D Chimera fron Jons.
 	  translate([((xMountWidth - chiWidth) / 2) + (chiWidth /2),
-		     - (xMountDepth + chiColdDepthOffset + 6), // 6 is there to offset the fan in the e3d model, used to line everything up properly
+		     - (xMountDepth + heDepthOffset + 6), // 6 is there to offset the fan in the e3d model, used to line everything up properly
 		     heMountL[2] - chiColdHeight])
 	       %e3d();
      }
@@ -779,7 +791,7 @@ if(carriage == "cbot") {
 		    // Replace material behind the mount.
 		    if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead") {
 			 translate([heMountL[0],
-				    heMountL[1] + jHeadMountDepth,
+				    heMountL[1] + jHeadMountDepth + heDepthOffset,
 				    heMountL[2]])
 			      cube([jHeadMountWidth, cBotCarriageDepth, jHeadMountHeight]);
 		    }
@@ -1068,7 +1080,7 @@ module jhead_mount(carriageDepth) {
 module jhead_base() {
      // Create the base block which the holes will be carved out of.
      translate([0, (jHeadMountDepth / 2), 0])
-	  cube([jHeadMountWidth, (jHeadMountDepth / 2) + .1, jHeadMountHeight]);
+	  cube([jHeadMountWidth, (jHeadMountDepth / 2) + heDepthOffset + .1, jHeadMountHeight]);
 }
 
 module jhead_collar(carriageDepth) {
@@ -1112,14 +1124,14 @@ module jhead_holes(carriageDepth) {
 		-.1,
 		(jHeadMountHeight / 2)])
 	  rotate([-90,0,0])
-	  bolt_hole(jHeadMountBoltDiameter, jHeadMountDepth + carriageDepth - jHeadMountNutDepth, jHeadMountNutDiameter, jHeadMountNutDepth + .1);
+	  bolt_hole(jHeadMountBoltDiameter, jHeadMountDepth + heDepthOffset + carriageDepth - jHeadMountNutDepth, jHeadMountNutDiameter, jHeadMountNutDepth + .1);
 
      // Right Mount Screw
      translate([jHeadMountWidth - (jHeadMountWidth / 4),
 		-.1,
 		(jHeadMountHeight / 2)])
 	  rotate([-90,0,0])
-	  bolt_hole(jHeadMountBoltDiameter, jHeadMountDepth + carriageDepth - jHeadMountNutDepth, jHeadMountNutDiameter, jHeadMountNutDepth + .1);
+	  bolt_hole(jHeadMountBoltDiameter, jHeadMountDepth + heDepthOffset + carriageDepth - jHeadMountNutDepth, jHeadMountNutDiameter, jHeadMountNutDepth + .1);
 		
 }
 
