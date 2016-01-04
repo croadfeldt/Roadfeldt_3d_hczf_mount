@@ -1981,7 +1981,7 @@ module induct_ext() {
 		      heMountL[0] + heMountWidth + inductMountDistance + inductMountWidth - (inductBraceWidth / 2):
 		      heMountL[0] - (inductMountDistance + inductMountWidth - (inductBraceWidth / 2)),
 		      0,
-		      heMountL[2] + heNozzleL[0][2] + inductHeight + inductMountThickness + inductBraceHeight - (inductBraceWidth / 2)])
+		      heAnchorL[2] + heNozzleL[0][2] + inductHeight + inductMountThickness + inductBraceHeight - (inductBraceWidth / 2)])
 	       rotate([90,0,0])
 	       cylinder(d=inductBraceWidth, h=xMountDepth, $fn=100);
 
@@ -1990,7 +1990,7 @@ module induct_ext() {
 		      heMountL[0] + heMountWidth + inductMountDistance + (inductBraceWidth / 2):
 		      heMountL[0] - inductMountDistance - (inductBraceWidth / 2),
 		      0,
-		      heMountL[2] + heNozzleL[0][2] + inductHeight + inductMountThickness + inductBraceHeight - (inductBraceWidth / 2)])
+		      heAnchorL[2] + heNozzleL[0][2] + inductHeight + inductMountThickness + inductBraceHeight - (inductBraceWidth / 2)])
 	       rotate([90,0,0])
 	       cylinder(d=inductBraceWidth, h=xMountDepth, $fn=100);
 
@@ -1999,7 +1999,7 @@ module induct_ext() {
 		      heMountL[0] + heMountWidth + inductMountDistance + inductMountWidth - (inductBraceWidth / 2):
 		      heMountL[0] - (inductMountDistance + inductMountWidth - (inductBraceWidth / 2)),
 		      0,
-		      heMountL[2] + heNozzleL[0][2] + inductHeight + (inductBraceWidth / 2)])
+		      heAnchorL[2] + heNozzleL[0][2] + inductHeight + (inductBraceWidth / 2)])
 	       rotate([90,0,0])
 	       cylinder(d=inductBraceWidth, h=xMountDepth, $fn=100);
 
@@ -2008,7 +2008,7 @@ module induct_ext() {
 		      heMountL[0] + heMountWidth + inductMountDistance + (inductBraceWidth / 2):
 		      heMountL[0] - inductMountDistance - (inductBraceWidth / 2),
 		      0,
-		      heMountL[2] + heNozzleL[0][2] + inductHeight + (inductBraceWidth / 2)])
+		      heAnchorL[2] + heNozzleL[0][2] + inductHeight + (inductBraceWidth / 2)])
 	       rotate([90,0,0])
 	       cylinder(d=inductBraceWidth, h=xMountDepth, $fn=100);
      }
