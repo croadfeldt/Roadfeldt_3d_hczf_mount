@@ -158,6 +158,9 @@ cBotWhich = "all"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carri
 // Do you want a carriage mount axis limit switch?
 cBotXAxisSwitch = "none"; // [yl99:YL-99, keyes:Keyes, gen:Generic Mini Switch, none:None]
 
+// Which side should have the endstop mount?
+cBotXAxisSwitchSide = "acc"; // [he:Hot End, acc:Accessory, both:Both]
+
 // How deep into the carriage should the switch be recessed?
 cBotXAxisSwitchDepth = 1;
 
@@ -2423,7 +2426,9 @@ module cbot_carriage_holes(heSide=false) {
      }
      
      // Carve out a space for the Axis endstop if needed.
-     if(cBotXAxisSwitch != "none") {
+     if(cBotXAxisSwitch != "none" &&
+	((heSide == true && (cBotXAxisSwitchSide == "he" || cBotXAxisSwitchSide == "both")) ||
+	(heSide == false && (cBotXAxisSwitchSide == "acc" || cBotXAxisSwitchSide == "both")))) {
 	  // Carve out a space for the switch.
 	  translate([cBotCarriageWidth - cBotXAxisSwitchDimensions[0][0] + cBotXAxisSwitchOffset,
 		     -(cBotCarriageDepth - cBotXAxisSwitchDepth + cBotXAxisSwitchDimensions[0][1]),
