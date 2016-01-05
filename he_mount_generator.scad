@@ -201,7 +201,7 @@ cBotCarriageMountScrewVerticalDistance = 30;
 cBotBackMountVertPosition = 40;
 
 // Vertical position of fan bracket.
-cBotFanMountPos = 20;
+cBotFanMountPos = 25;
 
 // Vertical position of accessory mount holes. Offset from top and bottom respectively.
 cBotAccessoryMountPos = 7;
@@ -423,9 +423,9 @@ chiColdHeight = 30;
 chiColdDepth = 16;
 chiScrewHole = 3.2; // Size of hole for screws that mount the Chimera Cold End.
 chiBowdenHole = 8.2; // Size of hole for bowden tube fittings.
-chiHEPosUD = 15;
+chiHEPosUD = (carriage == "prusai3" ? 15 : 20);
 chiBraceLength = chiColdDepth; // Length of brace for chimera mount in the horizontal. From back plane towards the front.
-chiBraceHeight = (chiColdHeight / 2);
+chiBraceHeight = (chiColdHeight / 2) - (carriage == "prusai3" ? (chiHEPosUD - (chiColdHeight / 2) < xMountCornerRadius ? xMountCornerRadius - (chiHEPosUD - (chiColdHeight / 2)) : 0) : 0);
 chiWidth = 31; // Width of Chimera is 30, use 31 to account for 3d printer material overage. Use 30.5 for cnc.
 chiMountDepth = (heDepthOffset + 20); // How far out the Chimera mount top plate should be.
 chiMountWidth = (chiBraceThickness * 2) + chiWidth; // The width of the Chimera mount top plate.
@@ -444,7 +444,7 @@ cycNozzleL = [[15,-6,-50.1]]; // Location of Cyclops nozzle in relation to the t
 
 // Variables for J Head Mount
 jHeadWidth = 26;
-jHeadHEPosUD = 14;
+jHeadHEPosUD = (carriage == "prusai3" ? 14 : 20);
 jHeadUpperCollarDiameter = 16;
 jHeadUpperCollarHeight = (hotend == "hexagon" ? 4.7 : (hotend == "jhead_mkv" ? 4.76 : 3.7));
 jHeadInnerCollarDiameter = 12;
@@ -601,7 +601,7 @@ cBotFanTabMat = 2;
 
 /* [Hidden] */
 inductMountWidth = inductDiameter + (inductBraceWidth * 2) + (inductMat * 2);
-cBotCarriageWidth = cBotCarriageMinWidth + (servoInduct == "servo" ? servoWidth :
+cBotCarriageWidth = cBotCarriageMinWidth + (servoInduct == "servo" ? servoHeight :
 					    (servoInduct == "induct" ? inductMountWidth :
 					    0));
 cBotFanBarWidth = cBotFanTabWidth + (cBotFanTabWidth * 2) + (fanTabNubClear * 2);
@@ -1324,14 +1324,14 @@ module jhead_holes(carriageDepth) {
 		-.1,
 		jHeadMountScrewVerticalOffset])
 	  rotate([-90,0,0])
-	  bolt_hole(jHeadMountBoltDiameter, jHeadMountDepth + heDepthOffset + carriageDepth - jHeadMountNutDepth, jHeadMountNutDiameter, jHeadMountNutDepth);
+	  bolt_hole(jHeadMountBoltDiameter, jHeadMountDepth + heDepthOffset + carriageDepth - jHeadMountNutDepth, jHeadMountNutDiameter, jHeadMountNutDepth + .1);
 
      // Right Mount Screw
      translate([jHeadMountWidth - jHeadMountScrewHorizontalOffset,
 		-.1,
 		jHeadMountScrewVerticalOffset])
 	  rotate([-90,0,0])
-	  bolt_hole(jHeadMountBoltDiameter, jHeadMountDepth + heDepthOffset + carriageDepth - jHeadMountNutDepth, jHeadMountNutDiameter, jHeadMountNutDepth);
+	  bolt_hole(jHeadMountBoltDiameter, jHeadMountDepth + heDepthOffset + carriageDepth - jHeadMountNutDepth, jHeadMountNutDiameter, jHeadMountNutDepth + .1);
 		
 }
 
@@ -2381,15 +2381,16 @@ module cbot_carriage_holes(heSide=false) {
      // Carve out some cable tie locations.
      for(j=[cBotCableTieHorizontalDistance : cBotCableTieHorizontalDistance : cBotCarriageWidth - cBotCableTieHorizontalDistance]) {
 	  for(i=[0 : 1 : cBotCableTieVerticalCount - 1]) {
-		    if((cBotXAxisSwitch == "keyes" || cBotXAxisSwitch == "yl99") &&
-		       (i == 1 || i == 2) && (j >= (cBotCableTieHorizontalDistance * 3)))  {
-			 // Don't carve out this cable tie, it is under the switch.
-		    } else {
-			 translate([ j,
-				     -8,
-				     cBotCarriageHeight - cBotCableTieVerticalPos - (cBotCableTieVerticalDistance * i)])
-			      cable_tie(3,1.2,4.5);
-		    }
+	       if(((cBotXAxisSwitch == "keyes" || cBotXAxisSwitch == "yl99") &&
+		  (i == 1 || i == 2) && (j >= (cBotCableTieHorizontalDistance * 3))) ||
+		    ( i == 2 && (j == cBotCableTieHorizontalDistance * 2))) {
+		    // Don't carve out this cable tie, it is under the switch.
+	       } else {
+		    translate([ j,
+				-8,
+				cBotCarriageHeight - cBotCableTieVerticalPos - (cBotCableTieVerticalDistance * i)])
+			 cable_tie(3,1.2,4.5);
+	       }
 	  }
      }
 
