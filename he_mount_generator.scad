@@ -54,7 +54,7 @@ use<delta_blower_fans.scad>;
 carriage = "cbot"; // [cbot:C Bot style, prusai3:Prusa i3]
 
 // Which hot end is in use. Ensure you enter height from top of mount to tip of nozzle if you select generic J Head.
-hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
+hotend = "e3d_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
 
 // Which Z Probe type is in use. Select Servo here if you want to if you Servo Bracket selected above, otherwise it won't appear.
 servoInduct = "induct"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, none:Neither/None]
@@ -715,6 +715,7 @@ zProbeBottomL = -zProbeTopL[2] + (heAnchorL[2] + heNozzleL[0][2]) + (servoHatTop
 
 // Toggle that controls if fan is shown.
 showFan = true;
+showHE = true;
 
 //////////// Prusa i3 Carriage //////////
 if (carriage == "prusai3") {
@@ -814,7 +815,7 @@ if (carriage == "prusai3") {
      }
     
      // Display cold / hot end model.
-     if((prusai3Which == "hotm" || prusai3Which == "all") && (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")) {
+     if((prusai3Which == "hotm" || prusai3Which == "all") && (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") && (showHE == true)) {
 	  // Place the E3D Chimera fron Jons.
 	  translate([((xMountWidth - chiWidth) / 2) + (chiWidth /2),
 		     - (xMountDepth + heDepthOffset + 6), // 6 is there to offset the fan in the e3d model, used to line everything up properly
@@ -823,7 +824,7 @@ if (carriage == "prusai3") {
      }
 
      // Display E3D V6 if needed.
-     if((prusai3Which == "hotm" || prusai3Which == "all") && (hotend == "e3d_v6" || hotend == "e3d_v6_vol")) {
+     if((prusai3Which == "hotm" || prusai3Which == "all") && (hotend == "e3d_v6" || hotend == "e3d_v6_vol") && (showHE == true)) {
 	  // Place the E3D V6.
 	  translate([heMountL[0] + (jHeadMountWidth / 2),
 		     heMountL[1] + (jHeadMountDepth / 2),
@@ -833,7 +834,7 @@ if (carriage == "prusai3") {
      }
 
      // Display Hexagon if needed.
-     if((prusai3Which == "hotm" || prusai3Which == "all") && (hotend == "hexagon")) {
+     if((prusai3Which == "hotm" || prusai3Which == "all") && (hotend == "hexagon") && (showHE == true)) {
 	  // Place the E3D V6.
 	  translate([heMountL[0] + (jHeadMountWidth / 2),
 		     heMountL[1] + (jHeadMountDepth / 2),
@@ -964,7 +965,7 @@ if(carriage == "cbot") {
 		    }
 		    
 		    // Display cold / hot end model.
-		    if(hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") {
+		    if((hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") && (showHE == true)) {
 			 // Place the E3D Chimera fron Jons.
 			 translate([(chiWidth / 2) + chiBraceThickness,
 				    chiColdDepth - 2, // 6 is there to offset the fan in the e3d model, used to line everything up properly
@@ -983,7 +984,7 @@ if(carriage == "cbot") {
 	  }
 
 	  // Display E3D V6 if needed.
-	  if(hotend == "e3d_v6" || hotend == "e3d_v6_vol") {
+	  if((hotend == "e3d_v6" || hotend == "e3d_v6_vol") && (showHE == true)){
 	       // Place the E3D V6
 	       translate([heMountL[0] + (jHeadMountWidth / 2),
 			  heMountL[1] + (jHeadMountDepth / 2),
@@ -993,7 +994,7 @@ if(carriage == "cbot") {
 	  }
 
 	  // Display Hexagon if needed.
-	  if((cBotWhich == "hotm" || cBotWhich == "all") && (hotend == "hexagon")) {
+	  if((cBotWhich == "hotm" || cBotWhich == "all") && (hotend == "hexagon") && (showHE == true)) {
 	       // Place the E3D V6.
 	       translate([heMountL[0] + (jHeadMountWidth / 2),
 			  heMountL[1] + (jHeadMountDepth / 2),
