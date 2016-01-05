@@ -156,7 +156,7 @@ prusai3FanBracketDepth = 3;
 cBotWhich = "all"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, jhead_col:J Head Style Collar, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All Parts] 
 
 // Do you want a carriage mount axis limit switch?
-cBotXAxisSwitch = "yl99"; // [yl99:YL-99, keyes:Keyes, gen:Generic Mini Switch, none:None]
+cBotXAxisSwitch = "none"; // [yl99:YL-99, keyes:Keyes, gen:Generic Mini Switch, none:None]
 
 // How deep into the carriage should the switch be recessed?
 cBotXAxisSwitchDepth = 1;
