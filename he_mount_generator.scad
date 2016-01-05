@@ -57,7 +57,7 @@ carriage = "cbot"; // [cbot:C Bot style, prusai3:Prusa i3]
 hotend = "chimera_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
 
 // Which Z Probe type is in use. Select Servo here if you want to if you Servo Bracket selected above, otherwise it won't appear.
-servoInduct = "servo"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, none:Neither/None]
+servoInduct = "induct"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, none:Neither/None]
 
 // Which side should the z probe be on? Be mindful of clearance with fan mount.
 zProbeSide = "right"; // [right:Right of hot end., left:Left of hot end.]
@@ -118,7 +118,7 @@ xMountHoleHeight = 23;
 prusai3FanTabWidth = 8;
 
 // How far out should the tab the cooling fan hangs off of be. Must be above 0.
-prusai3FanTabDepth = 8;
+prusai3FanTabDepth = 4;
 
 // Degrees the fan mount is rotated in the vertical.
 prusai3FanTabVerticalAngle = 0;
@@ -154,6 +154,18 @@ prusai3FanBracketDepth = 3;
 
 // Which C Botpart should be exported.
 cBotWhich = "all"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, jhead_col:J Head Style Collar, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All Parts] 
+
+// Do you want a carriage mount axis limit switch?
+cBotXAxisSwitch = "yl99"; // [yl99:YL-99, keyes:Keyes, gen:Generic Mini Switch, none:None]
+
+// How deep into the carriage should the switch be recessed?
+cBotXAxisSwitchDepth = 1;
+
+// How far should the switch stick out from the carriage?
+cBotXAxisSwitchOffset = 2;
+
+// How far in should the cutout for the through hole cavity be?
+cBotXAxisSwitchTHOffset = 2;
 
 // Minimum width of carriage, will be increase if needed.
 cBotCarriageMinWidth = 72;
@@ -307,6 +319,9 @@ servoBracketNutDepth = 2.4;
 
 // Depth of the servo bracket base.
 servoBracketBaseDepth = 2;
+
+// Offset of servo mount from the bracket. Allows for C Bot bracket screws to clear. Keep in mind the fan mount probably needs to be adjusted as well so servo and fan mount and fan duct don't interfere with each other.
+servoBracketOffset = 1;
 
 // Distance between center of servo motor output and side of the servo body.
 servoCenterOffset = 5;
@@ -463,6 +478,17 @@ hexagonNozzleL = [[0, 0, -55]]; // This must be a vector of vectors. If only one
 genericJHeadNozzleL = [[0, 0, -genJHeadHeight]]; // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
 
 /* [Hidden] */
+
+// Collision switch variables
+ylSwitchDimensions = [[31,5,14],[4,12,2.5,4,1.8]]; //[x,y,z],[hole x, hole z, hole d, nut dia, nut depth],[hole.....
+keyesSwitchDimensions = [[35,10,21],[2.25,19,2.5,4,1.8],[2.25,2,2.5,4,1.8]];
+genSwitchDimensions = [[15,7,20],[2.5,5,2.5,4,1.8],[2.5,15,2.5,4,1.8]];
+cBotXAxisSwitchDimensions = (cBotXAxisSwitch == "yl99" ? ylSwitchDimensions :
+			     (cBotXAxisSwitch == "keyes" ? keyesSwitchDimensions :
+				  (cBotXAxisSwitch == "gen" ? genSwitchDimensions : [])));
+echo("cBotXAxisSwitchDimensions[0][0]",cBotXAxisSwitchDimensions[0][0]);
+echo("cBotXAxisSwitchDimensions[0][1]",cBotXAxisSwitchDimensions[0][1]);
+echo("cBotXAxisSwitchDimensions[0][2]",cBotXAxisSwitchDimensions[0][2]);
 
 // Display parts offset
 partsOffset = [0,10,0];
@@ -646,7 +672,7 @@ cBotServoBracketL = [(zProbeSide == "right" ?
 		     - ((servoBracketMat * 2) + servoWidth + ((servoMountPlateHeight - servoHeight) / 2))];
 servoBracketL = (carriage == "prusai3" ? prusai3ServoBracketL : cBotServoBracketL);
 servoMountL = [-(servoBracketMat + (servoBracketScrewDiameter / 2)),
-	       -((servoBracketMat * 2) + servoWidth + servoBracketBaseDepth),
+	       -((servoBracketMat * 2) + servoWidth + servoBracketBaseDepth + (carriage == "cbot" ? servoBracketOffset : 0)),
 	       (servoBracketMat * 2) + servoBracketNutDiameter];
 prusai3ServoBracketBotScrewL = [0,0,(servoBracketMat + (servoBracketNutDiameter / 2))];
 prusai3ServoBracketTopScrewL = [0,0,(servoBracketMat * 3) + (servoBracketNutDiameter * 1.5) + servoMountPlateHeight];
@@ -1851,7 +1877,7 @@ module servo_bracket_holes(cbot=false) {
 module servo_mount() {
      // Spin up a cube that we will punch a hole in for servo later.
      cube([(servoBracketMat * 2) + servoBracketScrewDiameter,
-	   (servoBracketMat * 2) + servoWidth + .1,
+	   (servoBracketMat * 2) + servoWidth + .1 + (carriage == "cbot" ? servoBracketOffset : 0),
 	   servoMountPlateHeight]);
 }
 
@@ -2346,10 +2372,15 @@ module cbot_carriage_holes(heSide=false) {
      // Carve out some cable tie locations.
      for(j=[cBotCableTieHorizontalDistance : cBotCableTieHorizontalDistance : cBotCarriageWidth - cBotCableTieHorizontalDistance]) {
 	  for(i=[0 : 1 : cBotCableTieVerticalCount - 1]) {
-	       translate([ j,
-			   -8,
-			   cBotCarriageHeight - cBotCableTieVerticalPos - (cBotCableTieVerticalDistance * i)])
-		    cable_tie(3,1.2,4.5);
+		    if((cBotXAxisSwitch == "keyes" || cBotXAxisSwitch == "yl99") &&
+		       (i == 1 || i == 2) && (j >= (cBotCableTieHorizontalDistance * 3)))  {
+			 // Don't carve out this cable tie, it is under the switch.
+		    } else {
+			 translate([ j,
+				     -8,
+				     cBotCarriageHeight - cBotCableTieVerticalPos - (cBotCableTieVerticalDistance * i)])
+			      cable_tie(3,1.2,4.5);
+		    }
 	  }
      }
 
@@ -2376,12 +2407,57 @@ module cbot_carriage_holes(heSide=false) {
 			  cBotAccessoryMountPos * i])
 		    rotate([-90,0,0])
 		    bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
+	       
+	       if((cBotXAxisSwitch == "keyes") &&
+		  (i >= 2) && (j >= 1))  {
+		    // Don't carve out this accessory hole, it is under the switch.
+		    } else {
+		    
+		    translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)),
+			       -cBotCarriageDepth,
+			       cBotCarriageHeight - (cBotAccessoryMountPos * i)])
+			 rotate([-90,0,0])
+			 bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
+	       }
+	  }
+     }
+     
+     // Carve out a space for the Axis endstop if needed.
+     if(cBotXAxisSwitch != "none") {
+	  // Carve out a space for the switch.
+	  translate([cBotCarriageWidth - cBotXAxisSwitchDimensions[0][0] + cBotXAxisSwitchOffset,
+		     -(cBotCarriageDepth - cBotXAxisSwitchDepth + cBotXAxisSwitchDimensions[0][1]),
+		     ((cBotCarriageHeight / 2) - cBotBeltBottomPos + cBotBeltScrewDistance + (cBotBeltScrewNutDiameter / 2))]) {
+	       cube(cBotXAxisSwitchDimensions[0]);
+	       
+	       // Carve out a space for through hole solder points, if needed.
+	       if(cBotXAxisSwitch == "yl99" || cBotXAxisSwitch == "keyes") {
+		    hull() {
+			 translate([cBotXAxisSwitchTHOffset,
+				    cBotXAxisSwitchDimensions[0][1],
+				    (cBotXAxisSwitchDimensions[0][2] / 2) - 3])
+			      sphere(r=.75, $fn=100);
+			 
+			 translate([cBotXAxisSwitchTHOffset,
+				    cBotXAxisSwitchDimensions[0][1],
+				    (cBotXAxisSwitchDimensions[0][2] / 2) + 3])
+			      sphere(r=.75, $fn=100);
+		    }
+	       }
 
-	       translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)),
-			  -cBotCarriageDepth,
-			  cBotCarriageHeight - (cBotAccessoryMountPos * i)])
-		    rotate([-90,0,0])
-		    bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
+	       // Carve out the mounting holes
+	       for(i=[1:1:len(cBotXAxisSwitchDimensions)-1]) {
+		    translate([cBotXAxisSwitchDimensions[i][0],
+			       cBotXAxisSwitchDimensions[0][1],
+			       cBotXAxisSwitchDimensions[i][1]])
+			 rotate([-90,0,0])
+			 bolt_hole(cBotXAxisSwitchDimensions[i][2],
+				   (cBotCarriageDepth - cBotXAxisSwitchDepth -
+				    cBotXAxisSwitchDimensions[i][4]),
+				   cBotXAxisSwitchDimensions[i][3],
+				   cBotXAxisSwitchDimensions[i][4]);
+	       }
+	       
 	  }
      }
 }
