@@ -68,6 +68,9 @@ printFanSide = "left"; // [left:Left side of hot end., right:Right side of hot e
 // Should the fan outlet point towards the left or the right? Be mindful of Z probe clearance.
 printFanDirection = "right"; // [left:Fan outlet to the left, right:Fan outlet to right]
 
+// Should the nut traps be closed, so printing support is not needed? This will mean the holes with nut traps will be closed with .1mm amount of material which will need to be removed prior to use.
+boltHoleSupportFix = 1; // [ 1:Yes, 0:No]
+
 // Should the parts be exploded, do this before producing the stl file. You will still receive a single STL file with all the parts, but they will be separated so you can split them up with Cura or NetFabb. Select no if you want to see the parts fit together as they would on the printer. Selecting no will NOT produce a valid STL for printing as the parts will be inseparable.
 explodeParts = 1; // [1:Yes, 0:No]
 
@@ -1170,7 +1173,10 @@ module xback_holes() {
 	  for(ud = udVec) {
 	       translate([lr,0,ud])
 		    rotate([90,90,0])
-		    bolt_hole();
+		    bolt_hole(xMountBoltDiameter,
+			      xMountBoltDepth,
+			      xMountNutDiameter,
+			      xMountDepth);
 	  }
      }
 }
@@ -1184,7 +1190,7 @@ module bolt_hole(bdia=xMountBoltDiameter,
 	  // Note we shift the cylinders in the z axis by .1 and make then .2 bigger to avoid coincident faces.
 	  // Screw hole
 	  translate([0,0,-.1])
-	       cylinder(d=bdia,h=bdep + .2,$fn=100);
+	       cylinder(d=bdia,h=bdep + (boltHoleSupportFix == 1 ? 0 : .2),$fn=100);
 	  // Nut Trap
 	  translate([0,0,bdep])
 	       cylinder(d=ndia,h=ndep + .1,$fn=6);
@@ -1318,14 +1324,14 @@ module jhead_holes(carriageDepth) {
 		-.1,
 		jHeadMountScrewVerticalOffset])
 	  rotate([-90,0,0])
-	  bolt_hole(jHeadMountBoltDiameter, jHeadMountDepth + heDepthOffset + carriageDepth - jHeadMountNutDepth, jHeadMountNutDiameter, jHeadMountNutDepth + .1);
+	  bolt_hole(jHeadMountBoltDiameter, jHeadMountDepth + heDepthOffset + carriageDepth - jHeadMountNutDepth, jHeadMountNutDiameter, jHeadMountNutDepth);
 
      // Right Mount Screw
      translate([jHeadMountWidth - jHeadMountScrewHorizontalOffset,
 		-.1,
 		jHeadMountScrewVerticalOffset])
 	  rotate([-90,0,0])
-	  bolt_hole(jHeadMountBoltDiameter, jHeadMountDepth + heDepthOffset + carriageDepth - jHeadMountNutDepth, jHeadMountNutDiameter, jHeadMountNutDepth + .1);
+	  bolt_hole(jHeadMountBoltDiameter, jHeadMountDepth + heDepthOffset + carriageDepth - jHeadMountNutDepth, jHeadMountNutDiameter, jHeadMountNutDepth);
 		
 }
 
