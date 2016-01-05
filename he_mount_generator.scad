@@ -294,7 +294,7 @@ fanDuctOutletSize = [15,1,3];
 /* [Z Probe / Servo] */
 
 // How much of a gap from the edge of the X Carriage back plane to the inside of the servo mount.
-probeExtWidth = 20;
+probeExtWidth = 25;
 
 // How wide the servo body is when held vertical and mount holes on top and bottom with output facing away.
 servoWidth = 12;
