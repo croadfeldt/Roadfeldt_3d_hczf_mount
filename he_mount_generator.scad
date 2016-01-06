@@ -156,7 +156,7 @@ prusai3FanBracketDepth = 3;
 // all = All parts
 
 // Which C Botpart should be exported.
-cBotWhich = "all"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, jhead_col:J Head Style Collar, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All Parts] 
+cBotWhich = "jhead_col"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, jhead_col:J Head Style Collar, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All Parts] 
 
 // Do you want a carriage mount axis limit switch?
 cBotXAxisSwitch = "none"; // [yl99:YL-99, keyes:Keyes, gen:Generic Mini Switch, none:None]
@@ -241,11 +241,11 @@ genJHeadHeight = 0;
 // J Head adjustments. How much to adjust the J Head mount. Really dependent on your printer. Print a calibration cube and enter the adjustments in size here. These are mm and will be added to their respective parameters. eg; you want to make the height of the collar in the middle smaller by .2mm, enter -.2 in innerCollarHeightAdjustment. If you want to make that same collar a larger hole by .2mm, enter .2 in innerCollarDiameterAdjustment.
 
 upperCollarDiameterAdjustment = .1;
-upperCollarHeightAdjustment = .1;
+upperCollarHeightAdjustment = .15;
 innerCollarDiameterAdjustment = .2;
-innerCollarHeightAdjustment = -.2;
+innerCollarHeightAdjustment = -.3;
 lowerCollarDiameterAdjustment = .1;
-lowerCollarHeightAdjustment = .1;
+lowerCollarHeightAdjustment = .15;
 
 /* [Print Cooling Fan] */
 
