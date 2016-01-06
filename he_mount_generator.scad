@@ -240,12 +240,12 @@ genJHeadHeight = 0;
 
 // J Head adjustments. How much to adjust the J Head mount. Really dependent on your printer. Print a calibration cube and enter the adjustments in size here. These are mm and will be added to their respective parameters. eg; you want to make the height of the collar in the middle smaller by .2mm, enter -.2 in innerCollarHeightAdjustment. If you want to make that same collar a larger hole by .2mm, enter .2 in innerCollarDiameterAdjustment.
 
-upperCollarDiameterAdjustment = 0;
-upperCollarHeightAdjustment = 0;
-innerCollarDiameterAdjustment = 0;
-innerCollarHeightAdjustment = 0;
-lowerCollarDiameterAdjustment = 0;
-lowerCollarHeightAdjustment = 0;
+upperCollarDiameterAdjustment = .1;
+upperCollarHeightAdjustment = .1;
+innerCollarDiameterAdjustment = .2;
+innerCollarHeightAdjustment = -.2;
+lowerCollarDiameterAdjustment = .1;
+lowerCollarHeightAdjustment = .1;
 
 /* [Print Cooling Fan] */
 
