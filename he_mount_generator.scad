@@ -238,6 +238,15 @@ chiMountHeight = 5;
 // Enter height in millimeters from the top of the J Head mount, usually that is the top of the cold end itself. The top of the mount is 3.7 mm from the top of the inner groove of the J Head mount.
 genJHeadHeight = 0;
 
+// J Head adjustments. How much to adjust the J Head mount. Really dependent on your printer. Print a calibration cube and enter the adjustments in size here. These are mm and will be added to their respective parameters. eg; you want to make the height of the collar in the middle smaller by .2mm, enter -.2 in innerCollarHeightAdjustment. If you want to make that same collar a larger hole by .2mm, enter .2 in innerCollarDiameterAdjustment.
+
+upperCollarDiameterAdjustment = 0;
+upperCollarHeightAdjustment = 0;
+innerCollarDiameterAdjustment = 0;
+innerCollarHeightAdjustment = 0;
+lowerCollarDiameterAdjustment = 0;
+lowerCollarHeightAdjustment = 0;
+
 /* [Print Cooling Fan] */
 
 // How thick the fan mount should be.
@@ -445,12 +454,12 @@ cycNozzleL = [[15,-6,-50.1]]; // Location of Cyclops nozzle in relation to the t
 // Variables for J Head Mount
 jHeadWidth = 26;
 jHeadHEPosUD = (carriage == "prusai3" ? 14 : 20);
-jHeadUpperCollarDiameter = 16;
-jHeadUpperCollarHeight = (hotend == "hexagon" ? 4.7 : (hotend == "jhead_mkv" ? 4.76 : 3.7));
-jHeadInnerCollarDiameter = 12;
-jHeadInnerCollarHeight = (hotend == "hexagon" ? 4.5 : (hotend == "jhead_mkv" ? 4.64 : 6));
-jHeadLowerCollarDiameter = 16;
-jHeadLowerCollarHeight = (hotend == "hexagon" ? 4.6 : 3);
+jHeadUpperCollarDiameter = 16 + upperCollarDiameterAdjustment;
+jHeadUpperCollarHeight = (hotend == "hexagon" ? 4.7 : (hotend == "jhead_mkv" ? 4.76 : 3.7)) + upperCollarHeightAdjustment;
+jHeadInnerCollarDiameter = 12 + innerCollarDiameterAdjustment;
+jHeadInnerCollarHeight = (hotend == "hexagon" ? 4.5 : (hotend == "jhead_mkv" ? 4.64 : 6)) + innerCollarHeightAdjustment;
+jHeadLowerCollarDiameter = 16 + lowerCollarDiameterAdjustment;
+jHeadLowerCollarHeight = (hotend == "hexagon" ? 4.6 : 3) + lowerCollarHeightAdjustment;
 jHeadMountWidth = 36;
 jHeadMountHeight = jHeadUpperCollarHeight + jHeadInnerCollarHeight + jHeadLowerCollarHeight;
 jHeadMountDepth = 25;
@@ -907,7 +916,7 @@ if (carriage == "prusai3") {
 	       servo_bracket_holes();
 	  }
      }
-
+     
      // Z Probe Arm
      if((prusai3Which == "zarm" || prusai3Which == "all") && servoInduct == "servo" && servoInduct != "none") {
 	  // Place the Z Probe Arm
@@ -916,6 +925,20 @@ if (carriage == "prusai3") {
 	       z_probe_arm(zProbeBottomL);
 	       
 	       z_probe_arm_holes(zProbeBottomL);
+	  }
+     }
+
+     // Inductive / Capacitive Extension
+     if((prusai3Which == "induct" || prusai3Which == "all") && servoInduct == "induct") {
+	  // Place the induct mount itself
+	  difference() {
+	       // Place the mount.
+	       translate(inductMountL)
+		    induct_mount(inductMountBracketed, xMountDepth);
+	       
+	       // Carve out the wholes for the mount.
+	       translate(inductMountL)
+		    induct_mount_holes(inductMountBracketed);
 	  }
      }
 }
@@ -1078,7 +1101,7 @@ if(carriage == "cbot") {
      }
 
      // Inductive / Capacitive Extension
-     if(servoInduct == "induct") {
+     if((cBotWhich == "induct" || cBotWhich == "all") && servoInduct == "induct") {
 	  // Place the induct mount itself
 	  difference() {
 	       // Place the mount.
