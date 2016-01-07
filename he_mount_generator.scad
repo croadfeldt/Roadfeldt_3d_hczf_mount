@@ -243,7 +243,7 @@ genJHeadHeight = 0;
 upperCollarDiameterAdjustment = .1;
 upperCollarHeightAdjustment = .15;
 innerCollarDiameterAdjustment = .2;
-innerCollarHeightAdjustment = -.3;
+innerCollarHeightAdjustment = -0.3;
 lowerCollarDiameterAdjustment = .1;
 lowerCollarHeightAdjustment = .15;
 
@@ -453,15 +453,19 @@ cycNozzleL = [[15,-6,-50.1]]; // Location of Cyclops nozzle in relation to the t
 
 // Variables for J Head Mount
 jHeadWidth = 26;
-jHeadHEPosUD = (carriage == "prusai3" ? 14 : 20);
-jHeadUpperCollarDiameter = 16 + upperCollarDiameterAdjustment;
-jHeadUpperCollarHeight = (hotend == "hexagon" ? 4.7 : (hotend == "jhead_mkv" ? 4.76 : 3.7)) + upperCollarHeightAdjustment;
-jHeadInnerCollarDiameter = 12 + innerCollarDiameterAdjustment;
-jHeadInnerCollarHeight = (hotend == "hexagon" ? 4.5 : (hotend == "jhead_mkv" ? 4.64 : 6)) + innerCollarHeightAdjustment;
-jHeadLowerCollarDiameter = 16 + lowerCollarDiameterAdjustment;
-jHeadLowerCollarHeight = (hotend == "hexagon" ? 4.6 : 3) + lowerCollarHeightAdjustment;
-jHeadMountWidth = 36;
+jHeadUpperCollarDiameter = upperCollarDiameterAdjustment + 16;
+jHeadUpperCollarHeight = upperCollarHeightAdjustment + (hotend == "hexagon" ? 4.7 :
+							(hotend == "jhead_mkv" ? 4.76 :
+							 3.7));
+jHeadInnerCollarDiameter = innerCollarDiameterAdjustment + 12;
+jHeadInnerCollarHeight =  innerCollarHeightAdjustment + (hotend == "hexagon" ? 4.5 :
+							 (hotend == "jhead_mkv" ? 4.64 :
+							  6));
+jHeadLowerCollarDiameter = lowerCollarDiameterAdjustment + 16;
+jHeadLowerCollarHeight = lowerCollarHeightAdjustment + (hotend == "hexagon" ? 4.6 : 3);
 jHeadMountHeight = jHeadUpperCollarHeight + jHeadInnerCollarHeight + jHeadLowerCollarHeight;
+jHeadHEPosUD = (carriage == "prusai3" ? 14 : 20);
+jHeadMountWidth = 36;
 jHeadMountDepth = 25;
 jHeadCollarCornerRadius = 3;
 jHeadMountBoltDiameter = 3.2;
