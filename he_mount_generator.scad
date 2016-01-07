@@ -159,7 +159,7 @@ prusai3FanBracketDepth = 3;
 cBotWhich = "all"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, jhead_col:J Head Style Collar, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All Parts] 
 
 // Do you want a carriage mount axis limit switch?
-cBotXAxisSwitch = "none"; // [yl99:YL-99, keyes:Keyes, gen:Generic Mini Switch, none:None]
+cBotXAxisSwitch = "gen"; // [yl99:YL-99, keyes:Keyes, gen:Generic Mini Switch, none:None]
 
 // Which side should have the endstop mount?
 cBotXAxisSwitchSide = "acc"; // [he:Hot End, acc:Accessory, both:Both]
@@ -383,7 +383,7 @@ zProbeSwitchActivationDistance = 5;
 inductMountDistance = 8;
 
 // Diameter of sensor.
-inductDiameter = 12;
+inductDiameter = 12.6;
 
 // Amount of material around sensor, account for nuts and washers around the sensor.
 inductMat = 3;
@@ -495,9 +495,9 @@ genericJHeadNozzleL = [[0, 0, -genJHeadHeight]]; // This must be a vector of vec
 /* [Hidden] */
 
 // Collision switch variables
-ylSwitchDimensions = [[31,5,14],[4,12,2.5,4,1.8]]; //[x,y,z],[hole x, hole z, hole d, nut dia, nut depth],[hole.....
-keyesSwitchDimensions = [[35,10,21],[2.25,19,2.5,4,1.8],[2.25,2,2.5,4,1.8]];
-genSwitchDimensions = [[15,7,20],[2.5,5,2.5,4,1.8],[2.5,15,2.5,4,1.8]];
+ylSwitchDimensions = [[31.5,5,15],[4.5,12.5,2.5,4,1.8]]; //[x,y,z],[hole x, hole z, hole d, nut dia, nut depth],[hole.....
+keyesSwitchDimensions = [[35.5,10,22],[2.75,19.5,2.5,4,1.8],[2.75,2.5,2.5,4,1.8]];
+genSwitchDimensions = [[15.5,7,21],[3,5.5,2.5,4,1.8],[3,15.5,2.5,4,1.8]];
 cBotXAxisSwitchDimensions = (cBotXAxisSwitch == "yl99" ? ylSwitchDimensions :
 			     (cBotXAxisSwitch == "keyes" ? keyesSwitchDimensions :
 				  (cBotXAxisSwitch == "gen" ? genSwitchDimensions : [])));
