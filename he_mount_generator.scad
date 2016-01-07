@@ -499,9 +499,9 @@ genericJHeadNozzleL = [[0, 0, -genJHeadHeight]]; // This must be a vector of vec
 /* [Hidden] */
 
 // Collision switch variables
-ylSwitchDimensions = [[31.5,5,15],[4.5,12.5,2.5,4,1.8]]; //[x,y,z],[hole x, hole z, hole d, nut dia, nut depth],[hole.....
-keyesSwitchDimensions = [[35.5,10,22],[2.75,19.5,2.5,4,1.8],[2.75,2.5,2.5,4,1.8]];
-genSwitchDimensions = [[15.5,7,21],[3,5.5,2.5,4,1.8],[3,15.5,2.5,4,1.8]];
+ylSwitchDimensions = [[31.5,5,15],[4,12.5,2.5,4,1.8]]; //[x,y,z],[hole x, hole z, hole d, nut dia, nut depth],[hole.....
+keyesSwitchDimensions = [[35.5,10,22],[2.25,19.5,2.5,4,1.8],[2.25,2.5,2.5,4,1.8]];
+genSwitchDimensions = [[10.5,7,21],[2.5,5.5,2.5,4,1.8],[2.5,15.5,2.5,4,1.8]];
 cBotXAxisSwitchDimensions = (cBotXAxisSwitch == "yl99" ? ylSwitchDimensions :
 			     (cBotXAxisSwitch == "keyes" ? keyesSwitchDimensions :
 				  (cBotXAxisSwitch == "gen" ? genSwitchDimensions : [])));
