@@ -38,10 +38,10 @@
 
 // Which hotend are we importing? Can only use one at a time, Jons uses the same variable
 // and module names and openscad doesn't support conditionally import as far as I can tell.
-use<e3d_v6_chimera.scad>;
+//use<e3d_v6_chimera.scad>;
 //use<e3d_vulcano_chimera.scad>;
 //use<e3d_cyclops.scad>;
-//use<e3d_v6_all_metall_hotend.scad>;
+use<e3d_v6_all_metall_hotend.scad>;
 //use<e3d_v6_volcano_all_metall_hotend.scad>;
 use<Hexagon-102.scad>;
 
@@ -171,7 +171,7 @@ cBotXAxisSwitchDepth = 1;
 cBotXAxisSwitchOffset = 2;
 
 // How far in should the cutout for the through hole cavity be?
-cBotXAxisSwitchTHOffset = 2;
+cBotXAxisSwitchTHOffset = 2.5;
 
 // Minimum width of carriage, will be increase if needed.
 cBotCarriageMinWidth = 72;
@@ -499,7 +499,7 @@ genericJHeadNozzleL = [[0, 0, -genJHeadHeight]]; // This must be a vector of vec
 /* [Hidden] */
 
 // Collision switch variables
-ylSwitchDimensions = [[31.5,5,15],[4,12.5,2.5,4,1.8]]; //[x,y,z],[hole x, hole z, hole d, nut dia, nut depth],[hole.....
+ylSwitchDimensions = [[25.5,5,15],[7.25,12,3.2,6.5,2.4]]; //[x,y,z],[hole x, hole z, hole d, nut dia, nut depth],[hole.....
 keyesSwitchDimensions = [[35.5,10,22],[2.25,19.5,2.5,4,1.8],[2.25,2.5,2.5,4,1.8]];
 genSwitchDimensions = [[10.5,7,21],[2.5,5.5,2.5,4,1.8],[2.5,15.5,2.5,4,1.8]];
 cBotXAxisSwitchDimensions = (cBotXAxisSwitch == "yl99" ? ylSwitchDimensions :
@@ -2475,14 +2475,20 @@ module cbot_carriage_holes(heSide=false) {
 		    hull() {
 			 translate([cBotXAxisSwitchTHOffset,
 				    cBotXAxisSwitchDimensions[0][1],
-				    (cBotXAxisSwitchDimensions[0][2] / 2) - 3])
-			      sphere(r=.75, $fn=100);
+				    (cBotXAxisSwitchDimensions[0][2] / 2) - 4])
+			      sphere(r=1.5, $fn=100);
 			 
 			 translate([cBotXAxisSwitchTHOffset,
 				    cBotXAxisSwitchDimensions[0][1],
-				    (cBotXAxisSwitchDimensions[0][2] / 2) + 3])
-			      sphere(r=.75, $fn=100);
+				    (cBotXAxisSwitchDimensions[0][2] / 2) + 4])
+			      sphere(r=1.5, $fn=100);
 		    }
+
+		    // Carve out a space for the switch itself.
+		    translate([cBotXAxisSwitchDimensions[0][0] - 7,
+			       cBotXAxisSwitchDimensions[0][1] -.1,
+			       (cBotXAxisSwitchDimensions[0][2] / 2) - 6.65])
+			 cube([7,1.7 + .1,13.3]);
 	       }
 
 	       // Carve out the mounting holes
@@ -2496,8 +2502,7 @@ module cbot_carriage_holes(heSide=false) {
 				    cBotXAxisSwitchDimensions[i][4]),
 				   cBotXAxisSwitchDimensions[i][3],
 				   cBotXAxisSwitchDimensions[i][4]);
-	       }
-	       
+	       }	       
 	  }
      }
 }
