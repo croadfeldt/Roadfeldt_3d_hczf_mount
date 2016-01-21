@@ -294,7 +294,7 @@ fanDuctOutsideOverlap = 6;
 // How far below the nozzle should the fan outlet point?
 fanDuctOutletOffset = 5;
 
- // Offset from the nozzles where the fan duct outlets should be placed. Leave named variables in place.
+// Offset from the nozzles where the fan duct outlets should be placed. Leave named variables in place.
 fanDuctOutletNozzleOffsetL = [0,-18 - fanDuctThickness,5];
 
 // Size of the fan duct outlets.
@@ -499,8 +499,8 @@ genericJHeadNozzleL = [[0, 0, -genJHeadHeight]]; // This must be a vector of vec
 /* [Hidden] */
 
 // Collision switch variables
-ylSwitchDimensions = [[25.5,5,15],[7.25,12,3.2,6.5,2.4]]; //[x,y,z],[hole x, hole z, hole d, nut dia, nut depth],[hole.....
-keyesSwitchDimensions = [[35.5,10,22],[2.25,19.5,2.5,4,1.8],[2.25,2.5,2.5,4,1.8]];
+ylSwitchDimensions = [[25.5,5,15],[7.25,11.5,3.2,6.5,2.4]]; //[x,y,z],[hole x, hole z, hole d, nut dia, nut depth],[hole.....
+keyesSwitchDimensions = [[26.5,10,22],[3.5,18.5,3.2,6.5,2.4],[3.5,3.5,3.2,6.5,2.4]];
 genSwitchDimensions = [[10.5,7,21],[2.5,5.5,2.5,4,1.8],[2.5,15.5,2.5,4,1.8]];
 cBotXAxisSwitchDimensions = (cBotXAxisSwitch == "yl99" ? ylSwitchDimensions :
 			     (cBotXAxisSwitch == "keyes" ? keyesSwitchDimensions :
@@ -1793,13 +1793,13 @@ module fan_duct_nozzle(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, t
 	       translate(heNozzleL[a])
 	       translate([0,0,3]) {
 	       translate([fanDuctOutletNozzleOffsetL[0],
-			 reverseY == false ? fanDuctOutletNozzleOffsetL[1] : - fanDuctOutletNozzleOffsetL[1],
-			 fanDuctOutletNozzleOffsetL[2] - (fanDuctOutletSize[2]) ]) { // Offset from the nozzle where the outlet should be.
-	       // Rotate the duct outlets to point to the correct spot.
-	       rotate(reverseY == false ? fanDuctOutletAngle : - fanDuctOutletAngle)
-		    cube([fanDuctOutletSize[0] + (wallThickness * 2),
-			  fanDuctOutletSize[1] + (interior ? .1 : 0),
-			  fanDuctOutletSize[2] + (wallThickness * 2)], center=true);
+			  reverseY == false ? fanDuctOutletNozzleOffsetL[1] : - fanDuctOutletNozzleOffsetL[1],
+			  fanDuctOutletNozzleOffsetL[2] - (fanDuctOutletSize[2]) ]) { // Offset from the nozzle where the outlet should be.
+		    // Rotate the duct outlets to point to the correct spot.
+		    rotate(reverseY == false ? fanDuctOutletAngle : - fanDuctOutletAngle)
+			 cube([fanDuctOutletSize[0] + (wallThickness * 2),
+			       fanDuctOutletSize[1] + (interior ? .1 : 0),
+			       fanDuctOutletSize[2] + (wallThickness * 2)], center=true);
 	       }
 	  }
      }
@@ -2484,11 +2484,26 @@ module cbot_carriage_holes(heSide=false) {
 			      sphere(r=1.5, $fn=100);
 		    }
 
+		    // Carve out some space for the solder pads near the switch.
+		    for(i=[-5:5:5]) {
+			 hull() {
+			      translate([cBotXAxisSwitchDimensions[0][0] - 11,
+					 cBotXAxisSwitchDimensions[0][1],
+					 (cBotXAxisSwitchDimensions[0][2] / 2) + i])
+				   sphere(r=1.4, $fn=100);
+			      
+			      translate([cBotXAxisSwitchDimensions[0][0] - 7,
+					 cBotXAxisSwitchDimensions[0][1],
+					 (cBotXAxisSwitchDimensions[0][2] / 2) + i])
+				   sphere(r=1.4, $fn=100);
+			 }
+		    }
+
 		    // Carve out a space for the switch itself.
 		    translate([cBotXAxisSwitchDimensions[0][0] - 7,
 			       cBotXAxisSwitchDimensions[0][1] -.1,
 			       (cBotXAxisSwitchDimensions[0][2] / 2) - 6.65])
-			 cube([7,1.7 + .1,13.3]);
+			 cube([7,1.4 + .1,13.3]);
 	       }
 
 	       // Carve out the mounting holes
