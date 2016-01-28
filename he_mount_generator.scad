@@ -151,12 +151,14 @@ prusai3FanBracketDepth = 3;
 // fant = Fan Bracket
 // duct = Fan Duct
 // mag = Magnetic Z Probe mount
-// zpro = Z Probe arm used with servo
+// zarm = Z Probe arm used with servo
 // jhead_col = J Head style collar
+// induct = Inductive Sensor Mount
+// xbump = X Endstop Bumper
 // all = All parts
 
 // Which C Botpart should be exported.
-cBotWhich = "all"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, jhead_col:J Head Style Collar, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, all:All Parts] 
+cBotWhich = "all"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, jhead_col:J Head Style Collar, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, xbump:X Endstop Bumper, all:All Parts] 
 
 // Do you want a carriage mount axis limit switch?
 cBotXAxisSwitch = "gen"; // [yl99:YL-99, keyes:Keyes, gen:Generic Mini Switch, none:None]
@@ -183,13 +185,13 @@ cBotCarriageHeight = 65;
 cBotCarriageDepth = 5;
 
 // Diameter of screw holes for carriage idler wheels.
-cBotCarriageIdlerScrewDiameter = 5;
+cBotCarriageIdlerScrewDiameter = 5.2;
 
 // Amount of material around screw holes for carriage idler wheels.
 cBotCarriageIdlerScrewMat = 3.3;
 
 // Diameter of screw holes that mounts back plane to carriage.
-cBotCarriageMountScrewDiameter = 4;
+cBotCarriageMountScrewDiameter = 4.2;
 
 // Horizontal distance of screw holes for back plane mount. Not used if hot end mount is integrated.
 cBotCarriageMountScrewHorizontalDistance = 30;
@@ -611,6 +613,10 @@ cBotFanTabDepth = 4;
 cBotFanTabAngle = 0;
 cBotFanTabHole = 3.2;
 cBotFanTabMat = 2;
+cBotXBumperHeight = 10; // Total Height of bumper.
+cBotXBumperWidth = 14; // How wide to make the bumper.
+cBotXBumperDepth = 3; // How thick to make the bumper.
+cBotXBumperHolePos = [10,5]; // Where the hole is in relation to the bottom of the bumper.
 
 /* [Hidden] */
 inductMountWidth = inductDiameter + (inductBraceWidth * 2) + (inductMat * 2);
@@ -1153,6 +1159,12 @@ if(carriage == "cbot") {
      if(cBotWhich == "belth" || cBotWhich == "all") {
 	  translate([-15,0,0])
 	       cbot_belt_holder();
+     }
+
+     // X Axis Switch Bumper
+     if(cBotWhich == "xbump" || cBotWhich == "all") {
+	  translate([-25, 0, 30])
+	       cbot_x_bumper();
      }
 }
 
@@ -2410,6 +2422,8 @@ module cbot_carriage_holes(heSide=false) {
      for(j=[cBotCableTieHorizontalDistance : cBotCableTieHorizontalDistance : cBotCarriageWidth - cBotCableTieHorizontalDistance]) {
 	  for(i=[0 : 1 : cBotCableTieVerticalCount - 1]) {
 	       if(((cBotXAxisSwitch == "keyes" || cBotXAxisSwitch == "yl99") &&
+		   (((cBotXAxisSwitchSide == "acc" || cBotXAxisSwitchSide == "both") && heSide == false) ||
+		    ((cBotXAxisSwitchSide == "he" || cBotXAxisSwitchSide == "both") && heSide == true)) &&
 		  (i == 1 || i == 2) && (j >= (cBotCableTieHorizontalDistance * 3))) ||
 		    ( i == 2 && (j == cBotCableTieHorizontalDistance * 2))) {
 		    // Don't carve out this cable tie, it is under the switch.
@@ -2625,3 +2639,13 @@ module cbot_belt_holder_holes() {
 	  cylinder(d=cBotBeltScrewDiameter, h=cBotBeltHolderDepth + .2, $fn=100);
 }
 
+module cbot_x_bumper() {
+     // Small bumper for the carriage mounted X Axis Switch.
+     difference() {
+	  cube([cBotXBumperWidth, cBotXBumperDepth, cBotXBumperHeight]);
+	  
+	  translate([cBotXBumperHolePos[0], cBotXBumperDepth + .1, cBotXBumperHolePos[1]])
+	       rotate([90,0,0])
+	       cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotXBumperDepth + .2, $fn=100);
+     }
+}
