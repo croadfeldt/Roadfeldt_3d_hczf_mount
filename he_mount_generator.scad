@@ -51,7 +51,7 @@ use<delta_blower_fans.scad>;
 /* [Features] */
 
 // What type of Carriage do you use / need?
-carriage = "cbot"; // [cbot:C Bot style, prusai3:Prusa i3]
+carriage = "prusai3"; // [cbot:C Bot style, prusai3:Prusa i3]
 
 // Which hot end is in use. Ensure you enter height from top of mount to tip of nozzle if you select generic J Head.
 hotend = "e3d_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
@@ -781,17 +781,6 @@ if (carriage == "prusai3") {
 		    if(servoInduct == "induct") {
 			 // Place the Inductive / Capacitive Sensor extension.
 			 induct_ext();
-
-			 // Place the induct mount itself
-			 difference() {
-			      // Place the mount.
-			      translate(inductMountL)
-				   induct_mount(inductMountBracketed, xMountDepth);
-			      
-			      // Carve out the wholes for the mount.
-			      translate(inductMountL)
-				   induct_mount_holes(inductMountBracketed);
-			 }
 		    }
 	       }
 	       
@@ -941,7 +930,8 @@ if (carriage == "prusai3") {
      // Inductive / Capacitive Extension
      if((prusai3Which == "induct" || prusai3Which == "all") && servoInduct == "induct") {
 	  // Place the induct mount itself
-	  difference() {
+	  translate(explodeParts == 1 ? (-partsOffset) : [])
+	       difference() {
 	       // Place the mount.
 	       translate(inductMountL)
 		    induct_mount(inductMountBracketed, xMountDepth);
