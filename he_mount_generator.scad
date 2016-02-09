@@ -97,7 +97,7 @@ xMountWidth = 40;
 xMountHeight = 40;
 
 // How deep the overall X Back Plane should be.
-xMountDepth = 9;
+xMountDepth = 6;
 
 // The radius of the rounded X Back Plane corners.
 xMountCornerRadius = 4;
@@ -388,7 +388,7 @@ inductMountDistance = 8;
 inductDiameter = 12.6;
 
 // Amount of material around sensor, account for nuts and washers around the sensor.
-inductMat = 3;
+inductMat = 5;
 
 // Offset of mount from back of X Carriage back plane.
 inductOffset = 0;
