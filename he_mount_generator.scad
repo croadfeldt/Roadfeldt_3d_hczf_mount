@@ -1344,7 +1344,7 @@ module bolt_hole(bdia=xMountBoltDiameter,
 	  // Note we shift the cylinders in the z axis by .1 and make then .2 bigger to avoid coincident faces.
 	  // Screw hole
 	  translate([0,0,-.1])
-#	       cylinder(d=bdia,h=bdep + (boltHoleSupportFix == 1 ? 0 : .2),$fn=100);
+	       cylinder(d=bdia,h=bdep + (boltHoleSupportFix == 1 ? 0 : .2),$fn=100);
 	  // Nut Trap
 	  translate([0,0,bdep])
 	       cylinder(d=ndia,h=ndep + .1,$fn=6);
