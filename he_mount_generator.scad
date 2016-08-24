@@ -64,7 +64,7 @@ extruder = "titan"; // [bowden:Bowden, titan:E3D Titan, carl_direct:Carl Feniak 
 fanDuctStyle = "classic"; // [Full:Full 360 duct, classic:Simple single outlet]
 
 // Which Z Probe type is in use. Select Servo here if you want to if you Servo Bracket selected above, otherwise it won't appear.
-servoInduct = "bltouch"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, bltouch:BL Touch, none:Neither/None]
+servoInduct = "induct"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, bltouch:BL Touch, none:Neither/None]
 
 // Which side should the z probe be on? Be mindful of clearance with fan mount.
 // If you choose a Prusa i3 style carriage and a titan extruder, this will be overridden to left.
