@@ -18,3 +18,5 @@ Hexagon-102.scad
 #he_mount_generator.scad#
 
 *.scad#
+
+*.gcode
