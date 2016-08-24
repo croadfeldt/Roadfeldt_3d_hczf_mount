@@ -55,7 +55,7 @@ use<delta_blower_fans.scad>;
 carriage = "cbot"; // [cbot:C Bot style, prusai3:Prusa i3]
 
 // Which hot end is in use. Ensure you enter height from top of mount to tip of nozzle if you select generic J Head.
-hotend = "e3d_v6_vol"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
+hotend = "e3d_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
 
 // What style of extruder are you using?
 extruder = "titan"; // [bowden:Bowden, titan:E3D Titan, carl_direct:Carl Feniak Direct Drive - Not ready yet.]
@@ -64,7 +64,7 @@ extruder = "titan"; // [bowden:Bowden, titan:E3D Titan, carl_direct:Carl Feniak 
 fanDuctStyle = "classic"; // [Full:Full 360 duct, classic:Simple single outlet]
 
 // Which Z Probe type is in use. Select Servo here if you want to if you Servo Bracket selected above, otherwise it won't appear.
-servoInduct = "induct"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, bltouch:BL Touch, none:Neither/None]
+servoInduct = "bltouch"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, bltouch:BL Touch, none:Neither/None]
 
 // Which side should the z probe be on? Be mindful of clearance with fan mount.
 // If you choose a Prusa i3 style carriage and a titan extruder, this will be overridden to left.
@@ -479,6 +479,7 @@ chiBowdenLocs = [[(chiMountWidth / 2) - 9, chiMountDepth - (heDepthOffset + 6)],
 chiV6NozzleL = [[6,-6,-49.6],[24,-6,-49.6]]; // Location of Chimera V6 Nozzles in relation to top rear left corner of cold end.
 chiVolNozzleL = [[6,-6,-59.6],[24,-6,-59.6]]; // Location of Chimera Volcano nozzles in relation to the top rear left corner of cold end.
 cycNozzleL = [[15,-6,-50.1]]; // Location of Cyclops nozzle in relation to the top rear left corner of cold end.
+chiCBotProbePos = 1; // Mounting position of probe mounts for the E3D Chimera on the C-Bot carriage.
 
 /* [J Head Mount Advanced */
 
@@ -506,6 +507,7 @@ jHeadMountNutDepth = 2.4;
 jHeadFanScrewOffset = 5;
 jHeadMountScrewHorizontalOffset = (jHeadWidth / 4);
 jHeadMountScrewVerticalOffset = (jHeadMountHeight / 2);
+jHeadCBotProbePos = 2; // Mounting position of probe mounts for J-Head mount based hotends on the C-Bot carriage.
 
 /* [Hidden] */
 // If the hotend is a chimera / cyclops based one, force extruder to be bowden and fan duct style to be classic..
@@ -681,6 +683,7 @@ cBotXBumperHolePos = [10,5]; // Where the hole is in relation to the bottom of t
 /* [Hidden] */
 realZProbeSide = (carriage == "prusai3" && extruder == "titan" ? "left" : zProbeSide);
 inductMountWidth = inductDiameter + (probeBraceWidth * 2) + (inductMat * 2);
+cBotProbePos = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") ? chiCBotProbePos : jHeadCBotProbePos; // Used the correct location of the probe mount based on hotend type.
 heMountWidth = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
      ? chiMountWidth
      : (hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead")
@@ -754,8 +757,8 @@ prusai3ProbeMountL = [ realZProbeSide == "right" ?
 			-xMountDepth,
 			heAnchorL[2] + heNozzleL[0][2] + probePlateHeight];
 cBotProbeMountL = [ realZProbeSide == "right" ?
-		     (cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * floor((((cBotCarriageWidth - (cBotCarriageIdlerScrewDiameter * 2) - (cBotCarriageIdlerScrewMat * 4)) / cBotFanMountDistance) / 2) -2 /* The number after the - sign before this comment indicates position from edge */))) - (probeMountWidth / 2) :
-		     (cBotCarriageWidth / 2) - ((cBotFanMountDistance / 2) + (cBotFanMountDistance * floor((((cBotCarriageWidth - (cBotCarriageIdlerScrewDiameter * 2) - (cBotCarriageIdlerScrewMat * 4)) / cBotFanMountDistance) / 2) -2 /* The number after the - sign before this comment indicates position from edge. */))) - (probeMountWidth / 2),
+		     (cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * floor((((cBotCarriageWidth - (cBotCarriageIdlerScrewDiameter * 2) - (cBotCarriageIdlerScrewMat * 4)) / cBotFanMountDistance) / 2) - cBotProbePos /* The number after the - sign before this comment indicates position from edge */))) - (probeMountWidth / 2) :
+		     (cBotCarriageWidth / 2) - ((cBotFanMountDistance / 2) + (cBotFanMountDistance * floor((((cBotCarriageWidth - (cBotCarriageIdlerScrewDiameter * 2) - (cBotCarriageIdlerScrewMat * 4)) / cBotFanMountDistance) / 2) - cBotProbePos /* The number after the - sign before this comment indicates position from edge. */))) - (probeMountWidth / 2),
 		     - cBotCarriageDepth,
 		     heAnchorL[2] + heNozzleL[0][2] + probePlateHeight];
 probeMountL = (carriage == "prusai3" ? prusai3ProbeMountL : (carriage == "cbot" ? cBotProbeMountL : 0));
