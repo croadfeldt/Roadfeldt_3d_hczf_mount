@@ -55,7 +55,7 @@ use<delta_blower_fans.scad>;
 carriage = "cbot"; // [cbot:C Bot style, prusai3:Prusa i3]
 
 // Which hot end is in use. Ensure you enter height from top of mount to tip of nozzle if you select generic J Head.
-hotend = "e3d_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
+hotend = "e3d_v6_vol"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
 
 // What style of extruder are you using?
 extruder = "titan"; // [bowden:Bowden, titan:E3D Titan, carl_direct:Carl Feniak Direct Drive - Not ready yet.]
@@ -415,7 +415,7 @@ inductDiameter = 12.6;
 inductMat = 5;
 
 // Height of mount plate above nozzle tip.
-inductPlateHeight = 20;
+inductPlateHeight = 25;
 
 // How much extra should be added to the carriage to provide clearance for the inductive mount bracket.
 inductBracketExtra = 6;
@@ -496,9 +496,10 @@ jHeadInnerCollarHeight =  innerCollarHeightAdjustment + (hotend == "hexagon" ? 4
 jHeadLowerCollarDiameter = lowerCollarDiameterAdjustment + 16;
 jHeadLowerCollarHeight = lowerCollarHeightAdjustment + (hotend == "hexagon" ? 4.6 : 3);
 jHeadMountHeight = jHeadUpperCollarHeight + jHeadInnerCollarHeight + jHeadLowerCollarHeight;
-jHeadHEPosUD = (carriage == "prusai3" ? 14 : (hotend == "e3d_v6" && servoInduct == "bltouch" ? 21 :
-					      (hotend == "jhead_mkv" && servoInduct == "bltouch" ? 11 :
-					       (hotend == "hexagon" && servoInduct == "bltouch" ? 14 : 30))));
+jHeadHEPosUD = (carriage == "prusai3" ? 14 : (hotend == "e3d_v6" ? 21 :
+					      (hotend == "jhead_mkv" ? 11 :
+					       (hotend == "generic_jhead" ? 11 :
+					       (hotend == "hexagon" ? 14 : 30)))));
 jHeadMountWidth = 36;
 jHeadCollarCornerRadius = 3;
 jHeadMountBoltDiameter = 3.2;
@@ -2448,8 +2449,8 @@ module induct_mount(carriageDepth,cbot=false) {
 	  // Induct mount top right corner.
 	  translate([ probeMountWidth - (probeBraceWidth / 2),
 		      -(probeMountBracketed == 0 ? 0 : probeBracketDepth),
+		      cbot == true ? -(heAnchorL[2] + heNozzleL[0][2] + probePlateHeight) + (cBotAccessoryMountPos * 2) + (probeBraceWidth / 2) :
 		      probePlateThickness + probeBraceHeight - (probeBraceWidth / 2)])
-	       rotate([-90,0,0])
 	       sphere(d=probeBraceWidth, $fn=100);
 	  
 	  // Induct mount bottom right corner.
@@ -2471,8 +2472,8 @@ module induct_mount(carriageDepth,cbot=false) {
      hull() {
 	  translate([ (probeBraceWidth / 2),
 		      -(probeMountBracketed == 0 ? 0 : probeBracketDepth),
+		      cbot == true ? -(heAnchorL[2] + heNozzleL[0][2] + probePlateHeight) + (cBotAccessoryMountPos * 2) + (probeBraceWidth / 2) :
 		      probePlateThickness + probeBraceHeight - (probeBraceWidth / 2)])
-	       rotate([-90,0,0])
 	       sphere(d=probeBraceWidth, $fn=100);
 	  
 	  // Induct mount bottom left corner.
