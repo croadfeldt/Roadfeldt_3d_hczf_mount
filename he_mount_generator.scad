@@ -1,4 +1,4 @@
-// Roadfeldt - Hot End Mount Generator
+// Roadfeldt - Hot End Mount GeneratorA
 //
 /*
   Copyright (C)2015-2016 Chris Roadfeldt <chris@roadfeldt.com>
@@ -1347,8 +1347,8 @@ module bolt_hole(bdia=xMountBoltDiameter,
      union() {
 	  // Note we shift the cylinders in the z axis by .1 and make then .2 bigger to avoid coincident faces.
 	  // Screw hole
-	  translate([0,0,-.1])
-	       cylinder(d=bdia,h=bdep + (boltHoleSupportFix == 1 ? 0 : .2),$fn=100);
+	  translate([0,0,-.2])
+	       cylinder(d=bdia,h=bdep + (boltHoleSupportFix == 1 ? 0 : .3),$fn=100);
 	  // Nut Trap
 	  translate([0,0,bdep])
 	       cylinder(d=ndia,h=ndep + .1,$fn=6);
