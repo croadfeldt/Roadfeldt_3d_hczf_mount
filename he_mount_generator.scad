@@ -1,4 +1,4 @@
-// Roadfeldt - Hot End Mount GeneratorA
+// Roadfeldt - Hot End Mount Generator
 //
 /*
   Copyright (C)2015-2016 Chris Roadfeldt <chris@roadfeldt.com>
