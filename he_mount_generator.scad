@@ -298,7 +298,7 @@ fanTabNubClear = .1;
 fanDuctBowlDepth = 5;
 
 // How thick should the exterior walls of the fan duct be?
-fanDuctThickness = .8;
+fanDuctThickness = 1;
 
 // How thick should the interior walls of the fan duct be?
 fanDuctInternalThickness = .8;
@@ -310,11 +310,11 @@ fanDuctOverlap = 2.75;
 fanDuctOutsideOverlap = 6;
 
 // How far below the nozzle should the fan outlet point?
-fanDuctOutletOffset = 1;
+fanDuctOutletOffset = 10;
 
 // Offset from the nozzles where the fan duct outlets should be placed. Leave named variables in place.
 fanDuctOutletNozzleOffsetL = [16,3]; // [0] X distance from nozzle for start of duct opening, fanDuctThickness will be subtracted from this [1] Z distance from nozzle tip. + up, - down
-classicFanDuctOutletNozzleOffsetL = [10,2]; // [0] X distance from nozzle for start of duct opening, fanDuctThickness will be subtracted from this [1] Z distance from nozzle tip. + up, - down
+classicFanDuctOutletNozzleOffsetL = [10,0]; // [0] X distance from nozzle for start of duct opening, fanDuctThickness will be subtracted from this [1] Z distance from nozzle tip. + up, - down
 
 // Size of air chamber around fan duct ring.
 fanDuctAirChamberSize = [5,1.5]; // [0] X width of internal portion of air chamber, [1] Z height of internal portion of air chamber.
@@ -769,7 +769,7 @@ echo("probeMountWidth", probeMountWidth);
 
 // Variables for Fan Duct
 fanDuctOutletAngle = atan((fanDuctOutletNozzleOffsetL[1] + fanDuctOutletOffset + fanDuctOutletSize[1]) / fanDuctOutletNozzleOffsetL[0]);
-classicFanDuctOutletAngle = atan((classicFanDuctOutletNozzleOffsetL[1] + fanDuctOutletOffset + (classicFanDuctOutletSize[1] / 2) + fanDuctThickness) / classicFanDuctOutletNozzleOffsetL[0]);
+classicFanDuctOutletAngle = atan((classicFanDuctOutletNozzleOffsetL[1] + fanDuctOutletOffset + classicFanDuctOutletSize[1] + (fanDuctThickness * 2)) / classicFanDuctOutletNozzleOffsetL[0]);
 fanDuctConnectRadius = fanDuctConnectSize[2] / 2; // Radius of the bottom of the fan duct below housing.
 
 // Variables for probe extension and servo bracket.
@@ -1878,13 +1878,13 @@ echo("reverseY",reverseY);
 
 module fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDirection, reverseY=false) {
      // Carve out the inside part of connection to the fan.
-     translate([0, 0, -.1])
+     translate([0, 0, -fanDuctThickness - .1])
 	  cube([fanDuctConnectSize[0],
 		fanDuctConnectSize[1],
-		fanDuctOutsideOverlap + .2]);
+		fanDuctOutsideOverlap + fanDuctThickness + .2]);
      hull() {
 	  // Recreate the body of the fan shroud so we can hull to it.
-	  translate([0,0, -.1])
+	  translate([0,0, -fanDuctThickness - .1])
 	       cube([fanDuctConnectSize[0],
 		     fanDuctConnectSize[1],
 		     .2]);
@@ -1958,6 +1958,7 @@ module fan_duct_nozzle_connect(ductConnectL, fanScrewL, heAnchorL, tabHorizontal
 	       }
 	       else {
 		    // Rotate the duct outlets to point to the correct spot.
+		    // Edge nearest nozzle
 		    translate([0,
 			       (reverseY == false ? - classicFanDuctOutletNozzleOffsetL[0] : classicFanDuctOutletNozzleOffsetL[0]),
 			       classicFanDuctOutletNozzleOffsetL[1] + ((classicFanDuctOutletSize[2] / 2) + fanDuctThickness)])
