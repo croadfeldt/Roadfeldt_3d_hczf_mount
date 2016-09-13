@@ -64,30 +64,102 @@ flangeHoleDiameter = 4.5;
 // Radius of inside curve of the corners of the clamp around the extrusion. Enter 0 for square corners.
 insideRad = 1;
 
+// Radius of fillet on corners of bar.
+barFilletRadius = 1;
+
 // Start building the clamp.
 // Wall mount first
 // Move to the key stone location for the wall mount.
 translate([0, clampLength - clampMat, 0])
 difference() {
-     // Move to the correct starting place for the wall mount cube if needed.
-     translate([flangeHolePlace == "outside" ? -(flangeHoleDiameter * 2) : 0, 0, 0])
-     cube([flangeHolePlace == "outside" ? barHeight + (flangeHoleDiameter * 4) : barHeight, clampMat, clampWidth]);
+     union() {
+	  // Create the mounting bracket for the wall / secured mounting point.
+	  // Move to the correct starting place for the wall mount cube if needed.
+	  translate([(flangeHolePlace == "inside" ? 0 : -(flangeHoleDiameter * 2)), 0, 0])
+	       cube([(flangeHolePlace == "inside" ? barHeight : barHeight + (flangeHoleDiameter * 4)), clampMat, clampWidth]);
 
+	  // Create the cylinders that will be used to fillet the connection from the mounting plate to the bar.
+	  // Left side fillet cylinder hull.
+	  hull() {
+	       // Mate cylinder
+	       translate([(flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) + barFilletRadius + .01, + .01, 0])
+		    cylinder(r=.01, h=clampWidth, $fn=200);
+	       // Corner cylinder
+	       translate([(flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0), - barFilletRadius, 0])
+		    cylinder(r=barFilletRadius, h=clampWidth, $fn=200);
+	  }
+	  
+	  // Right side fillet cylinder hull.
+	  hull() {
+	       // Mate cylinder
+	       translate([barHeight - (flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) - barFilletRadius - .01, + .01, 0])
+		    cylinder(r=.01, h=clampWidth, $fn=200);
+	       // Corner cylinder
+	       translate([barHeight - (flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0), - barFilletRadius, 0])
+		    cylinder(r=barFilletRadius, h=clampWidth, $fn=200);
+	  }
+     }
+     
      // Create the wall mount holes. Move appropriate according to hole placement variable.
      // Left mounting hole.
-     translate([flangeHolePlace == "inside" ? flangeHoleDiameter : -flangeHoleDiameter, -.1, (clampWidth / 2)])
+     translate([(flangeHolePlace == "inside" ? flangeHoleDiameter : -flangeHoleDiameter), -.1, (clampWidth / 2)])
 	  rotate([-90,0,0])
 	  cylinder(d=flangeHoleDiameter, h=(clampMat + .2), $fn=200);
 
      // Right mounting hole.
-     translate([flangeHolePlace == "inside" ? barHeight - flangeHoleDiameter : barHeight + flangeHoleDiameter, -.1, (clampWidth / 2)])
+     translate([(flangeHolePlace == "inside" ? barHeight - flangeHoleDiameter : barHeight + flangeHoleDiameter), -.1, (clampWidth / 2)])
 	  rotate([-90,0,0])
 	  cylinder(d=flangeHoleDiameter, h=(clampMat + .2), $fn=200);
+
+     // Create the cylinders that will be used to clear the excess from the fillet for the connection from the mounting plate to the bar.
+     // Left side fillet cylinder.
+     translate([(flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) - (barFilletRadius * .5), - (barFilletRadius * 1.5), -.1])
+	       cylinder(r=(barFilletRadius * 1.5), h=clampWidth + .2, $fn=200);
+     
+     // Right side fillet cylinder.
+     translate([barHeight - (flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) + (barFilletRadius * .5), - (barFilletRadius * 1.5), -.1])
+	  cylinder(r=(barFilletRadius * 1.5), h=clampWidth + .2, $fn=200);
 }
 
 // Next create the bar from the clamp to the secure mounting point.
-translate([flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0, clampSlop + .1, 0])
-cube([flangeHolePlace == "inside" ? (barHeight - (flangeHoleDiameter * 4)) : barHeight, clampLength -.2 - clampSlop, clampWidth]);
+translate([(flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) + barFilletRadius, clampSlop + .1, 0])
+cube([(flangeHolePlace == "inside" ? (barHeight - (flangeHoleDiameter * 4)) : barHeight) - (barFilletRadius * 2), clampLength -.2 - clampSlop, clampWidth]);
+
+// Fillet the corners of the bar to the clamp.
+translate([0, clampMat, 0])
+difference() {
+     union() {
+	  // Create the cylinders that will be used to fillet the connection from the bar to the clamp.
+	  // Left side fillet cylinder hull.
+	  hull() {
+	       // Mate cylinder
+	       translate([(flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) + barFilletRadius + .01, - .01, 0])
+		    cylinder(r=.01, h=clampWidth, $fn=200);
+	       // Corner cylinder
+	       translate([(flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0), + barFilletRadius, 0])
+		    cylinder(r=barFilletRadius, h=clampWidth, $fn=200);
+	  }
+	  
+	  // Right side fillet cylinder hull.
+	  hull() {
+	       // Mate cylinder
+	       translate([barHeight - (flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) - barFilletRadius - .01, - .01, 0])
+		    cylinder(r=.01, h=clampWidth, $fn=200);
+	       // Corner cylinder
+	       translate([barHeight - (flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0), + barFilletRadius, 0])
+		    cylinder(r=barFilletRadius, h=clampWidth, $fn=200);
+	  }
+     }
+
+     // Create the cylinders that will be used to clear the excess from the fillet for the connection from the bar to the clamp.
+     // Left side fillet cylinder.
+     translate([(flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) - (barFilletRadius * .5), + (barFilletRadius * 1.5), -.1])
+	       cylinder(r=(barFilletRadius * 1.5), h=clampWidth + .2, $fn=200);
+     
+     // Right side fillet cylinder.
+     translate([barHeight - (flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) + (barFilletRadius * .5), + (barFilletRadius * 1.5), -.1])
+	  cylinder(r=(barFilletRadius * 1.5), h=clampWidth + .2, $fn=200);
+}
 
 // Create the clamp by using minkowski, then split it for 2 piece clamp if needed.
 difference() {
