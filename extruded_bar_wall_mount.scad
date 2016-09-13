@@ -31,7 +31,7 @@ barHeight = 40; // [10:10mm, 20:20mm, 30:30mm, 40:40mm, 50:50mm, 60:60mm, 70:70m
 // Width of clamp. How thick / wide should the clamp itself be?
 clampWidth = 10;
 
-// Fully enclose clamp or 2 piece?
+// Fully enclosed clamp or 2 piece?
 clampStyle = 2; // [1:Fully Enclosed, 2:2 Piece]
 
 // Separation distance if 2 piece. Does not affect design or usage, but will make printing easier.
