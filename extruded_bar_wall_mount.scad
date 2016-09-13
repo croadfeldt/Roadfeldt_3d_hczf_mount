@@ -32,7 +32,7 @@ barHeight = 40; // [10:10mm, 20:20mm, 30:30mm, 40:40mm, 50:50mm, 60:60mm, 70:70m
 clampWidth = 10;
 
 // Fully enclosed clamp or 2 piece?
-clampStyle = 2; // [1:Fully Enclosed, 2:2 Piece]
+clampStyle = 1; // [1:Fully Enclosed, 2:2 Piece]
 
 // Separation distance if 2 piece. Does not affect design or usage, but will make printing easier.
 clampSepDistance = 2;
@@ -46,17 +46,17 @@ clampLength = 50;
 // Depth of material around extrusion and wall / secured mount point fittings.
 clampMat = 3;
 
-// How much extra space should be equally added to all sides of the clamp to account for printer variation?
 // This increases the clamp size by twice the amount shown.
 // It does not affect the distance to the secured mounting point. But will create a space in
 // the amount shown between the clamp inner dimension and the item being clamped.
 // eg; clampSlop = 1, distance to secure mount = 50, results in a 49mm distance from inside of clamp wall to
 // outside of secured mount plate. It also creates a 1 mm gap to all inside clamp walls to the
 // item being clamped. If your printer is extremely accurate, change this to 0.
+// How much extra space should be equally added to all sides of the clamp to account for printer variation?
 clampSlop = .1;
 
 // Should the holes for the secured end be inside the overall heigh of the clamp or outside?
-flangeHolePlace = "inside"; // [inside:Inside overall height, Outside of height]
+flangeHolePlace = "inside"; // [inside:Inside overall height, outside:Outside of height]
 
 // Size of holes in wall / secured mount flange?
 flangeHoleDiameter = 4.5;
