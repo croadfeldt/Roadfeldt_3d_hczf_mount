@@ -28,11 +28,14 @@ barWidth = 20; // [10:10mm, 20:20mm, 30:30mm, 40:40mm, 50:50mm, 60:60mm, 70:70mm
 // Height / Vertical of bar to be clamped. eg; 20x40, then choose 40.
 barHeight = 40; // [10:10mm, 20:20mm, 30:30mm, 40:40mm, 50:50mm, 60:60mm, 70:70mm, 80:80mm]
 
+// What type of bar style do you want?
+barStyle = 2; // [1:Solid, 2:X]
+
 // Width of clamp. How thick / wide should the clamp itself be?
 clampWidth = 10;
 
-// Fully enclosed clamp or 2 piece?
-clampStyle = 1; // [1:Fully Enclosed, 2:2 Piece]
+// Fully enclosed clamp or Multi piece? Fully enclosed requires you to slide the clamp on before completing build. Multi Piece allows for retro-fitting.
+clampStyle = 2; // [1:Fully Enclosed, 2:Multi Piece]
 
 // Separation distance if 2 piece. Does not affect design or usage, but will make printing easier.
 clampSepDistance = 2;
@@ -45,6 +48,10 @@ clampLength = 50;
 
 // Depth of material around extrusion and wall / secured mount point fittings.
 clampMat = 3;
+
+// Height of gap in middle of clamp. 0 for no gap, # for # mm of gap. LED lights use 15mm to give plenty of space in the middle.
+// To define length of clamp tabs vs size of gap, enter this formula and replace ## with the length of the tab desired: barHeight - (## * 2)
+clampMidGap = barHeight - (10 * 2);
 
 // This increases the clamp size by twice the amount shown.
 // It does not affect the distance to the secured mounting point. But will create a space in
@@ -113,8 +120,43 @@ difference() {
 }
 
 // Next create the bar from the clamp to the secure mounting point.
-translate([(flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) + barFilletRadius, clampSlop + .1, 0])
-cube([(flangeHolePlace == "inside" ? (barHeight - (flangeHoleDiameter * 4)) : barHeight) - (barFilletRadius * 2), clampLength -.2 - clampSlop, clampWidth]);
+if (barStyle == 2) {
+     // Left
+     hull() {
+	  translate([(flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) + barFilletRadius + (clampMat / 2), clampSlop + .1 + (clampMat / 2), 0])
+	       cylinder(d=clampMat, h=clampWidth, $fn=200);
+	  translate([(flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) + barFilletRadius + (clampMat / 2), clampSlop - .1 + clampLength - (clampMat / 2), 0])
+	       cylinder(d=clampMat, h=clampWidth, $fn=200);
+	  }
+
+     // Right
+     hull() {
+	  translate([(flangeHolePlace == "inside" ? (barHeight - (flangeHoleDiameter * 2)) : barHeight) - (barFilletRadius + (clampMat / 2)), clampSlop + .1 + (clampMat / 2), 0])
+	       cylinder(d=clampMat, h=clampWidth, $fn=200);
+	  translate([(flangeHolePlace == "inside" ? (barHeight - (flangeHoleDiameter * 2)) : barHeight) - (barFilletRadius + (clampMat / 2)), clampSlop - .1 + clampLength - (clampMat / 2), 0])
+	       cylinder(d=clampMat, h=clampWidth, $fn=200);
+	  }
+
+     // Left to right cross.
+     hull() {
+	  translate([(flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) + barFilletRadius + (clampMat / 2), clampSlop + .1 + (clampMat / 2), 0])
+	       cylinder(d=clampMat, h=clampWidth, $fn=200);
+	  translate([(flangeHolePlace == "inside" ? (barHeight - (flangeHoleDiameter * 2)) : barHeight) - (barFilletRadius + (clampMat / 2)), clampSlop - .1 + clampLength - (clampMat / 2), 0])
+	       cylinder(d=clampMat, h=clampWidth, $fn=200);
+	  }
+
+     // Right to left cross.
+     hull() {
+	  translate([(flangeHolePlace == "inside" ? (barHeight - (flangeHoleDiameter * 2)) : barHeight) - (barFilletRadius + (clampMat / 2)), clampSlop + .1 + (clampMat / 2), 0])
+	       cylinder(d=clampMat, h=clampWidth, $fn=200);
+	  translate([(flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) + barFilletRadius + (clampMat / 2), clampSlop - .1 + clampLength - (clampMat / 2), 0])
+	       cylinder(d=clampMat, h=clampWidth, $fn=200);
+	  }
+}
+else {
+     translate([(flangeHolePlace == "inside" ? (flangeHoleDiameter * 2) : 0) + barFilletRadius, clampSlop + .1, 0])
+	  cube([(flangeHolePlace == "inside" ? (barHeight - (flangeHoleDiameter * 4)) : barHeight) - (barFilletRadius * 2), clampLength -.2 - clampSlop, clampWidth]);
+}
 
 // Fillet the corners of the bar to the clamp.
 translate([0, clampMat, 0])
@@ -222,6 +264,13 @@ difference() {
 	  // Right rear side fillet cylinder.
 	  translate([barHeight + clampMat + clampSlop + clampFilletRadius, - (barWidth / 2) + clampMat + clampFilletRadius, -.1])
 	       cylinder(r=clampFilletRadius, h=clampWidth + .2, $fn=200);
+     }
+
+     // Cut out the gap if needed.
+     if (clampMidGap > 0) {
+	  // Move to the center of the clamp opposite of the connecting bar.
+	  translate([-clampSlop + (barHeight / 2) - (clampMidGap / 2), - barWidth - clampSlop - (clampStyle == 2 ? clampSepDistance : 0) - clampMat - .1, - .1])
+	       cube([clampMidGap, clampMat + .2, clampWidth + .2]);
      }
 }
 
