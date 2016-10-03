@@ -20,3 +20,13 @@ Hexagon-102.scad
 *.scad#
 
 *.gcode
+
+*.stl
+
+*.scad~
+
+he_mount_generator.py
+
+.DS_Store
+
+he_mount_generator.py~
