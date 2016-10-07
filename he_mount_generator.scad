@@ -42,8 +42,8 @@
 //use<e3d_v6_chimera.scad>;
 //use<e3d_vulcano_chimera.scad>;
 //use<e3d_cyclops.scad>;
-//use<e3d_v6_all_metall_hotend.scad>;
-use<e3d_v6_volcano_all_metall_hotend.scad>;
+use<e3d_v6_all_metall_hotend.scad>;
+//use<e3d_v6_volcano_all_metall_hotend.scad>;
 use<Hexagon-102.scad>;
 
 // Bring in the basic delta fan designs I created for visualization.
@@ -55,13 +55,16 @@ use<delta_blower_fans.scad>;
 carriage = "cbot"; // [cbot:C Bot style, prusai3:Prusa i3]
 
 // Which hot end is in use. Ensure you enter height from top of mount to tip of nozzle if you select generic J Head.
-hotend = "e3d_v6_vol"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
+hotend = "e3d_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
+
+// Where should the hot end mount be positioned vertically? Optimized changes the mount height to increase vertical build height as much as possible. Universal keeps the mount height the same for all hot ends allow for easier interchange.
+hotendOpt = "universal"; // [ optimize:Optimized, universal:Universal]
 
 // What style of extruder are you using?
 extruder = "titan"; // [bowden:Bowden, titan:E3D Titan, carl_direct:Carl Feniak Direct Drive - Not ready yet.]
 
 // What type of fan duct should be made?
-fanDuctStyle = "classic"; // [Full:Full 360 duct, classic:Simple single outlet]
+fanDuctStyle = "simple"; // [round:Round 360 duct, simple:Simple single outlet]
 
 // Which Z Probe type is in use. Select Servo here if you want to if you Servo Bracket selected above, otherwise it won't appear.
 servoInduct = "induct"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, bltouch:BL Touch, none:Neither/None]
@@ -167,7 +170,7 @@ prusai3FanBracketDepth = 3;
 // bltouch = BL Touch mount
 // all = All parts
 
-// Which C Botpart should be exported.
+// Which C Bot part should be exported.
 cBotWhich = "all"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, jhead_col:J Head Style Collar, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, xbump:X Endstop Bumper, bltouch:BL Touch, all:All Parts] 
 
 // Do you want a carriage mount axis limit switch?
@@ -262,6 +265,17 @@ innerCollarHeightAdjustment = -0.3;
 lowerCollarDiameterAdjustment = .1;
 lowerCollarHeightAdjustment = .15;
 
+/* [E3D Titan] */
+
+// Would you like to have holes for accessories on the left side of the Titan mount?
+e3dTitanLeftAcc = 0; // [0:No, 1:yes]
+
+// Would you like to have holes for accessories on the right side of the Titan mount?
+e3dTitanRightAcc = 0; // [0:No, 1:yes]
+
+// Would you like to have holes for accessories on the top side of the Titan mount?
+e3dTitanTopAcc = 1; // [0:No, 1:yes]
+
 /* [Print Cooling Fan] */
 
 // How thick the fan mount should be.
@@ -314,14 +328,20 @@ fanDuctOutletOffset = 10;
 
 // Offset from the nozzles where the fan duct outlets should be placed. Leave named variables in place.
 fanDuctOutletNozzleOffsetL = [16,3]; // [0] X distance from nozzle for start of duct opening, fanDuctThickness will be subtracted from this [1] Z distance from nozzle tip. + up, - down
-classicFanDuctOutletNozzleOffsetL = [10,0]; // [0] X distance from nozzle for start of duct opening, fanDuctThickness will be subtracted from this [1] Z distance from nozzle tip. + up, - down
+simpleFanDuctOutletNozzleOffsetL = [10,0]; // [0] X distance from nozzle for start of duct opening, fanDuctThickness will be subtracted from this [1] Z distance from nozzle tip. + up, - down
 
 // Size of air chamber around fan duct ring.
 fanDuctAirChamberSize = [5,1.5]; // [0] X width of internal portion of air chamber, [1] Z height of internal portion of air chamber.
 
 // Size of the fan duct outlets.
 fanDuctOutletSize = [8,4]; // [0] Number of outlets, will be spread out equally. [1] Size of outlets.
-classicFanDuctOutletSize = [20,.1,3];
+simpleFanDuctOutletSize = [20,.1,3];
+
+// Length of runner before Simple Fan Duct Nozzle
+simpleFanDuctRunnerLength = 10;
+
+// Extra vertical offset from nozzle.
+simpleFanDuctRunnerOffset = 2;
 
 /* [Z Probe / Servo] */
 
@@ -414,7 +434,7 @@ inductDiameter = 12.6;
 // Amount of material around sensor, account for nuts and washers around the sensor.
 inductMat = 5;
 
-// Height of mount plate above nozzle tip.
+// Height of mount plate above nozzle tip. This is over written if universal mount height is selected.
 inductPlateHeight = 25;
 
 // How much extra should be added to the carriage to provide clearance for the inductive mount bracket.
@@ -496,10 +516,11 @@ jHeadInnerCollarHeight =  innerCollarHeightAdjustment + (hotend == "hexagon" ? 4
 jHeadLowerCollarDiameter = lowerCollarDiameterAdjustment + 16;
 jHeadLowerCollarHeight = lowerCollarHeightAdjustment + (hotend == "hexagon" ? 4.6 : 3);
 jHeadMountHeight = jHeadUpperCollarHeight + jHeadInnerCollarHeight + jHeadLowerCollarHeight;
-jHeadHEPosUD = (carriage == "prusai3" ? 14 : (hotend == "e3d_v6" ? 21 :
-					      (hotend == "jhead_mkv" ? 11 :
-					       (hotend == "generic_jhead" ? 11 :
-					       (hotend == "hexagon" ? 14 : 30)))));
+jHeadHEPosUD = (carriage == "prusai3" ? 14 : (hotendOpt == "universal" ? 21 : (
+						   hotend == "e3d_v6" ? 21 :
+						   (hotend == "jhead_mkv" ? 11 :
+						    (hotend == "generic_jhead" ? 11 :
+						     (hotend == "hexagon" ? 14 : 21))))));
 jHeadMountWidth = 36;
 jHeadCollarCornerRadius = 3;
 jHeadMountBoltDiameter = 3.2;
@@ -749,9 +770,10 @@ probeMountDistance = (servoInduct == "induct" ? inductMountDistance :
 probeMountWidth =  (servoInduct == "induct" ? inductMountWidth :
 		    (servoInduct == "bltouch" ? blMountWidth :
 		     0));
-probePlateHeight =  (servoInduct == "induct" ? inductPlateHeight :
-		(servoInduct == "bltouch" ? blPlateHeight :
-		 0));
+probePlateHeight =  (servoInduct == "induct" ? (hotendOpt == "universal" ? - (heAnchorL[2] + heNozzleL[0][2]) :
+						inductPlateHeight) :
+		     (servoInduct == "bltouch" ? blPlateHeight :
+		      0));
 prusai3ProbeMountL = [ realZProbeSide == "right" ?
 			heMountL[0] + heMountWidth + probeMountDistance:
 			heMountL[0] - (probeMountWidth + probeMountDistance),
@@ -769,7 +791,7 @@ echo("probeMountWidth", probeMountWidth);
 
 // Variables for Fan Duct
 fanDuctOutletAngle = atan((fanDuctOutletNozzleOffsetL[1] + fanDuctOutletOffset + fanDuctOutletSize[1]) / fanDuctOutletNozzleOffsetL[0]);
-classicFanDuctOutletAngle = atan((classicFanDuctOutletNozzleOffsetL[1] + fanDuctOutletOffset + classicFanDuctOutletSize[1] + (fanDuctThickness * 2)) / classicFanDuctOutletNozzleOffsetL[0]);
+simpleFanDuctOutletAngle = atan((simpleFanDuctOutletNozzleOffsetL[1] + fanDuctOutletOffset + simpleFanDuctOutletSize[1] + (fanDuctThickness * 2)) / simpleFanDuctOutletNozzleOffsetL[0]);
 fanDuctConnectRadius = fanDuctConnectSize[2] / 2; // Radius of the bottom of the fan duct below housing.
 
 // Variables for probe extension and servo bracket.
@@ -986,11 +1008,17 @@ if (carriage == "prusai3") {
 	  translate(explodeParts == 1 ? (fanScrewL - (partsOffset * 3)) : fanScrewL)
 	       rotate([prusai3FanTabHorizontalAngle,0,prusai3RealFanTabVerticalAngle])
 	       translate(ductConnectL)
-	       difference() {
-	       fan_duct(ductConnectL, fanScrewL, heAnchorL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, printFanDirection, false);
-	       
-	       fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, printFanDirection, false);
-	  }
+	       if (fanDuctStyle == "simple") {
+		    difference() {
+			 simple_fan_duct(ductConnectL, fanScrewL, heAnchorL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, printFanDirection, false);		    
+			 simple_fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, printFanDirection, false);
+		    }
+	       } else {
+		    difference() {
+			 round_fan_duct(ductConnectL, fanScrewL, heAnchorL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, printFanDirection, false);
+			 round_fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, prusai3FanTabHorizontalAngle, prusai3RealFanTabVerticalAngle, printFanDirection, false);
+		    }
+	       }
      }
 
      // Servo Bracket
@@ -1198,11 +1226,17 @@ if(carriage == "cbot") {
 	  translate(explodeParts == 1 ? (fanScrewL + (partsOffset * 2)) : fanScrewL)
 	       rotate([cBotFanTabHorizontalAngle,0,cBotFanTabVerticalAngle])
 	       translate(ductConnectL)
-	       difference() {
-	       fan_duct(ductConnectL, fanScrewL, heAnchorL, cBotFanTabHorizontalAngle, cBotRealFanTabVerticalAngle, printFanDirection, true);
-	       
-	       fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, cBotFanTabHorizontalAngle, cBotRealFanTabVerticalAngle, printFanDirection, true);
-	  }
+	       if (fanDuctStyle == "simple") {
+		    difference() {
+			 simple_fan_duct(ductConnectL, fanScrewL, heAnchorL, cBotFanTabHorizontalAngle, cBotRealFanTabVerticalAngle, printFanDirection, true);
+			 simple_fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, cBotFanTabHorizontalAngle, cBotRealFanTabVerticalAngle, printFanDirection, true);
+		    }
+	       } else {
+		    difference() {
+			 round_fan_duct(ductConnectL, fanScrewL, heAnchorL, cBotFanTabHorizontalAngle, cBotRealFanTabVerticalAngle, printFanDirection, true);
+			 round_fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, cBotFanTabHorizontalAngle, cBotRealFanTabVerticalAngle, printFanDirection, true);
+		    }
+	       }
      }
 
      // Inductive / Capacitive Extension
@@ -1561,13 +1595,15 @@ module fan_tab_holes(tabWidth, tabDepth, tabHeight, tabHole, tabHoleMat) {
 module servo_ext(servoBracketL) {
      // Create the extension for the z Probe Servo.
      hull() {
+	  // Bottom outside corner
 	  translate([ realZProbeSide == "right" ?
 		      servoBracketL[0] - xMountCornerRadius :
 		      servoBracketL[0] + xMountCornerRadius,
 		      0,xMountCornerRadius])
 	       rotate([90,0,0])
 	       cylinder(r=xMountCornerRadius, h=carriageDepth, $fn=100);
-	  
+
+	  // Top outside corner
 	  translate([ realZProbeSide == "right" ?
 		      servoBracketL[0] - xMountCornerRadius :
 		      servoBracketL[0] + xMountCornerRadius,
@@ -1820,10 +1856,164 @@ module fan_screw_hole_single(tabHole, tabHoleMat, diameter, thickness, height, x
 	  cylinder(d=diameter,h=height,$fn=100,center=true);
 }
 
-// Fan Duct
-module fan_duct(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDirection, reverseY=false) {
+// Simple Fan Duct
+module simple_fan_duct(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDirection, reverseY=false) {
      // Simple fan duct to get something working for now.
      // Create the connection to the fan.
+     translate([-fanDuctThickness, -fanDuctThickness, 0])
+	  difference() {
+	  cube([fanDuctConnectSize[0] + (fanDuctThickness * 2),
+		fanDuctConnectSize[1] + (fanDuctThickness * 2),
+		fanDuctOutsideOverlap]);
+
+	  hull() {
+	       translate([-.1,
+			  -.1,
+			  ((fanDirection == "left" && reverseY == true) || (fanDirection == "right" && reverseY == false)) ? fanDuctOverlap
+			      : fanDuctOutsideOverlap])
+		    cube([.1, fanDuctConnectSize[1] + (fanDuctThickness * 2) + .2,
+			  ((fanDirection == "left" && reverseY == true) || (fanDirection == "right" && reverseY == false)) ? fanDuctOutsideOverlap
+			  : fanDuctOverlap]);
+	       
+	       translate([(fanDuctConnectSize[0] + (fanDuctThickness * 2)),
+			  -.1,
+			  ((fanDirection == "left" && reverseY == true) || (fanDirection == "right" && reverseY == false)) ? fanDuctOutsideOverlap
+			  : fanDuctOverlap])
+		    cube([.1, fanDuctConnectSize[1] + (fanDuctThickness * 2) + .2,
+			  ((fanDirection == "left" && reverseY == true) || (fanDirection == "right" && reverseY == false)) ? fanDuctOverlap
+			  : fanDuctOutsideOverlap]);
+	  }
+     }
+     
+     hull() {
+	  // Recreate the body of the fan shroud so we can hull to it.
+	  translate([-fanDuctThickness, -fanDuctThickness, 0])
+	       cube([fanDuctConnectSize[0] + (fanDuctThickness * 2),
+		     fanDuctConnectSize[1] + (fanDuctThickness * 2),
+		     .1]);
+
+	  // Round out the bottom a bit
+	  translate([-fanDuctThickness,
+		     fanDuctConnectRadius,
+		     - (fanDuctBowlDepth - fanDuctConnectRadius) - fanDuctConnectRadius - fanDuctThickness])
+	       difference() {
+	       rotate([0,90,0])
+		    cylinder(r=(fanDuctConnectRadius + fanDuctThickness), h=fanDuctConnectSize[0] + (fanDuctThickness * 2),$fn=100);
+	       
+	       translate([- .1, - (fanDuctConnectRadius + 2.5), 0])
+		    cube([fanDuctConnectSize[0] + (fanDuctThickness * 2) + .2, (fanDuctConnectRadius * 2) + 5, fanDuctConnectRadius + fanDuctThickness + 5]);
+	  }
+	  // Create the connection to the outlets.
+	  simple_fan_duct_nozzle_connect(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, false, reverseY);
+     }
+
+     // Connect the nozzle connect to the nozzles.
+     hull() {
+	  // Create the connection to the outlets.
+	  simple_fan_duct_nozzle_connect(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, false, reverseY);
+	  // Create the outlets.
+	  simple_fan_duct_nozzle(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, false, reverseY);
+     }
+}
+
+module simple_fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDirection, reverseY=false) {
+     // Carve out the inside part of connection to the fan.
+     translate([0, 0, -fanDuctThickness - .1])
+	  cube([fanDuctConnectSize[0],
+		fanDuctConnectSize[1],
+		fanDuctOutsideOverlap + fanDuctThickness + .2]);
+     hull() {
+	  // Recreate the body of the fan shroud so we can hull to it.
+	  translate([0,0, -fanDuctThickness - .1])
+	       cube([fanDuctConnectSize[0],
+		     fanDuctConnectSize[1],
+		     .2]);
+
+	  // Round out the bottom a bit
+	  translate([0,
+		     fanDuctConnectRadius,
+		     - (fanDuctBowlDepth - fanDuctConnectRadius) - fanDuctConnectRadius])
+	       difference() {
+	       rotate([0,90,0])
+		    cylinder(r=fanDuctConnectRadius, h=fanDuctConnectSize[0],$fn=100);
+	       
+	       translate([- .1, - (fanDuctConnectRadius + 2.5), 0])
+		    cube([fanDuctConnectSize[0] + .2, (fanDuctConnectRadius * 2) + 5, fanDuctConnectRadius + 5]);
+	  }
+	  // Create the connection to the outlets.
+	  simple_fan_duct_nozzle_connect(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, true, reverseY);
+     }
+
+     // Connect the nozzle connect to the nozzles.
+     hull() {
+	  // Create the connection to the outlets.
+	  simple_fan_duct_nozzle_connect(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, true, reverseY);
+	  // Create the outlets.
+	  simple_fan_duct_nozzle(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, true, reverseY);
+     }
+}
+
+module simple_fan_duct_nozzle_connect(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, interior=false, reverseY=false) {
+     // Loop through the nozzles, create duct for each one.
+     for(a=[0: 1: len(heNozzleL) - 1]) {
+	  // Start the process of placing the nozzles in the correct place. Split up to keep things simpler to understand for now.
+	  echo("ductConnectL", ductConnectL);
+	  echo("heAnchorL", heAnchorL);
+	  echo("fanDuctOutletNozzleOffsetL", fanDuctOutletNozzleOffsetL);
+	  echo("reverseY", reverseY);
+	  echo("heNozzleL",heNozzleL[a]);
+	  echo("heNozzleL", heNozzleL);
+	  translate(-ductConnectL)
+	       rotate([-tabHorizontalAngle,0,0])
+	       rotate([0,0,-tabVerticalAngle])
+	       translate(-fanScrewL)
+	       translate(heAnchorL)
+	       translate(heNozzleL[a]) {
+	       translate([0,
+			  (reverseY == false ? - simpleFanDuctOutletNozzleOffsetL[0] - simpleFanDuctRunnerLength: simpleFanDuctOutletNozzleOffsetL[0] + simpleFanDuctRunnerLength),
+			  simpleFanDuctOutletNozzleOffsetL[1] + ((simpleFanDuctOutletSize[2] / 2) + fanDuctThickness) + simpleFanDuctRunnerOffset])
+		    rotate([(reverseY == false ? - simpleFanDuctOutletAngle : simpleFanDuctOutletAngle), 0, 0])
+		    cube([simpleFanDuctOutletSize[0] + (interior ? 0 : (fanDuctThickness * 2)),
+			  simpleFanDuctOutletSize[1] + (interior ? .01 : 0),
+			  simpleFanDuctOutletSize[2] + (interior ? 0 : (fanDuctThickness * 2))], center=true);
+	  }
+     }
+}
+
+module simple_fan_duct_nozzle(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, interior=false, reverseY=false) {
+     // Loop through the nozzles, create duct for each one.
+     for(a=[0: 1: len(heNozzleL) - 1]) {
+	  // Start the process of placing the nozzles in the correct place. Split up to keep things simpler to understand for now.
+	  echo("ductConnectL", ductConnectL);
+	  echo("heAnchorL", heAnchorL);
+	  echo("fanDuctOutletNozzleOffsetL", fanDuctOutletNozzleOffsetL);
+	  echo("fanDuctOutletSize", fanDuctOutletSize);
+	  echo("fanDuctOutletOffset", fanDuctOutletOffset);
+	  echo("reverseY", reverseY);
+	  echo("heNozzleL",heNozzleL[a]);
+	  echo("heNozzleL", heNozzleL);
+	  echo("fanDuctOutletAngle", fanDuctOutletAngle);
+	  translate(-ductConnectL)
+	       rotate([-tabHorizontalAngle,0,0])
+	       rotate([0,0,-tabVerticalAngle])
+	       translate(-fanScrewL)
+	       translate(heAnchorL)
+	       translate(heNozzleL[a]) {
+	       // Rotate the duct outlets to point to the correct spot.
+	       // Edge nearest nozzle
+	       translate([0,
+			  (reverseY == false ? - simpleFanDuctOutletNozzleOffsetL[0] : simpleFanDuctOutletNozzleOffsetL[0]),
+			  simpleFanDuctOutletNozzleOffsetL[1] + ((simpleFanDuctOutletSize[2] / 2) + fanDuctThickness)])
+		    rotate([(reverseY == false ? - simpleFanDuctOutletAngle : simpleFanDuctOutletAngle), 0, 0])
+		    cube([simpleFanDuctOutletSize[0] + (interior ? 0 : (fanDuctThickness * 2)),
+			  simpleFanDuctOutletSize[1] + (interior ? .01 : 0),
+			  simpleFanDuctOutletSize[2] + (interior ? 0 : (fanDuctThickness * 2))], center=true);
+	  }
+     }
+}
+
+// Round Fan Duct
+module round_fan_duct(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDirection, reverseY=false) {
 echo("fanDirection:",fanDirection);
 echo("reverseY",reverseY);
      translate([-fanDuctThickness, -fanDuctThickness, 0])
@@ -1870,13 +2060,13 @@ echo("reverseY",reverseY);
 		    cube([fanDuctConnectSize[0] + (fanDuctThickness * 2) + .2, (fanDuctConnectRadius * 2) + 5, fanDuctConnectRadius + fanDuctThickness + 5]);
 	  }
 	  // Create the connection to the outlets.
-	  fan_duct_nozzle_connect(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, false, reverseY);
+	  round_fan_duct_nozzle_connect(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, false, reverseY);
      }
      // Create the outlets.
-     fan_duct_nozzle(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, false, reverseY);
+     round_fan_duct_nozzle(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, false, reverseY);
 }
 
-module fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDirection, reverseY=false) {
+module round_fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDirection, reverseY=false) {
      // Carve out the inside part of connection to the fan.
      translate([0, 0, -fanDuctThickness - .1])
 	  cube([fanDuctConnectSize[0],
@@ -1901,14 +2091,14 @@ module fan_duct_holes(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, ta
 		    cube([fanDuctConnectSize[0] + .2, (fanDuctConnectRadius * 2) + 5, fanDuctConnectRadius + 5]);
 	  }
 	  // Create the connection to the outlets.
-	  fan_duct_nozzle_connect(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, true, reverseY);
+	  round_fan_duct_nozzle_connect(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, true, reverseY);
      }
 
      // Create the outlets.
-     fan_duct_nozzle(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, true, reverseY);
+     round_fan_duct_nozzle(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, true, reverseY);
 }
 
-module fan_duct_nozzle_connect(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, interior=false, reverseY=false) {
+module round_fan_duct_nozzle_connect(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, interior=false, reverseY=false) {
      // Build array of points for the duct connector.
      // First array is line of cylinders for connector to fan, first element in array is angle, set that to zero so there is no rotation, want a line.
      dca = [ for (a=[0:30:180]) let (x = (fanDuctOutletNozzleOffsetL[0] + fanDuctAirChamberSize[0] + fanDuctThickness + (interior ? 0 : fanDuctThickness) - (fanDuctInternalThickness / 2) -
@@ -1940,38 +2130,25 @@ module fan_duct_nozzle_connect(ductConnectL, fanScrewL, heAnchorL, tabHorizontal
 	       translate(heAnchorL)
 	       translate(heNozzleL[a]) {
 	       // Determine what style of fan duct we are making.
-	       if (realFanDuctStyle == "full") {
-		    // Create the connector for the duct from the fan.
-		    // Rotate depending on the orientation of the duct to fan.
-		    rotate([0,0,(reverseY ? 0 : 180)])
-			 for (a=dcMat) {
-			      // Create the connector by hull from the edge of the interior of the air duct chamber to a line of cylinders on the edge of the duct.
-			      hull() {
-				   for (b=a) {
-					// Rotate around the duct to create the other cylinder and thus the connection to the duct connector from the air chamber.
-					rotate([0,0,dc[b][0]])
-					     translate([dc[b][1],dc[b][2],dc[b][3]])
-					     cylinder(d=fanDuctInternalThickness,h=(fanDuctAirChamberSize[1] + (interior ? 0 : (fanDuctThickness * 2))), $fn=100);
-				   }
+	       // Create the connector for the duct from the fan.
+	       // Rotate depending on the orientation of the duct to fan.
+	       rotate([0,0,(reverseY ? 0 : 180)])
+		    for (a=dcMat) {
+			 // Create the connector by hull from the edge of the interior of the air duct chamber to a line of cylinders on the edge of the duct.
+			 hull() {
+			      for (b=a) {
+				   // Rotate around the duct to create the other cylinder and thus the connection to the duct connector from the air chamber.
+				   rotate([0,0,dc[b][0]])
+					translate([dc[b][1],dc[b][2],dc[b][3]])
+					cylinder(d=fanDuctInternalThickness,h=(fanDuctAirChamberSize[1] + (interior ? 0 : (fanDuctThickness * 2))), $fn=100);
 			      }
 			 }
-	       }
-	       else {
-		    // Rotate the duct outlets to point to the correct spot.
-		    // Edge nearest nozzle
-		    translate([0,
-			       (reverseY == false ? - classicFanDuctOutletNozzleOffsetL[0] : classicFanDuctOutletNozzleOffsetL[0]),
-			       classicFanDuctOutletNozzleOffsetL[1] + ((classicFanDuctOutletSize[2] / 2) + fanDuctThickness)])
-			 rotate([(reverseY == false ? - classicFanDuctOutletAngle : classicFanDuctOutletAngle), 0, 0])
-			 cube([classicFanDuctOutletSize[0] + (interior ? 0 : (fanDuctThickness * 2)),
-			       classicFanDuctOutletSize[1] + (interior ? .01 : 0),
-			       classicFanDuctOutletSize[2] + (interior ? 0 : (fanDuctThickness * 2))], center=true);
-	       }
+		    }
 	  }
      }
 }
 
-module fan_duct_nozzle(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, interior=false, reverseY=false) {
+module round_fan_duct_nozzle(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, tabVerticalAngle, fanDuctThickness, interior=false, reverseY=false) {
      // Corner positions for nozzle outlet.
      //  b------------a
      //  |c----------d|
@@ -2045,61 +2222,43 @@ module fan_duct_nozzle(ductConnectL, fanScrewL, heAnchorL, tabHorizontalAngle, t
 	       translate(-fanScrewL)
 	       translate(heAnchorL)
 	       translate(heNozzleL[a]) {
-	       // Determine what style of fan duct we are making.
-	       if (realFanDuctStyle == "full") {
-		    // Create the air duct, skip if this an interior pass.
-		    if (! interior) {
-			 // Create the air chamber.
-			 rotate_extrude(angle=360,$fn=200) {
-			      translate(fanDuctOutletNozzleOffsetL)
-				   polygon(points = nz);
-			 }
-		    } else {
-			 // Create the nozzle outlets.
-			 // First determine the circular angle each outlet should be separated by.
-			 rotateDegree = abs(360 / fanDuctOutletSize[0]);
-			 for (o=[0:1:(fanDuctOutletSize[0] - 1)]) {
-			      // Rotate around the nozzle and place the nozzle.
-			      rotate([0,0,(rotateDegree * o)])
-				   translate([0,fanDuctOutletNozzleOffsetL[0],fanDuctOutletNozzleOffsetL[1] + (fanDuctOutletSize[1] / 2)])
-				   rotate([90+fanDuctOutletAngle,0,0])
-				   translate([0,0,-(fanDuctThickness * 2)])
-				   cylinder(d=fanDuctOutletSize[1],h=(fanDuctThickness * 18), $fn=100);
-			 }
+	       // Create the air duct, skip if this an interior pass.
+	       if (! interior) {
+		    // Create the air chamber.
+		    rotate_extrude(angle=360,$fn=200) {
+			 translate(fanDuctOutletNozzleOffsetL)
+			      polygon(points = nz);
 		    }
+	       }
 		    
-		    // Create the connector for the duct from the fan.
-		    // Rotate depending on the orientation of the duct to fan.
-		    for (a=dcMat) {
-			 // Create the connector by hull from the edge of the interior of the air duct chamber to a line of cylinders on the edge of the duct.
-			 difference() {
-			      hull() {
-				   for (b=a) {
-					// Rotate around the duct to create the other cylinder and thus the connection to the duct connector from the air chamber.
-					rotate([0,0,dc[b][0]])
-					     translate([dc[b][1],dc[b][2],dc[b][3]])
-					     cylinder(d=fanDuctInternalThickness,h=(fanDuctAirChamberSize[1] + (interior ? 0 : (fanDuctThickness * 2))), $fn=100);
-				   }
+	       // Create the connector for the duct from the fan.
+	       // Rotate depending on the orientation of the duct to fan.
+	       for (a=dcMat) {
+		    // Create the connector by hull from the edge of the interior of the air duct chamber to a line of cylinders on the edge of the duct.
+		    difference() {
+			 hull() {
+			      for (b=a) {
+				   // Rotate around the duct to create the other cylinder and thus the connection to the duct connector from the air chamber.
+				   rotate([0,0,dc[b][0]])
+					translate([dc[b][1],dc[b][2],dc[b][3]])
+					cylinder(d=fanDuctInternalThickness,h=(fanDuctAirChamberSize[1] + (interior ? 0 : (fanDuctThickness * 2))), $fn=100);
 			      }
-			      
-			      // Don't remove the internal wedge portion.
-			      if (interior) {
-				   for (c=dcWedgeMat) {
-					hull() {
-					     for (d=c) {
-						  // Rotate around the duct to create the other cylinder and thus the connection to the duct connector from the air chamber.
-						  rotate([0,0,dc[d][0]])
-						       translate([dc[d][1],dc[d][2],dc[d][3]])
-						       cylinder(d=fanDuctInternalThickness,h=(fanDuctAirChamberSize[1] + (interior ? 0 : (fanDuctThickness * 2))), $fn=100);
-					     }
+			 }
+			 
+			 // Don't remove the internal wedge portion.
+			 if (interior) {
+			      for (c=dcWedgeMat) {
+				   hull() {
+					for (d=c) {
+					     // Rotate around the duct to create the other cylinder and thus the connection to the duct connector from the air chamber.
+					     rotate([0,0,dc[d][0]])
+						  translate([dc[d][1],dc[d][2],dc[d][3]])
+						  cylinder(d=fanDuctInternalThickness,h=(fanDuctAirChamberSize[1] + (interior ? 0 : (fanDuctThickness * 2))), $fn=100);
 					}
 				   }
 			      }
 			 }
 		    }
-	       }
-	       else {
-		    // Do nothing here for classic nozzle.
 	       }
 	  }
      }
@@ -2341,7 +2500,7 @@ module probe_ext() {
 
 	  // Probe extension top outside corner.
 	  translate([ realZProbeSide == "right" ?
-		      heMountL[0] + heMountWidth + probeMountDistance + probeMountWidth - (probeBraceWidth / 2):
+		      heMountL[0] + heMountWidth + probeMountDistance + probeMountWidth - (probeExtHeight == "full" ? xMountCornerRadius : (probeBraceWidth / 2)):
 		      heMountL[0] - (probeMountDistance + probeMountWidth - (probeExtHeight == "full" ? xMountCornerRadius : (probeBraceWidth / 2))),
 		      0,
 		      (probeExtHeight == "full" ?
@@ -2414,11 +2573,11 @@ module induct_mount(carriageDepth,cbot=false) {
      
      // Create mounting plate
      // This will stick out a bit further than expected to accomodate the desire to have inductMat flat around the induct sensor and still have round corner.
-     // Induct mount bottom right corner.
      hull() {
+	  // Induct mount bottom right.
 	  hull() {
 	       translate([ probeMountWidth - (probeBraceWidth / 2),
-			   -(probeMountBracketed == 0 ? 0 : probeBracketDepth) - (inductDiameter + (inductMat * 2) + probeOffset),
+		     - (probeMountBracketed == 0 ? 0 : probeBracketDepth) - (probeOffset + (inductDiameter / 2) + inductMat),
 			   (probePlateThickness / 2)])
 		    sphere(d=probePlateThickness, $fn=100);
 	       
@@ -2429,10 +2588,10 @@ module induct_mount(carriageDepth,cbot=false) {
 		    cylinder(d=probePlateThickness, h=(probeMountBracketed == 0 ? carriageDepth : probeBracketDepth), $fn=100);
 	  }
 	  
-	  // Induct mount bottom left corner.
+	  // Induct mount bottom left.
 	  hull() {
 	       translate([ (probeBraceWidth / 2),
-			   -(probeMountBracketed == 0 ? 0 : probeBracketDepth) - (inductDiameter + (inductMat * 2) + probeOffset),
+		     - (probeMountBracketed == 0 ? 0 : probeBracketDepth) - (probeOffset + (inductDiameter / 2) + inductMat),
 			   (probePlateThickness / 2)])
 		    sphere(d=probePlateThickness, $fn=100);
 	       
@@ -2442,6 +2601,16 @@ module induct_mount(carriageDepth,cbot=false) {
 		    rotate([-90,0,0])
 		    cylinder(d=probePlateThickness, h=(probeMountBracketed == 0 ? carriageDepth : probeBracketDepth), $fn=100);
 	  }
+
+	  // Create mount for the inductive sensor itself.
+	  translate([(probeMountWidth / 2),
+		     - (probeMountBracketed == 0 ? 0 : probeBracketDepth) - (probeOffset + (inductDiameter / 2) + inductMat),
+		     (probePlateThickness / 2)])
+	       minkowski() {
+	       cylinder(d=(inductDiameter + inductMat), h=.0000000001, $fn=100);
+	       sphere(d=probePlateThickness, $fn=100, center=true);
+	  }
+
      }
      
      // Create braces
@@ -2457,7 +2626,7 @@ module induct_mount(carriageDepth,cbot=false) {
 	  // Induct mount bottom right corner.
 	  hull() {
 	       translate([ probeMountWidth - (probeBraceWidth / 2),
-			   -(probeMountBracketed == 0 ? 0 : probeBracketDepth) - (inductDiameter + (inductMat * 2) + probeOffset),
+			   - (probeMountBracketed == 0 ? 0 : probeBracketDepth) - (probeOffset + (inductDiameter / 2) + inductMat),
 			   (probeBraceWidth / 2)])
 		    sphere(d=probeBraceWidth, $fn=100);
 	       
@@ -2480,7 +2649,7 @@ module induct_mount(carriageDepth,cbot=false) {
 	  // Induct mount bottom left corner.
 	  hull() {
 	       translate([ (probeBraceWidth / 2),
-			   -(probeMountBracketed == 0 ? 0 : probeBracketDepth) - (inductDiameter + (inductMat * 2) + probeOffset),
+			   - (probeMountBracketed == 0 ? 0 : probeBracketDepth) - (probeOffset + (inductDiameter / 2) + inductMat),
 			   (probeBraceWidth / 2)])
 		    sphere(d=probeBraceWidth, $fn=100);
 	       
@@ -2950,19 +3119,24 @@ module e3d_titan_mount() {
 	  difference() {
 	  hull() {
 	       // Lower left corner
+	       translate([(e3dTitanLeftAcc == 1 ? - (cBotAccessoryMountPos + cBotBeltScrewDiameter) : 0), 0, 0])
 	       cube([1, (carriageDepth + heDepthOffset), 1]);
 
 	       // Upper left corner
-	       translate([e3dTitanMountCornerRadius, 0, (nema17OuterOffset * 2) + (e3dTitanMountMat * 2) - e3dTitanMountCornerRadius])
+	       translate([e3dTitanMountCornerRadius - (e3dTitanLeftAcc == 1 ? (cBotAccessoryMountPos + cBotBeltScrewDiameter): 0),
+			  0,
+			  (nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + (e3dTitanTopAcc == 1 ? (cBotAccessoryMountPos + cBotBeltScrewDiameter) : 0) - e3dTitanMountCornerRadius])
 		    rotate([-90,0,0])
 		    cylinder(r=e3dTitanMountCornerRadius, h=(carriageDepth + heDepthOffset), $fn=100);
 
 	       // Lower right corner
-	       translate([((nema17OuterOffset * 2) + (e3dTitanMountMat * 2)) - 1, 0, 0])
+	       translate([((nema17OuterOffset * 2) + (e3dTitanMountMat * 2)) + (e3dTitanRightAcc == 1 ? (cBotAccessoryMountPos + cBotBeltScrewDiameter) : 0) - 1, 0, 0])
 		    cube([1, (carriageDepth + heDepthOffset), 1]);
 	       
 	       // Upper right corner
-	       translate([(nema17OuterOffset * 2) + (e3dTitanMountMat * 2) - e3dTitanMountCornerRadius, 0, (nema17OuterOffset * 2) + (e3dTitanMountMat * 2) - e3dTitanMountCornerRadius])
+	       translate([(nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + (e3dTitanRightAcc == 1 ? (cBotAccessoryMountPos + cBotBeltScrewDiameter) : 0) - e3dTitanMountCornerRadius,
+			  0,
+			  (nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + (e3dTitanTopAcc == 1 ? (cBotAccessoryMountPos + cBotBeltScrewDiameter) : 0) - e3dTitanMountCornerRadius])
 		    rotate([-90,0,0])
 		    cylinder(r=e3dTitanMountCornerRadius, h=(carriageDepth + heDepthOffset), $fn=100);
 	  }
@@ -2970,6 +3144,36 @@ module e3d_titan_mount() {
 	  // Now remove the center where the titan and Nema 17 will be.
 	  translate([e3dTitanMountMat, -.1, (e3dTitanMountMat + .01)])
 	       cube([(nema17OuterOffset * 2), (carriageDepth + .2), (nema17OuterOffset * 2)]);
+
+	  // Create the accessory holes if needed.
+	  // Left side
+	  if (e3dTitanLeftAcc) {
+	       for(i=[1:1:5]) {
+		    translate([ - cBotBeltScrewDiameter, -.1, cBotFanMountDistance * i])
+			 rotate([-90,0,0])
+			 cylinder(d=cBotBeltScrewDiameter, h=(carriageDepth + heDepthOffset + .2), $fn=100);
+	       }
+	  }
+	  
+	  // Right side
+	  if (e3dTitanRightAcc) {
+	       for(i=[1:1:5]) {
+		    translate([((nema17OuterOffset * 2) + (e3dTitanMountMat * 2)) + cBotBeltScrewDiameter, -.1, cBotFanMountDistance * i])
+			 rotate([-90,0,0])
+			 cylinder(d=cBotBeltScrewDiameter, h=(carriageDepth + heDepthOffset + .2), $fn=100);
+	       }
+	  }
+	  
+	  // Top side
+	  if (e3dTitanTopAcc) {
+	       for(i=[1:1:4]) {
+		    translate([(((nema17OuterOffset * 2) + (e3dTitanMountMat * 2)) / 2) - (cBotFanMountDistance * 2.5) + (cBotFanMountDistance * i),
+			       -.1,
+			       (nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + cBotBeltScrewDiameter])
+			 rotate([-90,0,0])
+			 cylinder(d=cBotBeltScrewDiameter, h=(carriageDepth + heDepthOffset + .2), $fn=100);
+	       }
+	  }
      }
 
      // Create the face the Titan and Nema 17 will attach to.
