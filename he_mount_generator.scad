@@ -557,7 +557,7 @@ e3dTitanMountMat = 4; // How much material should be around the face of the moun
 e3dTitanMountCornerRadius = 4; // The radius of the corners for the mounting plate.
 e3dTitanMountBraceWidth = 2; // Width of the brace that stabilizes the E3D Titan and Stepper.
 e3dTitanMountBraceHeight = 5; // Height of brace.
-e3dTitanMountLowerOverlap = 10; // Amount the brace overlaps the main carriage.
+e3dTitanMountLowerOverlap = 15; // Amount the brace overlaps the main carriage.
 
 /* [Hidden] */
 
