@@ -42,8 +42,8 @@
 //use<e3d_v6_chimera.scad>;
 //use<e3d_vulcano_chimera.scad>;
 //use<e3d_cyclops.scad>;
-use<e3d_v6_all_metall_hotend.scad>;
-//use<e3d_v6_volcano_all_metall_hotend.scad>;
+//use<e3d_v6_all_metall_hotend.scad>;
+use<e3d_v6_volcano_all_metall_hotend.scad>;
 use<Hexagon-102.scad>;
 
 // Bring in the basic delta fan designs I created for visualization.
@@ -55,7 +55,7 @@ use<delta_blower_fans.scad>;
 carriage = "cbot"; // [cbot:C Bot style, prusai3:Prusa i3]
 
 // Which hot end is in use. Ensure you enter height from top of mount to tip of nozzle if you select generic J Head.
-hotend = "e3d_v6"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
+hotend = "e3d_v6_vol"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
 
 // Where should the hot end mount be positioned vertically? Optimized changes the mount height to increase vertical build height as much as possible. Universal keeps the mount height the same for all hot ends allow for easier interchange.
 hotendOpt = "universal"; // [ optimize:Optimized, universal:Universal]
@@ -265,17 +265,6 @@ innerCollarHeightAdjustment = -0.3;
 lowerCollarDiameterAdjustment = .1;
 lowerCollarHeightAdjustment = .15;
 
-/* [E3D Titan] */
-
-// Would you like to have holes for accessories on the left side of the Titan mount?
-e3dTitanLeftAcc = 0; // [0:No, 1:yes]
-
-// Would you like to have holes for accessories on the right side of the Titan mount?
-e3dTitanRightAcc = 0; // [0:No, 1:yes]
-
-// Would you like to have holes for accessories on the top side of the Titan mount?
-e3dTitanTopAcc = 1; // [0:No, 1:yes]
-
 /* [Print Cooling Fan] */
 
 // How thick the fan mount should be.
@@ -437,7 +426,7 @@ inductMat = 5;
 // Height of mount plate above nozzle tip. This is over written if universal mount height is selected.
 inductPlateHeight = 25;
 
-// How much extra should be added to the carriage to provide clearance for the inductive mount bracket.
+// How much extra should be added to the carriage width to provide clearance for the inductive mount bracket.
 inductBracketExtra = 6;
 
 /* [ Generic Probe Mount Variables ] */
@@ -537,8 +526,8 @@ realExtruder = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "
 realFanDuctStyle = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") ? "classic" : fanDuctStyle;
 echo("realFanDuctStyle", realFanDuctStyle);
 
-// If the extruder is an E3D Titan, change the he depth to allign the titan and hotend properly.
-jHeadMountDepth = (realExtruder == "titan" ? 27 : 25); // Do not change this value, the direct drive extruders require this to be placed here and OpenSCAD programming makes it nearly impossible to auto adjust.
+// Depth from center of hotend to face of carriage.
+jHeadMountDepth = 28.5; // Do not change this value, the direct drive extruders require this to be placed here and OpenSCAD programming makes it nearly impossible to auto adjust.
 
 /* [E3D V6 Advanced] */
 
@@ -564,12 +553,18 @@ genericJHeadNozzleL = [[0, 0, -genJHeadHeight]]; // This must be a vector of vec
 /* [E3D Titan Extruder Advanced] */
 
 // Variables for E3D Titan extruder.
-e3dTitanOffset = [11.1,13.5]; // This is offset of the filament path. 0 - From center of stepper shaft, 1 - From face of carrier / mount. Do not change.
-e3dTitanMountThickness = 5; // [2:2 MM, 5:5 MM]
-e3dTitanMountMat = 3; // How much material should be around the face of the mount.
+e3dTitanMountMat = 4; // How much material should be around the face of the mount.
 e3dTitanMountCornerRadius = 4; // The radius of the corners for the mounting plate.
+e3dTitanMountBraceWidth = 2; // Width of the brace that stabilizes the E3D Titan and Stepper.
+e3dTitanMountBraceHeight = 5; // Height of brace.
+e3dTitanMountLowerOverlap = 10; // Amount the brace overlaps the main carriage.
 
 /* [Hidden] */
+
+// E3D Titan settings
+e3dTitanOffset = [11.1,13.5]; // This is offset of the filament path. 0 - From center of stepper shaft, 1 - From face of carrier / mount. Do not change.
+e3dTitanMountThickness = 7; // Only use the 7mm mount spacing. This allows for easier printing and provides a better thermal mass to reduce warping due to stepper overheating.
+e3dTitanFilamentSideBodyOffset = 4; // How much longer to make the mount on the side nearest the filament path.
 
 // Collision switch variables
 ylSwitchDimensions = [[25.5,5,15],[7.25,11.5,3.2,6.5,2.4]]; //[x,y,z],[hole x, hole z, hole d, nut dia, nut depth],[hole.....
@@ -831,7 +826,7 @@ servoMountL = (carriage == "prusai3" ? prusai3ServoMountL : cBotServoMountL);
 // Variables for Z Probe
 prusai3ZProbeTopL = [realZProbeSide == "right" ?
 		     servoBracketL[0] + servoMountL[0] - zProbeArmOffset:
-		     servoBracketL[0] + servoMountL[0] + zProbeArmOffset,
+		     servoBracketL[0] - servoMountL[0] + zProbeArmOffset,
 		     servoBracketL[1] + servoMountL[1] + servoBracketMat + (servoWidth / 2),
 		     servoBracketL[2] + servoMountL[2] + ((servoMountPlateHeight - servoHeight) / 2) + servoCenterOffset];
 cBotZProbeTopL = [realZProbeSide == "right" ?
@@ -1071,7 +1066,7 @@ if (carriage == "prusai3") {
 
      // Place the titan direct extruder if needed.
      if (realExtruder == "titan" && (prusai3Which == "hotm" || prusai3Which == "all")) {
-	  translate([heAnchorL[0], heAnchorL[1] + e3dTitanOffset[1], (xMountHeight - .01)])
+	  translate([heAnchorL[0], -carriageDepth, (xMountHeight - .01)])
 	       e3d_titan_mount();
      }
 }
@@ -1090,7 +1085,7 @@ if(carriage == "cbot") {
 			 translate([(cBotCarriageWidth / 2) - (cBotCenterHoleWidth / 2),
 				    heMountL[1] + chiMountDepth,
 				    heMountL[2]])
-			      cube([cBotCenterHoleWidth, cBotCarriageDepth, chiMountHeight]);
+			      cube([cBotCenterHoleWidth, carriageDepth, chiMountHeight]);
 		    }
 
 		    // Replace material behind the mount.
@@ -1098,14 +1093,14 @@ if(carriage == "cbot") {
 			 translate([(cBotCarriageWidth / 2) - (cBotCenterHoleWidth / 2),
 				    heMountL[1] + jHeadMountDepth + heDepthOffset,
 				    heMountL[2]])
-			      cube([cBotCenterHoleWidth, cBotCarriageDepth, jHeadMountHeight]);
+			      cube([cBotCenterHoleWidth, carriageDepth, jHeadMountHeight]);
 		    }
 	       }
 
 	       // Carve J Head style mount holes, if needed.
 	       if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead") {
 		    translate(heMountL)
-			 jhead_holes(cBotCarriageDepth);
+			 jhead_holes(carriageDepth);
 	       }
 	  }
 		    
@@ -1135,7 +1130,7 @@ if(carriage == "cbot") {
 	  if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead") {
 	       // Place the J Head style mount
 	       translate(heMountL)
-		    jhead_mount(cBotCarriageDepth);
+		    jhead_mount(carriageDepth);
 
 	  }
 
@@ -1164,7 +1159,7 @@ if(carriage == "cbot") {
      // J Head style mount collar
      if((hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead") && (cBotWhich == "jhead_col" || cBotWhich == "all")) {
 	  translate(explodeParts == 1 ? (heMountL - partsOffset) : heMountL)
-	       jhead_collar(cBotCarriageDepth);
+	       jhead_collar(carriageDepth);
      }
 
      // Opposite side carriage plate.
@@ -1248,7 +1243,7 @@ if(carriage == "cbot") {
 			 (explodeParts == 1 ? (probeMountL - partsOffset) :
 			  probeMountL) :
 			 probeMountL)
-		    induct_mount(cBotCarriageDepth,true);
+		    induct_mount(carriageDepth,true);
 	       
 	       // Carve out the wholes for the mount.
 	       translate(probeMountBracketed == 1 ?
@@ -1268,7 +1263,7 @@ if(carriage == "cbot") {
 			 (explodeParts == 1 ? (probeMountL - partsOffset) :
 			  probeMountL) :
 			 probeMountL)
-		    bltouch_mount(cBotCarriageDepth,true);
+		    bltouch_mount(carriageDepth,true);
 	  }
      }
 
@@ -1309,7 +1304,7 @@ if(carriage == "cbot") {
 
      // Place the titan direct extruder if needed.
      if (realExtruder == "titan" && (cBotWhich == "hotm" || cBotWhich == "all")) {
-	  translate([heAnchorL[0], heAnchorL[1] + e3dTitanOffset[1], (cBotCarriageHeight - .01)])
+	  translate([heAnchorL[0], -carriageDepth, (cBotCarriageHeight - .01)])
 	       e3d_titan_mount();
      }
 }
@@ -2745,21 +2740,21 @@ module cbot_carriage_base(heSide=false) {
 	  // Create the top left corner.
 	  translate([0, 0, cBotCarriageHeight - (cBotCarriageCornerRadius * 2)])
 	       rotate([90,0,0])
-	       cylinder(r=cBotCarriageCornerRadius, h=cBotCarriageDepth, $fn=100);
+	       cylinder(r=cBotCarriageCornerRadius, h=carriageDepth, $fn=100);
 
 	  // Create the top right Corner
 	  translate([cBotCarriageWidth - (cBotCarriageCornerRadius * 2), 0, cBotCarriageHeight - (cBotCarriageCornerRadius * 2)])
 	       rotate([90,0,0])
-	       cylinder(r=cBotCarriageCornerRadius, h=cBotCarriageDepth, $fn=100);
+	       cylinder(r=cBotCarriageCornerRadius, h=carriageDepth, $fn=100);
 
 	  // Create the bottom left corner.
 	  rotate([90,0,0])
-	       cylinder(r=cBotCarriageCornerRadius, h=cBotCarriageDepth, $fn=100);
+	       cylinder(r=cBotCarriageCornerRadius, h=carriageDepth, $fn=100);
 		
 	  // Create the bottom right corner
 	  translate([cBotCarriageWidth - (cBotCarriageCornerRadius * 2), 0, 0])
 	       rotate([90,0,0])
-	       cylinder(r=cBotCarriageCornerRadius, h=cBotCarriageDepth, $fn=100);
+	       cylinder(r=cBotCarriageCornerRadius, h=carriageDepth, $fn=100);
      }
 
      // Create angle portion of top left corner.
@@ -2775,11 +2770,11 @@ module cbot_carriage_base(heSide=false) {
 	  }
 	       
 	  hull() {
-	       translate([-cBotCarriageCornerRadius, -cBotTopHoleDepth - (cBotTopHoleDepth - cBotCarriageDepth) - .1, cBotCarriageCornerRadius])
-		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - cBotCarriageDepth) + .1, .1]);
+	       translate([-cBotCarriageCornerRadius, -cBotTopHoleDepth - (cBotTopHoleDepth - carriageDepth) - .1, cBotCarriageCornerRadius])
+		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - carriageDepth) + .1, .1]);
 		    
-	       translate([-cBotCarriageCornerRadius, -cBotCarriageDepth - (cBotTopHoleDepth - cBotCarriageDepth) - .1, -cBotCarriageCornerRadius - cBotTopHoleLength])
-		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - cBotCarriageDepth) + .1, .1]);
+	       translate([-cBotCarriageCornerRadius, -carriageDepth - (cBotTopHoleDepth - carriageDepth) - .1, -cBotCarriageCornerRadius - cBotTopHoleLength])
+		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - carriageDepth) + .1, .1]);
 	  }
      }
      
@@ -2796,11 +2791,11 @@ module cbot_carriage_base(heSide=false) {
 	  }
 
 	  hull() {
-	       translate([-cBotCarriageCornerRadius, -cBotTopHoleDepth - (cBotTopHoleDepth - cBotCarriageDepth) - .1, cBotCarriageCornerRadius])
-		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - cBotCarriageDepth) + .1, .1]);
+	       translate([-cBotCarriageCornerRadius, -cBotTopHoleDepth - (cBotTopHoleDepth - carriageDepth) - .1, cBotCarriageCornerRadius])
+		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - carriageDepth) + .1, .1]);
 		    
-	       translate([-cBotCarriageCornerRadius, -cBotCarriageDepth - (cBotTopHoleDepth - cBotCarriageDepth) - .1, -cBotCarriageCornerRadius - cBotTopHoleLength])
-		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - cBotCarriageDepth) + .1, .1]);
+	       translate([-cBotCarriageCornerRadius, -carriageDepth - (cBotTopHoleDepth - carriageDepth) - .1, -cBotCarriageCornerRadius - cBotTopHoleLength])
+		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - carriageDepth) + .1, .1]);
 	  }
      }
 }
@@ -2810,12 +2805,12 @@ module cbot_carriage_holes(heSide=false) {
      // Bottom left.
      translate([cBotCarriageCornerRadius, .1, cBotCarriageCornerRadius])
 	  rotate([90, 0, 0])
-	  cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotCarriageDepth + .2, $fn=100);
+	  cylinder(d=cBotCarriageIdlerScrewDiameter, h=carriageDepth + .2, $fn=100);
 
      // Bottom right.
      translate([cBotCarriageWidth - cBotCarriageCornerRadius, .1, cBotCarriageCornerRadius])
 	  rotate([90, 0, 0])
-	  cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotCarriageDepth + .2, $fn=100);
+	  cylinder(d=cBotCarriageIdlerScrewDiameter, h=carriageDepth + .2, $fn=100);
 
      // Top left.
      translate([cBotCarriageCornerRadius, .1, cBotCarriageHeight - cBotCarriageCornerRadius])
@@ -2844,12 +2839,12 @@ module cbot_carriage_holes(heSide=false) {
 	  translate([(cBotCarriageWidth / 2), .1, (cBotCarriageHeight / 2)])
 	       rotate([90, 0, 0])
 	       resize([cBotCenterHoleWidth,0,0])
-	       cylinder(d=cBotCenterHoleDiameter, cBotCarriageDepth + .2, $fn=100);
+	       cylinder(d=cBotCenterHoleDiameter, carriageDepth + .2, $fn=100);
 
 	  // Leave a bar for the fan mount if needed.
 	  if(! heSide) {
-	       translate([0, -cBotCarriageDepth, cBotFanMountPos - (cBotFanBracketHeight * .75)])
-		    cube([cBotCarriageWidth, cBotCarriageDepth, (cBotFanBracketHeight * 1.5)]);
+	       translate([0, -carriageDepth, cBotFanMountPos - (cBotFanBracketHeight * .75)])
+		    cube([cBotCarriageWidth, carriageDepth, (cBotFanBracketHeight * 1.5)]);
 	  }
      }
      
@@ -2867,14 +2862,14 @@ module cbot_carriage_holes(heSide=false) {
      if(heSide == false) {
 	  // Cutout mounting holes for the fan mount. This can be easily made repeatable by replace the multipliers with j and i.
 	  // Left side
-	  translate([cBotCarriageWidth - fanScrewL[0] - (cBotFanMountDistance / 2), -cBotCarriageDepth, cBotFanMountPos])
+	  translate([cBotCarriageWidth - fanScrewL[0] - (cBotFanMountDistance / 2), -carriageDepth, cBotFanMountPos])
 	       rotate([-90,0,0])
-	       bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
+	       bolt_hole(cBotBeltScrewDiameter, carriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
 	  
 	  // Right side
-	  translate([cBotCarriageWidth - fanScrewL[0] + (cBotFanMountDistance / 2), -cBotCarriageDepth, cBotFanMountPos])
+	  translate([cBotCarriageWidth - fanScrewL[0] + (cBotFanMountDistance / 2), -carriageDepth, cBotFanMountPos])
 	       rotate([-90,0,0])
-	       bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
+	       bolt_hole(cBotBeltScrewDiameter, carriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
      }
 
      // Carve out some cable tie locations.
@@ -2901,23 +2896,23 @@ module cbot_carriage_holes(heSide=false) {
 
 	       // Left side
 	       translate([(cBotCarriageWidth / 2) - ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)),
-			  -cBotCarriageDepth,
+			  -carriageDepth,
 			  cBotAccessoryMountPos * i])
 		    rotate([-90,0,0])
-		    bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
+		    bolt_hole(cBotBeltScrewDiameter, carriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
 
 	       translate([(cBotCarriageWidth / 2) - ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)),
-			  -cBotCarriageDepth,
+			  -carriageDepth,
 			  cBotCarriageHeight - (cBotAccessoryMountPos * i)])
 		    rotate([-90,0,0])
-		    bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
+		    bolt_hole(cBotBeltScrewDiameter, carriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
 
 	       // Right side
 	       translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)),
-			  -cBotCarriageDepth,
+			  -carriageDepth,
 			  cBotAccessoryMountPos * i])
 		    rotate([-90,0,0])
-		    bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
+		    bolt_hole(cBotBeltScrewDiameter, carriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
 	       
 	       if((cBotXAxisSwitch == "keyes") &&
 		  (i >= 2) && (j >= 1))  {
@@ -2925,10 +2920,10 @@ module cbot_carriage_holes(heSide=false) {
 		    } else {
 		    
 		    translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)),
-			       -cBotCarriageDepth,
+			       -carriageDepth,
 			       cBotCarriageHeight - (cBotAccessoryMountPos * i)])
 			 rotate([-90,0,0])
-			 bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
+			 bolt_hole(cBotBeltScrewDiameter, carriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
 	       }
 	  }
      }
@@ -2939,7 +2934,7 @@ module cbot_carriage_holes(heSide=false) {
 	(heSide == false && (cBotXAxisSwitchSide == "acc" || cBotXAxisSwitchSide == "both")))) {
 	  // Carve out a space for the switch.
 	  translate([cBotCarriageWidth - cBotXAxisSwitchDimensions[0][0] + cBotXAxisSwitchOffset,
-		     -(cBotCarriageDepth - cBotXAxisSwitchDepth + cBotXAxisSwitchDimensions[0][1]),
+		     -(carriageDepth - cBotXAxisSwitchDepth + cBotXAxisSwitchDimensions[0][1]),
 		     ((cBotCarriageHeight / 2) - cBotBeltBottomPos + cBotBeltScrewDistance + (cBotBeltScrewNutDiameter / 2))]) {
 	       cube(cBotXAxisSwitchDimensions[0]);
 	       
@@ -2986,7 +2981,7 @@ module cbot_carriage_holes(heSide=false) {
 			       cBotXAxisSwitchDimensions[i][1]])
 			 rotate([-90,0,0])
 			 bolt_hole(cBotXAxisSwitchDimensions[i][2],
-				   (cBotCarriageDepth - cBotXAxisSwitchDepth -
+				   (carriageDepth - cBotXAxisSwitchDepth -
 				    cBotXAxisSwitchDimensions[i][4]),
 				   cBotXAxisSwitchDimensions[i][3],
 				   cBotXAxisSwitchDimensions[i][4]);
@@ -3006,20 +3001,20 @@ module cbot_belt_cutout() {
 	  }
 	  
 	  translate([cBotBeltToothLength + .1, 0, 0])
-	       polygon([[0,0],[(cBotBeltLength - cBotBeltToothLength) + .1,-(cBotCarriageDepth - cBotBeltDepth + .1)],[-1,-(cBotCarriageDepth - cBotBeltDepth)]]);
+	       polygon([[0,0],[(cBotBeltLength - cBotBeltToothLength) + .1,-(carriageDepth - cBotBeltDepth + .1)],[-1,-(carriageDepth - cBotBeltDepth)]]);
      }
      
-     translate([-.1, - (cBotCarriageDepth - cBotBeltDepth +.1), 0])
-	  cube([cBotBeltToothLength, (cBotCarriageDepth - cBotBeltDepth - cBotBeltToothHeight) + .1, cBotBeltHeight]);
+     translate([-.1, - (carriageDepth - cBotBeltDepth +.1), 0])
+	  cube([cBotBeltToothLength, (carriageDepth - cBotBeltDepth - cBotBeltToothHeight) + .1, cBotBeltHeight]);
 	  
      // Belt holder mounting holes.
-     translate([(cBotBeltToothLength / 2), -(cBotCarriageDepth - cBotBeltDepth), -cBotBeltScrewDistance])
+     translate([(cBotBeltToothLength / 2), -(carriageDepth - cBotBeltDepth), -cBotBeltScrewDistance])
 	  rotate([-90,0,0])
-	  bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
+	  bolt_hole(cBotBeltScrewDiameter, carriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
 
-     translate([(cBotBeltToothLength / 2), -(cBotCarriageDepth - cBotBeltDepth),  cBotBeltHeight + cBotBeltScrewDistance])
+     translate([(cBotBeltToothLength / 2), -(carriageDepth - cBotBeltDepth),  cBotBeltHeight + cBotBeltScrewDistance])
 	  rotate([-90,0,0])
-	  bolt_hole(cBotBeltScrewDiameter, cBotCarriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
+	  bolt_hole(cBotBeltScrewDiameter, carriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
 }
 
 module cbot_belt_holder() {
@@ -3115,75 +3110,94 @@ module e3d_titan_mount() {
      // Then remove the center portion where the Nema 17 will mount and recreate that portion to the specs
      // for the Nema 17.
      // Move everything around so position point is X - center of filament path, Y - face of mount on Titan side.
-     translate([-(nema17OuterOffset + e3dTitanOffset[0] + e3dTitanMountMat),0,-.01])
+     translate([-(nema17OuterOffset + e3dTitanOffset[0] + e3dTitanMountMat),0,-1])
 	  difference() {
 	  hull() {
 	       // Lower left corner
-	       translate([(e3dTitanLeftAcc == 1 ? - (cBotAccessoryMountPos + cBotBeltScrewDiameter) : 0), 0, 0])
 	       cube([1, (carriageDepth + heDepthOffset), 1]);
-
+	       
 	       // Upper left corner
-	       translate([e3dTitanMountCornerRadius - (e3dTitanLeftAcc == 1 ? (cBotAccessoryMountPos + cBotBeltScrewDiameter): 0),
+	       translate([e3dTitanMountCornerRadius,
 			  0,
-			  (nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + (e3dTitanTopAcc == 1 ? (cBotAccessoryMountPos + cBotBeltScrewDiameter) : 0) - e3dTitanMountCornerRadius])
+			  (nema17OuterOffset * 2) - e3dTitanMountCornerRadius + 1]) 
 		    rotate([-90,0,0])
 		    cylinder(r=e3dTitanMountCornerRadius, h=(carriageDepth + heDepthOffset), $fn=100);
-
+	       
 	       // Lower right corner
-	       translate([((nema17OuterOffset * 2) + (e3dTitanMountMat * 2)) + (e3dTitanRightAcc == 1 ? (cBotAccessoryMountPos + cBotBeltScrewDiameter) : 0) - 1, 0, 0])
+	       translate([((nema17OuterOffset * 2) + (e3dTitanMountMat * 2)) + e3dTitanFilamentSideBodyOffset - 1, 0, 0])
 		    cube([1, (carriageDepth + heDepthOffset), 1]);
 	       
 	       // Upper right corner
-	       translate([(nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + (e3dTitanRightAcc == 1 ? (cBotAccessoryMountPos + cBotBeltScrewDiameter) : 0) - e3dTitanMountCornerRadius,
+	       translate([(nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + e3dTitanFilamentSideBodyOffset - e3dTitanMountCornerRadius,
 			  0,
-			  (nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + (e3dTitanTopAcc == 1 ? (cBotAccessoryMountPos + cBotBeltScrewDiameter) : 0) - e3dTitanMountCornerRadius])
+			  (nema17OuterOffset * 2) - e3dTitanMountCornerRadius + 1])
 		    rotate([-90,0,0])
 		    cylinder(r=e3dTitanMountCornerRadius, h=(carriageDepth + heDepthOffset), $fn=100);
 	  }
-
+     
 	  // Now remove the center where the titan and Nema 17 will be.
-	  translate([e3dTitanMountMat, -.1, (e3dTitanMountMat + .01)])
-	       cube([(nema17OuterOffset * 2), (carriageDepth + .2), (nema17OuterOffset * 2)]);
+	  translate([e3dTitanMountMat, -.1, 5])
+	       cube([(nema17OuterOffset * 2) + e3dTitanFilamentSideBodyOffset, (carriageDepth + .2), (nema17OuterOffset * 2)]);
+     }
+     
+     // Create the bracing.
+     translate([-(nema17OuterOffset + e3dTitanOffset[0] + e3dTitanMountMat),0,-.01]) {
+	  // Left side brace
+	  hull() {
+	       // Lower left base.
+	       translate([0,0,-e3dTitanMountLowerOverlap])
+		    cube([e3dTitanMountBraceWidth, .01, .01]);
+	       
+	       // Lower left raised.
+	       translate([0, -e3dTitanMountBraceHeight + 3, -e3dTitanMountLowerOverlap + 5])
+		    rotate([0,90,0])
+		    cylinder(r=1.5, h=e3dTitanMountBraceWidth, $fn=100);
+	       
+	       // Upper left base.
+	       translate([0,0,(nema17OuterOffset * 2) - e3dTitanMountCornerRadius - .5])
+		    cube([e3dTitanMountBraceWidth, .01, .01]);
+	       
+	       // Upper left raised.
+	       translate([0, -e3dTitanMountBraceHeight + 3, (nema17OuterOffset * 2) - e3dTitanMountCornerRadius - 5.5])
+		    rotate([0,90,0])
+		    cylinder(r=1.5, h=e3dTitanMountBraceWidth, $fn=100);
+	  }
 
-	  // Create the accessory holes if needed.
-	  // Left side
-	  if (e3dTitanLeftAcc) {
-	       for(i=[1:1:5]) {
-		    translate([ - cBotBeltScrewDiameter, -.1, cBotFanMountDistance * i])
-			 rotate([-90,0,0])
-			 cylinder(d=cBotBeltScrewDiameter, h=(carriageDepth + heDepthOffset + .2), $fn=100);
-	       }
-	  }
-	  
-	  // Right side
-	  if (e3dTitanRightAcc) {
-	       for(i=[1:1:5]) {
-		    translate([((nema17OuterOffset * 2) + (e3dTitanMountMat * 2)) + cBotBeltScrewDiameter, -.1, cBotFanMountDistance * i])
-			 rotate([-90,0,0])
-			 cylinder(d=cBotBeltScrewDiameter, h=(carriageDepth + heDepthOffset + .2), $fn=100);
-	       }
-	  }
-	  
-	  // Top side
-	  if (e3dTitanTopAcc) {
-	       for(i=[1:1:4]) {
-		    translate([(((nema17OuterOffset * 2) + (e3dTitanMountMat * 2)) / 2) - (cBotFanMountDistance * 2.5) + (cBotFanMountDistance * i),
-			       -.1,
-			       (nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + cBotBeltScrewDiameter])
-			 rotate([-90,0,0])
-			 cylinder(d=cBotBeltScrewDiameter, h=(carriageDepth + heDepthOffset + .2), $fn=100);
-	       }
+	  // Right side brace
+	  hull() {
+	       // Lower right base.
+	       translate([(nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + e3dTitanFilamentSideBodyOffset - e3dTitanMountBraceWidth,
+			  0,-e3dTitanMountLowerOverlap])
+		    cube([e3dTitanMountBraceWidth, .01, .01]);
+	       
+	       // Lower right raised.
+	       translate([(nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + e3dTitanFilamentSideBodyOffset - e3dTitanMountBraceWidth,
+			  -e3dTitanMountBraceHeight + 3, -e3dTitanMountLowerOverlap + 5])
+		    rotate([0,90,0])
+		    cylinder(r=1.5, h=e3dTitanMountBraceWidth, $fn=100);
+	       
+	       // Upper right base.
+	       translate([(nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + e3dTitanFilamentSideBodyOffset - e3dTitanMountBraceWidth,
+			  0,(nema17OuterOffset * 2) - e3dTitanMountCornerRadius - .5])
+		    cube([e3dTitanMountBraceWidth, .01, .01]);
+	       
+	       // Upper right raised.
+	       translate([(nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + e3dTitanFilamentSideBodyOffset - e3dTitanMountBraceWidth,
+			  -e3dTitanMountBraceHeight + 3, (nema17OuterOffset * 2) - e3dTitanMountCornerRadius - 5.5])
+		    rotate([0,90,0])
+		    cylinder(r=1.5, h=e3dTitanMountBraceWidth, $fn=100);
 	  }
      }
 
      // Create the face the Titan and Nema 17 will attach to.
      difference() {
-	  translate([-(nema17OuterOffset + e3dTitanOffset[0] +.01),0,(e3dTitanMountMat - .01)])
-	       cube([(nema17OuterOffset * 2) + .02, e3dTitanMountThickness, (nema17OuterOffset * 2) + .02]);
+	  translate([-(nema17OuterOffset + e3dTitanOffset[0] + .01), carriageDepth - e3dTitanMountThickness , 0])
+	       cube([(nema17OuterOffset * 2) + e3dTitanFilamentSideBodyOffset + .02, e3dTitanMountThickness, (nema17OuterOffset * 2) + .02]);
+
 	  // Carve out the holes for the Nema 17 mount.
 	  // First position ourselves in the center of the face. All other offsets
 	  // are from center of Nema 17 output shaft.
-	  translate([-e3dTitanOffset[0],0,(nema17OuterOffset + e3dTitanMountMat)]) {
+	  translate([-e3dTitanOffset[0], carriageDepth - e3dTitanMountThickness, nema17OuterOffset]) {
 	       for (i= nema17MountHoleLocs) {
 		    translate([i[0],-.1,i[1]]) {
 			 rotate([-90,0,0])
@@ -3193,10 +3207,10 @@ module e3d_titan_mount() {
 	       
 	       // Carve out the center for the Nema 17 shaft and center raised portion.
 	       translate([0,-.1,0])
-		    rotate([-90,0,0])
+		    rotate([-90,-.1,0])
 		    cylinder(d=nema17CenterDiameter, h=(e3dTitanMountThickness + .2), $fn=200);
 		    }
-     }
+     }     
 }
 
 module bltouch_mount(carriageDepth,cbot=false) {
