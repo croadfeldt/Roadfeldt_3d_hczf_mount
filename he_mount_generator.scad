@@ -153,6 +153,9 @@ prusai3FanTabNubWidth = 4;
 // How deep the fan bracket should be.
 prusai3FanBracketDepth = 3;
 
+// How much vertical offset should be added / removed for a titan mount.
+prusai3TitanVertOffset = 15;
+
 /* [C Bot Carriage] */
 
 // Which part should be displayed.
@@ -239,6 +242,9 @@ cBotCableTieHorizontalCount = 3;
 // How much to shrink the horizontal spacing of the cable ties?
 cBotCableTieHorizontalOffset = 5;
 
+// How much vertical offset should be added / removed for the titan mount?
+cBotTitanVertOffset = -12;
+
 /* [Hot End Settings] */
 
 // How far out to offset the Hot End from the rear of the mount.
@@ -313,24 +319,24 @@ fanDuctOverlap = 2.75;
 fanDuctOutsideOverlap = 6;
 
 // How far below the nozzle should the fan outlet point?
-fanDuctOutletOffset = 10;
+fanDuctOutletOffset = 0;
 
 // Offset from the nozzles where the fan duct outlets should be placed. Leave named variables in place.
 fanDuctOutletNozzleOffsetL = [16,3]; // [0] X distance from nozzle for start of duct opening, fanDuctThickness will be subtracted from this [1] Z distance from nozzle tip. + up, - down
-simpleFanDuctOutletNozzleOffsetL = [10,0]; // [0] X distance from nozzle for start of duct opening, fanDuctThickness will be subtracted from this [1] Z distance from nozzle tip. + up, - down
+simpleFanDuctOutletNozzleOffsetL = [12,1.5]; // [0] X distance from nozzle for start of duct opening, fanDuctThickness will be subtracted from this [1] Z distance from nozzle tip. + up, - down
 
 // Size of air chamber around fan duct ring.
 fanDuctAirChamberSize = [5,1.5]; // [0] X width of internal portion of air chamber, [1] Z height of internal portion of air chamber.
 
 // Size of the fan duct outlets.
 fanDuctOutletSize = [8,4]; // [0] Number of outlets, will be spread out equally. [1] Size of outlets.
-simpleFanDuctOutletSize = [20,.1,3];
+simpleFanDuctOutletSize = [25,.1,4];
 
 // Length of runner before Simple Fan Duct Nozzle
-simpleFanDuctRunnerLength = 10;
+simpleFanDuctRunnerLength = 0;
 
 // Extra vertical offset from nozzle.
-simpleFanDuctRunnerOffset = 2;
+simpleFanDuctRunnerOffset = 0;
 
 /* [Z Probe / Servo] */
 
@@ -1066,7 +1072,7 @@ if (carriage == "prusai3") {
 
      // Place the titan direct extruder if needed.
      if (realExtruder == "titan" && (prusai3Which == "hotm" || prusai3Which == "all")) {
-	  translate([heAnchorL[0], -carriageDepth, (xMountHeight - .01)])
+	  translate([heAnchorL[0], -carriageDepth, (xMountHeight + prusai3TitanVertOffset - .01)])
 	       e3d_titan_mount();
      }
 }
@@ -1128,9 +1134,14 @@ if(carriage == "cbot") {
 	       
 	  // J Head style mount
 	  if(hotend == "e3d_v6" || hotend == "e3d_v6_vol" || hotend == "jhead_mkv" || hotend == "hexagon" || hotend == "gen_jhead") {
-	       // Place the J Head style mount
-	       translate(heMountL)
-		    jhead_mount(carriageDepth);
+	       // Ensure the holes are made in the carriage.
+	       difference() {
+		    // Place the J Head style mount
+		    translate(heMountL)
+			 jhead_mount(carriageDepth);
+
+		    cbot_carriage_holes(true);
+	       }
 
 	  }
 
@@ -1304,7 +1315,7 @@ if(carriage == "cbot") {
 
      // Place the titan direct extruder if needed.
      if (realExtruder == "titan" && (cBotWhich == "hotm" || cBotWhich == "all")) {
-	  translate([heAnchorL[0], -carriageDepth, (cBotCarriageHeight - .01)])
+	  translate([heAnchorL[0], -carriageDepth, (cBotCarriageHeight + cBotTitanVertOffset - .01)])
 	       e3d_titan_mount();
      }
 }
@@ -1468,6 +1479,31 @@ module jhead_base() {
      // Create the base block which the holes will be carved out of.
      translate([0, (jHeadMountDepth / 2), 0])
 	  cube([jHeadMountWidth, (jHeadMountDepth / 2) + heDepthOffset + .1, jHeadMountHeight]);
+
+     // Create some supports if needed.
+     if (extruder == "titan") {
+	  // Left Brace
+	  hull() {
+	       // Horizontal portion
+	       translate([0, (jHeadMountDepth / 2), jHeadMountHeight - e3dTitanMountBraceWidth])
+		    cube([e3dTitanMountBraceWidth, (jHeadMountDepth / 2) + .1, e3dTitanMountBraceWidth]);
+
+	       //Vertical portion
+	       translate([0, jHeadMountDepth, jHeadMountHeight - .1])
+		    cube([e3dTitanMountBraceWidth, carriageDepth, e3dTitanMountLowerOverlap]);
+	  }
+
+	  // Right Brace
+	  hull() {
+	       // Horizontal portion
+	       translate([jHeadMountWidth - e3dTitanMountBraceWidth, (jHeadMountDepth / 2), jHeadMountHeight - e3dTitanMountBraceWidth])
+		    cube([e3dTitanMountBraceWidth, (jHeadMountDepth / 2) + .1, e3dTitanMountBraceWidth]);
+
+	       //Vertical portion
+	       translate([jHeadMountWidth - e3dTitanMountBraceWidth, jHeadMountDepth, jHeadMountHeight - .1])
+		    cube([e3dTitanMountBraceWidth, carriageDepth, e3dTitanMountLowerOverlap]);
+	  }
+     }
 }
 
 module jhead_collar(carriageDepth) {
@@ -2834,7 +2870,7 @@ module cbot_carriage_holes(heSide=false) {
 	       cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotTopHoleDepth + .2, $fn=100);
      }
 
-     // Cut out the big oval in the middle.
+/*     // Cut out the big oval in the middle.
      difference() {
 	  translate([(cBotCarriageWidth / 2), .1, (cBotCarriageHeight / 2)])
 	       rotate([90, 0, 0])
@@ -2847,7 +2883,7 @@ module cbot_carriage_holes(heSide=false) {
 		    cube([cBotCarriageWidth, carriageDepth, (cBotFanBracketHeight * 1.5)]);
 	  }
      }
-     
+*/     
      // Cut out the belt holder and holes.
      // Top belt cutout
      translate([-.1, -cBotBeltDepth, ((cBotCarriageHeight / 2) + cBotBeltTopPos)])
@@ -2988,6 +3024,13 @@ module cbot_carriage_holes(heSide=false) {
 	       }	       
 	  }
      }
+
+     // Carve out space for the titan mount.
+     if (extruder == "titan") {
+	  translate([(heSide == true ? heAnchorL[0] : cBotCarriageWidth - heAnchorL[0]), - carriageDepth - .01, (cBotCarriageHeight + cBotTitanVertOffset)])
+	       translate([(heSide == true ? -(nema17OuterOffset + e3dTitanOffset[0]) : - (nema17OuterOffset - e3dTitanOffset[0])),0,0])
+	       cube([(nema17OuterOffset * 2) , carriageDepth + .02, (nema17OuterOffset * 2)]);
+     }
 }
 
 module cbot_belt_cutout() {
@@ -3114,7 +3157,8 @@ module e3d_titan_mount() {
 	  difference() {
 	  hull() {
 	       // Lower left corner
-	       cube([1, (carriageDepth + heDepthOffset), 1]);
+	       translate([0, 0, (carriage == "prusai3" ? -prusai3TitanVertOffset : 0)])
+		    cube([1, (carriageDepth + heDepthOffset), 1]);
 	       
 	       // Upper left corner
 	       translate([e3dTitanMountCornerRadius,
@@ -3124,7 +3168,7 @@ module e3d_titan_mount() {
 		    cylinder(r=e3dTitanMountCornerRadius, h=(carriageDepth + heDepthOffset), $fn=100);
 	       
 	       // Lower right corner
-	       translate([((nema17OuterOffset * 2) + (e3dTitanMountMat * 2)) + e3dTitanFilamentSideBodyOffset - 1, 0, 0])
+	       translate([((nema17OuterOffset * 2) + (e3dTitanMountMat * 2)) + e3dTitanFilamentSideBodyOffset - 1, 0, (carriage == "prusai3" ? -prusai3TitanVertOffset : 0)])
 		    cube([1, (carriageDepth + heDepthOffset), 1]);
 	       
 	       // Upper right corner
@@ -3145,11 +3189,11 @@ module e3d_titan_mount() {
 	  // Left side brace
 	  hull() {
 	       // Lower left base.
-	       translate([0,0,-e3dTitanMountLowerOverlap])
+	       translate([0, 0, - (e3dTitanMountLowerOverlap + (carriage == "prusai3" ? prusai3TitanVertOffset : 0))])
 		    cube([e3dTitanMountBraceWidth, .01, .01]);
 	       
 	       // Lower left raised.
-	       translate([0, -e3dTitanMountBraceHeight + 3, -e3dTitanMountLowerOverlap + 5])
+	       translate([0, -e3dTitanMountBraceHeight + 3,  - (e3dTitanMountLowerOverlap + (carriage == "prusai3" ? prusai3TitanVertOffset : 0)) + 5])
 		    rotate([0,90,0])
 		    cylinder(r=1.5, h=e3dTitanMountBraceWidth, $fn=100);
 	       
@@ -3167,12 +3211,12 @@ module e3d_titan_mount() {
 	  hull() {
 	       // Lower right base.
 	       translate([(nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + e3dTitanFilamentSideBodyOffset - e3dTitanMountBraceWidth,
-			  0,-e3dTitanMountLowerOverlap])
+			  0,- (e3dTitanMountLowerOverlap + (carriage == "prusai3" ? prusai3TitanVertOffset : 0))])
 		    cube([e3dTitanMountBraceWidth, .01, .01]);
 	       
 	       // Lower right raised.
 	       translate([(nema17OuterOffset * 2) + (e3dTitanMountMat * 2) + e3dTitanFilamentSideBodyOffset - e3dTitanMountBraceWidth,
-			  -e3dTitanMountBraceHeight + 3, -e3dTitanMountLowerOverlap + 5])
+			  -e3dTitanMountBraceHeight + 3, - (e3dTitanMountLowerOverlap + (carriage == "prusai3" ? prusai3TitanVertOffset : 0)) + 5])
 		    rotate([0,90,0])
 		    cylinder(r=1.5, h=e3dTitanMountBraceWidth, $fn=100);
 	       
