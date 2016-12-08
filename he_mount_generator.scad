@@ -52,7 +52,7 @@ use<delta_blower_fans.scad>;
 /* [Features] */
 
 // What type of Carriage do you use / need?
-carriage = "cbot"; // [cbot:C Bot style, prusai3:Prusa i3]
+carriage = "prusai3"; // [cbot:C Bot style, prusai3:Prusa i3]
 
 // Which hot end is in use. Ensure you enter height from top of mount to tip of nozzle if you select generic J Head.
 hotend = "e3d_v6_vol"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
@@ -722,7 +722,7 @@ cBotXBumperDepth = 3; // How thick to make the bumper.
 cBotXBumperHolePos = [10,5]; // Where the hole is in relation to the bottom of the bumper.
 
 /* [Hidden] */
-realZProbeSide = (carriage == "prusai3" && extruder == "titan" ? "left" : zProbeSide);
+realZProbeSide = (carriage == "prusai3" && realExtruder == "titan" ? "left" : zProbeSide);
 inductMountWidth = inductDiameter + (probeBraceWidth * 2) + (inductMat * 2);
 cBotProbePos = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") ? chiCBotProbePos : jHeadCBotProbePos; // Used the correct location of the probe mount based on hotend type.
 heMountWidth = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
@@ -1352,12 +1352,12 @@ module xback_plane(xw=xMountWidth,
      hull() {
 	  // Create the round edges on left edge. Will take care of round corners on right side later.
 	  // Bottom Left, enlarge the mount to accomodate titan extruder if needed.
-	  translate([xMountCornerRadius - (extruder == "titan" ? ((nema17OuterOffset + e3dTitanOffset[0] + e3dTitanMountMat) - (xMountWidth / 2)) : 0), 0,xMountCornerRadius])
+	  translate([xMountCornerRadius - (realExtruder == "titan" ? ((nema17OuterOffset + e3dTitanOffset[0] + e3dTitanMountMat) - (xMountWidth / 2)) : 0), 0,xMountCornerRadius])
 	       rotate([90,0,0])
 	       cylinder(r=xMountCornerRadius,h=carriageDepth);
 	  // Top Left
-	  translate([xMountCornerRadius - (extruder == "titan" ? ((nema17OuterOffset + e3dTitanOffset[0] + e3dTitanMountMat) - (xMountWidth / 2)) : 0),0,xMountHeight-xMountCornerRadius])
-	       if(extruder == "titan") {
+	  translate([xMountCornerRadius - (realExtruder == "titan" ? ((nema17OuterOffset + e3dTitanOffset[0] + e3dTitanMountMat) - (xMountWidth / 2)) : 0),0,xMountHeight-xMountCornerRadius])
+	       if(realExtruder == "titan") {
 		    translate([-xMountCornerRadius,-carriageDepth,0])
 		    cube([xMountCornerRadius, carriageDepth, xMountCornerRadius]);
 	       }
@@ -1499,7 +1499,7 @@ module jhead_base() {
 	  cube([jHeadMountWidth, (jHeadMountDepth / 2) + heDepthOffset + .1, jHeadMountHeight]);
 
      // Create some supports if needed.
-     if (extruder == "titan") {
+     if (realExtruder == "titan") {
 	  // Left Brace
 	  hull() {
 	       // Horizontal portion
@@ -3065,7 +3065,7 @@ module cBot_cut_other_holes(heSide=false){
      }
 
      // Carve out space for the titan mount, if needed.
-     if ((extruder == "titan" && heSide == true) || (extruder == "titan" && heSide == false && extruderStepper != "pancake")) {
+     if ((realExtruder == "titan" && heSide == true) || (realExtruder == "titan" && heSide == false && extruderStepper != "pancake")) {
 	  translate([(heSide == true ? heAnchorL[0] : cBotCarriageWidth - heAnchorL[0]), - carriageDepth - .01, (cBotCarriageHeight + cBotTitanVertOffset)])
 	       translate([(heSide == true ? -(nema17OuterOffset + e3dTitanOffset[0]) : - (nema17OuterOffset - e3dTitanOffset[0])),0,0])
 	       cube([(nema17OuterOffset * 2) , carriageDepth + .02, (nema17OuterOffset * 2)]);
