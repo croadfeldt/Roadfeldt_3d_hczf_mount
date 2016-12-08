@@ -52,7 +52,7 @@ use<delta_blower_fans.scad>;
 /* [Features] */
 
 // What type of Carriage do you use / need?
-carriage = "prusai3"; // [cbot:C Bot style, prusai3:Prusa i3]
+carriage = "cbot"; // [cbot:C Bot style, prusai3:Prusa i3]
 
 // Which hot end is in use. Ensure you enter height from top of mount to tip of nozzle if you select generic J Head.
 hotend = "e3d_v6_vol"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
