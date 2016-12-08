@@ -197,14 +197,29 @@ cBotXAxisSwitchTHOffset = 2.5;
 // Minimum width of carriage, will be increased if needed.
 cBotCarriageMinWidth = 40;
 
+// Height of XY Bar .
+cBotXYBarHeight = 40;
+
+// Distance between wheel centres to add to height of XY bar (10mm for solid v-wheels, Unknown for mini wheels).
+cBotWheelOffsetFromBar = 10;
+
 // Height of carriage. Only changed if height of XY Bar is modified.
-cBotCarriageHeight = 65;
+cBotCarriageHeight=cBotXYBarHeight + (cBotWheelOffsetFromBar *2)+ 5;
+
+// Distance between wheel centres to add to height of XY bar (10mm for solid v-wheels, Unknown for mini wheels).
+cBotWheelOffsetFromBar = 10;
 
 // Depth of carriage.
 cBotCarriageDepth = 5;
 
 // Diameter of screw holes for carriage idler wheels.
 cBotCarriageIdlerScrewDiameter = 5.2;
+
+// Should the carriage have 3 or 4 wheels?
+cBotNumberOfCarriageWheels = "4"; // [3:Three Wheels, 4:Four Wheels]
+
+// Diameter of screw holes for carriage eccentric spacer.
+cBotCarriageEccentricSpacerScrewDiameter = 7.2;
 
 // Amount of material around screw holes for carriage idler wheels.
 cBotCarriageIdlerScrewMat = 3.3;
@@ -2763,123 +2778,149 @@ function fan_duct_connect(tabScrewL, horizontalAngle, verticalAngle, dimensions,
      
 // C Bot modules
 module cbot_carriage_side(heSide=false) {
-echo("heSide", heSide);
-     // Create the base, then remove the holes.
-     difference() {
-	  cbot_carriage_base(heSide);
-
-	  cbot_carriage_holes(heSide);
-     }
+	echo("heSide", heSide);
+	echo("Number of wheels on carriage", cBotNumberOfCarriageWheels);
+   
+	if (cBotNumberOfCarriageWheels == "3")
+		{
+			 difference(){
+				cbot_carriage_base();  // Create the base.
+				
+				union(){
+					cbot_carriage_three_holes();  
+					cBot_cut_other_holes(heSide);
+				}
+			 }	
+		} else
+		{
+		difference(){
+				union(){
+					cbot_carriage_base();
+					cbot_carriage_wheel_bolt_angle_plates();}  // Create the base.
+				{union(){
+					cbot_carriage_holes();  // Then remove the holes.
+					cBot_cut_other_holes(heSide);}
+				}
+			}
+		}
 }
-
-module cbot_carriage_base(heSide=false) {
+module cbot_carriage_base() {
      // Base C Bot XY Carriage side.
      translate([cBotCarriageCornerRadius, 0, cBotCarriageCornerRadius])
-	  hull() {
-	  // Create the top left corner.
-	  translate([0, 0, cBotCarriageHeight - (cBotCarriageCornerRadius * 2)])
-	       rotate([90,0,0])
-	       cylinder(r=cBotCarriageCornerRadius, h=carriageDepth, $fn=100);
-
-	  // Create the top right Corner
-	  translate([cBotCarriageWidth - (cBotCarriageCornerRadius * 2), 0, cBotCarriageHeight - (cBotCarriageCornerRadius * 2)])
-	       rotate([90,0,0])
-	       cylinder(r=cBotCarriageCornerRadius, h=carriageDepth, $fn=100);
-
-	  // Create the bottom left corner.
-	  rotate([90,0,0])
-	       cylinder(r=cBotCarriageCornerRadius, h=carriageDepth, $fn=100);
-		
-	  // Create the bottom right corner
-	  translate([cBotCarriageWidth - (cBotCarriageCornerRadius * 2), 0, 0])
-	       rotate([90,0,0])
-	       cylinder(r=cBotCarriageCornerRadius, h=carriageDepth, $fn=100);
-     }
-
-     // Create angle portion of top left corner.
+	  hull() 
+		{
+		  // Create the top left corner.
+		  translate([0, 0, cBotCarriageHeight - (cBotCarriageCornerRadius * 2)])
+			   rotate([90,0,0])
+			   cylinder(r=cBotCarriageCornerRadius, h=carriageDepth, $fn=100);
+		  // Create the top right Corner
+		  translate([cBotCarriageWidth - (cBotCarriageCornerRadius * 2), 0, cBotCarriageHeight - (cBotCarriageCornerRadius * 2)])
+			   rotate([90,0,0])
+			   cylinder(r=cBotCarriageCornerRadius, h=carriageDepth, $fn=100);
+		  // Create the bottom left corner.
+		  rotate([90,0,0])
+			   cylinder(r=cBotCarriageCornerRadius, h=carriageDepth, $fn=100);
+		  // Create the bottom right corner
+		  translate([cBotCarriageWidth - (cBotCarriageCornerRadius * 2), 0, 0])
+			   rotate([90,0,0])
+			   cylinder(r=cBotCarriageCornerRadius, h=carriageDepth, $fn=100);
+		}
+}
+module cbot_carriage_wheel_bolt_angle_plates(){
+   // Create angle portion of top left corner.
      translate([cBotCarriageCornerRadius, 0, cBotCarriageHeight - cBotCarriageCornerRadius])
-	  difference() {
-	  hull() {
-	       rotate([90,0,0])
-		    cylinder(r=cBotCarriageCornerRadius, h=cBotTopHoleDepth, $fn=100);
-	       
-	       translate([0, 0, -cBotTopHoleLength])
-		    rotate([90,0,0])
-		    cylinder(r=cBotCarriageCornerRadius, h=cBotTopHoleDepth, $fn=100);
-	  }
-	       
-	  hull() {
-	       translate([-cBotCarriageCornerRadius, -cBotTopHoleDepth - (cBotTopHoleDepth - carriageDepth) - .1, cBotCarriageCornerRadius])
-		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - carriageDepth) + .1, .1]);
-		    
-	       translate([-cBotCarriageCornerRadius, -carriageDepth - (cBotTopHoleDepth - carriageDepth) - .1, -cBotCarriageCornerRadius - cBotTopHoleLength])
-		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - carriageDepth) + .1, .1]);
-	  }
-     }
-     
+	  difference() 
+		{
+		  hull() {
+			   rotate([90,0,0])
+				cylinder(r=cBotCarriageCornerRadius, h=cBotTopHoleDepth, $fn=100);
+			   translate([0, 0, -cBotTopHoleLength])
+				rotate([90,0,0])
+				cylinder(r=cBotCarriageCornerRadius, h=cBotTopHoleDepth, $fn=100);
+		  }
+		  hull() {
+			   translate([-cBotCarriageCornerRadius, -cBotTopHoleDepth - (cBotTopHoleDepth - carriageDepth) - .1, cBotCarriageCornerRadius])
+				cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - carriageDepth) + .1, .1]);
+			   translate([-cBotCarriageCornerRadius, -carriageDepth - (cBotTopHoleDepth - carriageDepth) - .1, -cBotCarriageCornerRadius - cBotTopHoleLength])
+				cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - carriageDepth) + .1, .1]);
+		  }
+		}
      // Create angle portion of top right corner
      translate([cBotCarriageWidth - cBotCarriageCornerRadius, 0, cBotCarriageHeight - cBotCarriageCornerRadius])
-	  difference() {
-	  hull() {
-	       rotate([90,0,0])
-		    cylinder(r=cBotCarriageCornerRadius, h=cBotTopHoleDepth, $fn=100);
-		    
-	       translate([0, 0, -cBotTopHoleLength])
-		    rotate([90,0,0])
-		    cylinder(r=cBotCarriageCornerRadius, h=cBotTopHoleDepth, $fn=100);
-	  }
-
-	  hull() {
-	       translate([-cBotCarriageCornerRadius, -cBotTopHoleDepth - (cBotTopHoleDepth - carriageDepth) - .1, cBotCarriageCornerRadius])
-		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - carriageDepth) + .1, .1]);
-		    
-	       translate([-cBotCarriageCornerRadius, -carriageDepth - (cBotTopHoleDepth - carriageDepth) - .1, -cBotCarriageCornerRadius - cBotTopHoleLength])
-		    cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - carriageDepth) + .1, .1]);
-	  }
-     }
+	  difference() 
+		{
+		  hull() {
+			   rotate([90,0,0])
+				cylinder(r=cBotCarriageCornerRadius, h=cBotTopHoleDepth, $fn=100);
+			   translate([0, 0, -cBotTopHoleLength])
+				rotate([90,0,0])
+				cylinder(r=cBotCarriageCornerRadius, h=cBotTopHoleDepth, $fn=100);
+				}		
+		  hull() {
+			   translate([-cBotCarriageCornerRadius, -cBotTopHoleDepth - (cBotTopHoleDepth - carriageDepth) - .1, cBotCarriageCornerRadius])
+				cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - carriageDepth) + .1, .1]);
+			   translate([-cBotCarriageCornerRadius, -carriageDepth - (cBotTopHoleDepth - carriageDepth) - .1, -cBotCarriageCornerRadius - cBotTopHoleLength])
+				cube([(cBotCarriageCornerRadius * 2) + .2, (cBotTopHoleDepth - carriageDepth) + .1, .1]);
+				}
+		}	
 }
-
-module cbot_carriage_holes(heSide=false) {
+module cbot_carriage_holes() {
      // Remove the holes for the corners.
      // Bottom left.
      translate([cBotCarriageCornerRadius, .1, cBotCarriageCornerRadius])
 	  rotate([90, 0, 0])
 	  cylinder(d=cBotCarriageIdlerScrewDiameter, h=carriageDepth + .2, $fn=100);
-
      // Bottom right.
      translate([cBotCarriageWidth - cBotCarriageCornerRadius, .1, cBotCarriageCornerRadius])
 	  rotate([90, 0, 0])
 	  cylinder(d=cBotCarriageIdlerScrewDiameter, h=carriageDepth + .2, $fn=100);
-
      // Top left.
      translate([cBotCarriageCornerRadius, .1, cBotCarriageHeight - cBotCarriageCornerRadius])
 	  hull() {
 	  rotate([90,0,0])
 	       cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotTopHoleDepth + .2, $fn=100);
-	  
 	  translate([0, 0, -cBotTopHoleLength])
 	       rotate([90,0,0])
 	       cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotTopHoleDepth + .2, $fn=100);
      }
-
      // Top right.
      translate([cBotCarriageWidth - cBotCarriageCornerRadius, .1, cBotCarriageHeight - cBotCarriageCornerRadius])
 	  hull() {
 	  rotate([90,0,0])
 	       cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotTopHoleDepth + .2, $fn=100);
-	  
 	  translate([0, 0, -cBotTopHoleLength])
 	       rotate([90,0,0])
 	       cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotTopHoleDepth + .2, $fn=100);
      }
-
+}
+module cbot_carriage_three_holes() {
+echo("cbot_carriage_three_holes");
+     // Remove the holes for the carriage wheels.
+	 // Bottom, Middle with eccentric spacer.
+	 translate([cBotCarriageWidth/2,.1,cBotCarriageCornerRadius])
+		rotate([90,0,0])
+		cylinder(d=cBotCarriageEccentricSpacerScrewDiameter, h=carriageDepth + .2, $fn=100);
+     // Top left.
+     translate([cBotCarriageCornerRadius, .1, cBotCarriageHeight - cBotCarriageCornerRadius])
+	  hull() 
+		{
+		  rotate([90,0,0])
+			   cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotTopHoleDepth + .2, $fn=100);
+		}
+     // Top right.
+     translate([cBotCarriageWidth - cBotCarriageCornerRadius, .1, cBotCarriageHeight - cBotCarriageCornerRadius])
+	  hull() 
+		{
+		  rotate([90,0,0])
+			   cylinder(d=cBotCarriageIdlerScrewDiameter, h=cBotTopHoleDepth + .2, $fn=100);
+		 }
+}
 /*     // Cut out the big oval in the middle.
      difference() {
 	  translate([(cBotCarriageWidth / 2), .1, (cBotCarriageHeight / 2)])
 	       rotate([90, 0, 0])
 	       resize([cBotCenterHoleWidth,0,0])
 	       cylinder(d=cBotCenterHoleDiameter, carriageDepth + .2, $fn=100);
-
 	  // Leave a bar for the fan mount if needed.
 	  if(! heSide) {
 	       translate([0, -carriageDepth, cBotFanMountPos - (cBotFanBracketHeight * .75)])
@@ -2887,16 +2928,15 @@ module cbot_carriage_holes(heSide=false) {
 	  }
      }
 */     
-     // Cut out the belt holder and holes.
-     // Top belt cutout
+module cBot_cut_other_holes(heSide=false){
+	// Cut out the belt holder and holes.
+    // Top belt cutout
      translate([-.1, -cBotBeltDepth, ((cBotCarriageHeight / 2) + cBotBeltTopPos)])
 	  cbot_belt_cutout();
-
      // Bottom belt cutout
      translate([cBotCarriageWidth + .1, -cBotBeltDepth, ((cBotCarriageHeight / 2) - cBotBeltBottomPos)])
 	  rotate([0, 180, 0])
 	  cbot_belt_cutout();
-
      // Don't cut out fan holes on side with hot end.
      if(heSide == false) {
 	  // Cutout mounting holes for the fan mount. This can be easily made repeatable by replace the multipliers with j and i.
@@ -2904,13 +2944,11 @@ module cbot_carriage_holes(heSide=false) {
 	  translate([cBotCarriageWidth - fanScrewL[0] - (cBotFanMountDistance / 2), -carriageDepth, cBotFanMountPos])
 	       rotate([-90,0,0])
 	       bolt_hole(cBotBeltScrewDiameter, carriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
-	  
 	  // Right side
 	  translate([cBotCarriageWidth - fanScrewL[0] + (cBotFanMountDistance / 2), -carriageDepth, cBotFanMountPos])
 	       rotate([-90,0,0])
 	       bolt_hole(cBotBeltScrewDiameter, carriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
      }
-
      // Carve out some cable tie locations.
      for(j=[cBotCableTieHorizontalDistance : cBotCableTieHorizontalDistance : cBotCarriageWidth - cBotCableTieHorizontalDistance]) {
 	  for(i=[0 : 1 : cBotCableTieVerticalCount - 1]) {
@@ -2928,36 +2966,41 @@ module cbot_carriage_holes(heSide=false) {
 	       }
 	  }
      }
-
      // Carve out some bolt holes for mounting various things.
+	 
+	 
      for(j=[0 : 1 : ((cBotCarriageWidth / cBotFanMountDistance) / 2) -2]) {
 	  for(i=[1 : 1 : 2]) {
-
 	       // Left side
-	       translate([(cBotCarriageWidth / 2) - ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)),
+		translate([(cBotCarriageWidth / 2) - ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)),
 			  -carriageDepth,
 			  cBotAccessoryMountPos * i])
 		    rotate([-90,0,0])
-		    bolt_hole(cBotBeltScrewDiameter, carriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
-
+			if((cBotNumberOfCarriageWheels == "3") && (j==0) && (i==1)){
+			//dont make the hole near the centre hole for the wheel.
+			} else {
+			 bolt_hole(cBotBeltScrewDiameter, carriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
 	       translate([(cBotCarriageWidth / 2) - ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)),
 			  -carriageDepth,
 			  cBotCarriageHeight - (cBotAccessoryMountPos * i)])
 		    rotate([-90,0,0])
 		    bolt_hole(cBotBeltScrewDiameter, carriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
+			}
+		   
 
 	       // Right side
 	       translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)),
 			  -carriageDepth,
 			  cBotAccessoryMountPos * i])
 		    rotate([-90,0,0])
+			if((cBotNumberOfCarriageWheels == "3") && (j==0) && (i==1)){
+			//dont make the hole near the centre hole for the wheel.
+			} else {
 		    bolt_hole(cBotBeltScrewDiameter, carriageDepth - cBotBeltScrewNutDepth, cBotBeltScrewNutDiameter, cBotBeltScrewNutDepth);
-	       
-	       if((cBotXAxisSwitch == "keyes") &&
-		  (i >= 2) && (j >= 1))  {
+			}
+	       if((cBotXAxisSwitch == "keyes") &&  (i >= 2) && (j >= 1))  {
 		    // Don't carve out this accessory hole, it is under the switch.
 		    } else {
-		    
 		    translate([(cBotCarriageWidth / 2) + ((cBotFanMountDistance / 2) + (cBotFanMountDistance * j)),
 			       -carriageDepth,
 			       cBotCarriageHeight - (cBotAccessoryMountPos * i)])
@@ -2966,7 +3009,6 @@ module cbot_carriage_holes(heSide=false) {
 	       }
 	  }
      }
-     
      // Carve out a space for the Axis endstop if needed.
      if(cBotXAxisSwitch != "none" &&
 	((heSide == true && (cBotXAxisSwitchSide == "he" || cBotXAxisSwitchSide == "both")) ||
@@ -2976,7 +3018,6 @@ module cbot_carriage_holes(heSide=false) {
 		     -(carriageDepth - cBotXAxisSwitchDepth + cBotXAxisSwitchDimensions[0][1]),
 		     ((cBotCarriageHeight / 2) - cBotBeltBottomPos + cBotBeltScrewDistance + (cBotBeltScrewNutDiameter / 2))]) {
 	       cube(cBotXAxisSwitchDimensions[0]);
-	       
 	       // Carve out a space for through hole solder points, if needed.
 	       if(cBotXAxisSwitch == "yl99" || cBotXAxisSwitch == "keyes") {
 		    hull() {
@@ -2984,13 +3025,11 @@ module cbot_carriage_holes(heSide=false) {
 				    cBotXAxisSwitchDimensions[0][1],
 				    (cBotXAxisSwitchDimensions[0][2] / 2) - 4])
 			      sphere(r=1.5, $fn=100);
-			 
 			 translate([cBotXAxisSwitchTHOffset,
 				    cBotXAxisSwitchDimensions[0][1],
 				    (cBotXAxisSwitchDimensions[0][2] / 2) + 4])
 			      sphere(r=1.5, $fn=100);
 		    }
-
 		    // Carve out some space for the solder pads near the switch.
 		    for(i=[-5:5:5]) {
 			 hull() {
@@ -2998,21 +3037,18 @@ module cbot_carriage_holes(heSide=false) {
 					 cBotXAxisSwitchDimensions[0][1],
 					 (cBotXAxisSwitchDimensions[0][2] / 2) + i])
 				   sphere(r=1.4, $fn=100);
-			      
 			      translate([cBotXAxisSwitchDimensions[0][0] - 7,
 					 cBotXAxisSwitchDimensions[0][1],
 					 (cBotXAxisSwitchDimensions[0][2] / 2) + i])
 				   sphere(r=1.4, $fn=100);
 			 }
 		    }
-
 		    // Carve out a space for the switch itself.
 		    translate([cBotXAxisSwitchDimensions[0][0] - 7,
 			       cBotXAxisSwitchDimensions[0][1] -.1,
 			       (cBotXAxisSwitchDimensions[0][2] / 2) - 6.65])
 			 cube([7,1.4 + .1,13.3]);
 	       }
-
 	       // Carve out the mounting holes
 	       for(i=[1:1:len(cBotXAxisSwitchDimensions)-1]) {
 		    translate([cBotXAxisSwitchDimensions[i][0],
@@ -3027,9 +3063,14 @@ module cbot_carriage_holes(heSide=false) {
 	       }	       
 	  }
      }
+<<<<<<< HEAD
+     // Carve out space for the titan mount.
+     if (extruder == "titan") {
+=======
 
      // Carve out space for the titan mount, if needed.
      if ((extruder == "titan" && heSide == true) || (extruder == "titan" && heSide == false && extruderStepper != "pancake")) {
+>>>>>>> refs/remotes/croadfeldt/master
 	  translate([(heSide == true ? heAnchorL[0] : cBotCarriageWidth - heAnchorL[0]), - carriageDepth - .01, (cBotCarriageHeight + cBotTitanVertOffset)])
 	       translate([(heSide == true ? -(nema17OuterOffset + e3dTitanOffset[0]) : - (nema17OuterOffset - e3dTitanOffset[0])),0,0])
 	       cube([(nema17OuterOffset * 2) , carriageDepth + .02, (nema17OuterOffset * 2)]);
