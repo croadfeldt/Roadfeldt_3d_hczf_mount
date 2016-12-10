@@ -197,6 +197,9 @@ cBotXAxisSwitchTHOffset = 2.5;
 // Minimum width of carriage, will be increased if needed.
 cBotCarriageMinWidth = 40;
 
+// Amount of material around screw holes for carriage idler wheels.
+cBotCarriageIdlerScrewMat = 3.3;
+
 // Height of XY Bar .
 cBotXYBarHeight = 40;
 
@@ -204,10 +207,7 @@ cBotXYBarHeight = 40;
 cBotWheelOffsetFromBar = 10;
 
 // Height of carriage. Only changed if height of XY Bar is modified.
-cBotCarriageHeight=cBotXYBarHeight + (cBotWheelOffsetFromBar *2)+ 5;
-
-// Distance between wheel centres to add to height of XY bar (10mm for solid v-wheels, Unknown for mini wheels).
-cBotWheelOffsetFromBar = 10;
+cBotCarriageHeight=cBotXYBarHeight + (cBotWheelOffsetFromBar * 2) + (cBotCarriageIdlerScrewMat * 2);
 
 // Depth of carriage.
 cBotCarriageDepth = 5;
@@ -220,9 +220,6 @@ cBotNumberOfCarriageWheels = "4"; // [3:Three Wheels, 4:Four Wheels]
 
 // Diameter of screw holes for carriage eccentric spacer.
 cBotCarriageEccentricSpacerScrewDiameter = 7.2;
-
-// Amount of material around screw holes for carriage idler wheels.
-cBotCarriageIdlerScrewMat = 3.3;
 
 // Diameter of screw holes that mounts back plane to carriage.
 cBotCarriageMountScrewDiameter = 4.2;
