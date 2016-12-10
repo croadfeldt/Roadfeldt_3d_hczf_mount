@@ -3060,14 +3060,10 @@ module cBot_cut_other_holes(heSide=false){
 	       }	       
 	  }
      }
-<<<<<<< HEAD
-     // Carve out space for the titan mount.
-     if (extruder == "titan") {
-=======
 
      // Carve out space for the titan mount, if needed.
      if ((extruder == "titan" && heSide == true) || (extruder == "titan" && heSide == false && extruderStepper != "pancake")) {
->>>>>>> refs/remotes/croadfeldt/master
+
 	  translate([(heSide == true ? heAnchorL[0] : cBotCarriageWidth - heAnchorL[0]), - carriageDepth - .01, (cBotCarriageHeight + cBotTitanVertOffset)])
 	       translate([(heSide == true ? -(nema17OuterOffset + e3dTitanOffset[0]) : - (nema17OuterOffset - e3dTitanOffset[0])),0,0])
 	       cube([(nema17OuterOffset * 2) , carriageDepth + .02, (nema17OuterOffset * 2)]);
