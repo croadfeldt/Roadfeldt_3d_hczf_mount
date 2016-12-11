@@ -197,6 +197,9 @@ cBotXAxisSwitchTHOffset = 2.5;
 // Minimum width of carriage, will be increased if needed.
 cBotCarriageMinWidth = 40;
 
+// Should the carriage have 3 or 4 wheels?
+cBotNumberOfCarriageWheels = "4"; // [3:Three Wheels, 4:Four Wheels]
+
 // Amount of material around screw holes for carriage idler wheels.
 cBotCarriageIdlerScrewMat = 3.3;
 
@@ -206,17 +209,11 @@ cBotXYBarHeight = 40;
 // Distance between wheel centres to add to height of XY bar (10mm for solid v-wheels, Unknown for mini wheels).
 cBotWheelOffsetFromBar = 10;
 
-// Height of carriage. Only changed if height of XY Bar is modified.
-cBotCarriageHeight=cBotXYBarHeight + (cBotWheelOffsetFromBar * 2) + (cBotCarriageIdlerScrewMat * 2);
-
 // Depth of carriage.
 cBotCarriageDepth = 5;
 
 // Diameter of screw holes for carriage idler wheels.
 cBotCarriageIdlerScrewDiameter = 5.2;
-
-// Should the carriage have 3 or 4 wheels?
-cBotNumberOfCarriageWheels = "4"; // [3:Three Wheels, 4:Four Wheels]
 
 // Diameter of screw holes for carriage eccentric spacer.
 cBotCarriageEccentricSpacerScrewDiameter = 7.2;
@@ -547,7 +544,14 @@ echo("realFanDuctStyle", realFanDuctStyle);
 // Depth from center of hotend to face of carriage.
 jHeadMountDepth = 28.5; // Do not change this value, the direct drive extruders require this to be placed here and OpenSCAD programming makes it nearly impossible to auto adjust.
 
-/* [E3D V6 Advanced] */
+// Height of c-Bot carriage. 
+
+ cBot3WheelHeight = cBotXYBarHeight + (cBotWheelOffsetFromBar * 2) + (cBotCarriageIdlerScrewMat * 2) + (cBotCarriageIdlerScrewDiameter /2) + (cBotCarriageEccentricSpacerScrewDiameter /2);
+ cBot4WheelHeight = cBotXYBarHeight + (cBotWheelOffsetFromBar * 2) + (cBotCarriageIdlerScrewMat * 2) + (cBotCarriageIdlerScrewDiameter);
+ cBotCarriageHeight = (cBotNumberOfCarriageWheels == "3") ? cBot3WheelHeight : cBot4WheelHeight;
+ echo ("carriage height:",cBotCarriageHeight);
+
+ /* [E3D V6 Advanced] */
 
 // Variables for E3D V6
 v6NozzleL = [[0, 0, -62]]; // This must be a vector of vectors. If only one nozzle, enter x,y,z in [[ ]]
@@ -2423,7 +2427,6 @@ module servo_mount() {
 	   servoMountPlateHeight]);
 }
 
-
 module servo_mount_holes(cbot=false) {
      // Servo hole
      translate([-.1,
@@ -2801,6 +2804,7 @@ module cbot_carriage_side(heSide=false) {
 			}
 		}
 }
+
 module cbot_carriage_base() {
      // Base C Bot XY Carriage side.
      translate([cBotCarriageCornerRadius, 0, cBotCarriageCornerRadius])
@@ -2894,7 +2898,7 @@ module cbot_carriage_three_holes() {
 echo("cbot_carriage_three_holes");
      // Remove the holes for the carriage wheels.
 	 // Bottom, Middle with eccentric spacer.
-	 translate([cBotCarriageWidth/2,.1,cBotCarriageCornerRadius])
+	 translate([cBotCarriageWidth/2,.1,(cBotCarriageEccentricSpacerScrewDiameter/2)+cBotCarriageIdlerScrewMat ])//cBotCarriageCornerRadius])
 		rotate([90,0,0])
 		cylinder(d=cBotCarriageEccentricSpacerScrewDiameter, h=carriageDepth + .2, $fn=100);
      // Top left.
