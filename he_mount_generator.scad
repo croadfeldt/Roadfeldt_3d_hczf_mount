@@ -1,7 +1,7 @@
 // Roadfeldt - Hot End Mount Generator
 //
 /*
-  Copyright (C)2015-2016 Chris Roadfeldt <chris@roadfeldt.com>
+  Copyright (C)2015-2017 Chris Roadfeldt <chris@roadfeldt.com>
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public License
@@ -58,13 +58,13 @@ carriage = "cbot"; // [cbot:C Bot style, prusai3:Prusa i3]
 hotend = "e3d_v6_vol"; // [chimera_v6:Chimera Dual V6, chimera_vol:Chimera Dual Volcano, cyclops:Cyclops, e3d_v6:E3D V6, e3d_v6_vol:E3D V6 w/ Volcano, jhead_mkv:J Head Mark V, hexagon:Hexagon, gen_jhead:Generic J Head]
 
 // Where should the hot end mount be positioned vertically? Optimized changes the mount height to increase vertical build height as much as possible. Universal keeps the mount height the same for all hot ends allow for easier interchange.
-hotendOpt = "universal"; // [ optimize:Optimized, universal:Universal]
+hotendOpt = "optimize"; // [ optimize:Optimized, universal:Universal]
 
 // What style of extruder are you using?
 extruder = "titan"; // [bowden:Bowden, titan:E3D Titan, carl_direct:Carl Feniak Direct Drive - Not ready yet.]
 
 // What type of fan duct should be made?
-fanDuctStyle = "simple"; // [round:Round 360 duct, simple:Simple single outlet]
+fanDuctStyle = "simple"; // [simple:Simple single outlet]
 
 // Which Z Probe type is in use. Select Servo here if you want to if you Servo Bracket selected above, otherwise it won't appear.
 servoInduct = "induct"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, bltouch:BL Touch, none:Neither/None]
@@ -174,7 +174,7 @@ prusai3TitanVertOffset = 15;
 // all = All parts
 
 // Which C Bot part should be exported.
-cBotWhich = "all"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, jhead_col:J Head Style Collar, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, xbump:X Endstop Bumper, bltouch:BL Touch, all:All Parts] 
+cBotWhich = "duct"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, jhead_col:J Head Style Collar, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, xbump:X Endstop Bumper, bltouch:BL Touch, all:All Parts] 
 
 // Do you want a carriage mount axis limit switch?
 cBotXAxisSwitch = "yl99"; // [yl99:YL-99, keyes:Keyes, gen:Generic Mini Switch, none:None]
@@ -291,14 +291,14 @@ fanMountScrewDiameter = 4.5;
 // Amount of material around the fan screw holes.
 fanMountScrewMat = 3;
 
-// X,Y coordinates of holes for fan screw relative to the center of the fan. Top right, top left, bottom left. Leave the negative signs.
-fanMountScrews = [[21,20],[-22,20],[-22,-18]];
+// X,Y coordinates of holes for fan screw relative to the center of the fan.
+fanMountScrews = [[-16,17],[21,20],[12,-17],[-22,-18]]; // 51x15
 
 // Dimensions of the fan. Width, depth, height when looking at it from the side.
-fanDimensions = [50,20,50];
+fanDimensions = [51,15,51];
 
 // Outside dimensions of fan outlet
-fanDuctConnectSize = [27, 20, 20];
+fanDuctConnectSize = [20, 15.4, 15.4];
 
 // Offset from center of fan body to center of fan tab. Left / Right, Forward / Back, Up / Down. Usually only need Left / Right.
 fanMountOffset = [2,0,0];
@@ -322,10 +322,10 @@ fanDuctThickness = 1;
 fanDuctInternalThickness = .8;
 
 // How far the fan duct should overlap the inside edge of the fan itself when connected.
-fanDuctOverlap = 2.75;
+fanDuctOverlap = 2;
 
 // How far the fan duct should overlap the outside edge of the fan itself when connected.
-fanDuctOutsideOverlap = 6;
+fanDuctOutsideOverlap = 2;
 
 // How far below the nozzle should the fan outlet point?
 fanDuctOutletOffset = 0;
@@ -1009,7 +1009,7 @@ if (carriage == "prusai3") {
 		    translate([fanMountOffset[2],
 			       -((prusai3FanTabHole / 2) + prusai3FanTabMat + fanMountThickness + fanMountOffset[1] + fanDimensions[1]),
 			       fanMountOffset[0]])
-		    %blower_fan_50_20();
+		    %blower_fan_51_15();
 	  }
 	  else {
 	       translate(explodeParts == 1 ? (fanScrewL - (partsOffset * 3)) : fanScrewL)
@@ -1018,7 +1018,7 @@ if (carriage == "prusai3") {
 		    translate([fanMountOffset[2],
 			       ((prusai3FanTabHole / 2) + prusai3FanTabMat + fanMountThickness + fanMountOffset[1]),
 			       fanMountOffset[0]])
-		    %blower_fan_50_20();
+		    %blower_fan_51_15();
 	  }
      }
 
@@ -1230,7 +1230,7 @@ if(carriage == "cbot") {
 		    translate([fanMountOffset[2],
 			       -((cBotFanTabHole / 2) + cBotFanTabMat + fanMountThickness + fanMountOffset[1] + fanDimensions[1]),
 			       fanMountOffset[0]])
-		    %blower_fan_50_20();
+		    %blower_fan_51_15();
 	  }
 	  else {
 	       rotate([0,-90,cBotRealFanTabVerticalAngle])
@@ -1241,7 +1241,7 @@ if(carriage == "cbot") {
 		    translate([fanMountOffset[2],
 			       ((cBotFanTabHole / 2) + cBotFanTabMat + fanMountThickness + fanMountOffset[1]),
 			       fanMountOffset[0]])
-		    %blower_fan_50_20();
+		    %blower_fan_51_15();
 	  }
      }
      
@@ -1754,30 +1754,16 @@ module fan_mount_base(tabHole, tabHoleMat, thickness, barWidth, mountOffset, fan
 	       cube([barWidth,thickness,tabHole + (tabHoleMat * 2)], center=true);
 
 	  // Create the fan mount.
-	  fan_screw_hole_single(tabHole,
-				tabHoleMat,
-				fanScrewDiameter + fanScrewMat,
-				thickness,
-				thickness,
-				fanScrews[0][0] + .1 + mountOffset[0],
-				mountOffset[1],
-				fanScrews[0][1] + mountOffset[2]);
-	  fan_screw_hole_single(tabHole,
-				tabHoleMat,
-				fanScrewDiameter + fanScrewMat,
-				thickness,
-				thickness,
-				- abs(fanScrews[1][0] + .1) + mountOffset[0],
-				mountOffset[1],
-				fanScrews[1][1] + mountOffset[2]);
-	  fan_screw_hole_single(tabHole,
-				tabHoleMat,
-				fanScrewDiameter + fanScrewMat,
-				thickness,
-				thickness,
-				- abs(fanScrews[2][0] + .1) + mountOffset[0],
-				mountOffset[1],
-				- abs(fanScrews[2][1]) + mountOffset[2]);
+	  for(fs = fanScrews) {
+	       fan_screw_hole_single(tabHole,
+				     tabHoleMat,
+				     fanScrewDiameter + fanScrewMat,
+				     thickness,
+				     thickness,
+				     fs[0] + .1 + mountOffset[0],
+				     mountOffset[1],
+				     fs[1] + mountOffset[2]);
+	  }
      }
 }
 
@@ -1793,31 +1779,17 @@ module fan_mount_nub_holes(tabHole, tabHoleMat, tabWidth, tabClear, barWidth) {
 
 module fan_mount_holes(tabHole, tabHoleMat, thickness, mountOffset, centerOffset, fanScrewDiameter, fanScrewMat, fanScrews, intakeDiameter) {
      // Carve out the fan mounting holes
-     fan_screw_hole_single(tabHole,
-			   tabHoleMat,
-			   fanScrewDiameter,
-			   thickness,
-			   thickness + .2,
-			   fanScrews[0][0] + .1 + mountOffset[0],
-			   mountOffset[1],
-			   fanScrews[0][1] + mountOffset[2]);
-     fan_screw_hole_single(tabHole,
-			   tabHoleMat,
-			   fanScrewDiameter,
-			   thickness,
-			   thickness + .2,
-			   - abs(fanScrews[1][0] + .1) + mountOffset[0],
-			   mountOffset[1],
-			   fanScrews[1][1] + mountOffset[2]);
-     fan_screw_hole_single(tabHole,
-			   tabHoleMat,
-			   fanScrewDiameter,
-			   thickness,
-			   thickness + .2,
-			   - abs(fanScrews[2][0] + .1) + mountOffset[0],
-			   mountOffset[1],
-			   - abs(fanScrews[2][1]) + mountOffset[2]);
-
+     for(fs = fanScrews) {
+	  fan_screw_hole_single(tabHole,
+				tabHoleMat,
+				fanScrewDiameter,
+				thickness,
+				thickness + .2,
+				fs[0] + .1 + mountOffset[0],
+				mountOffset[1],
+				fs[1] + mountOffset[2]);
+     }
+     
      // Cut out opening for air intake. Leave legs for securing mount to fan tab.
      translate([centerOffset[0] + mountOffset[0],
 		-((tabHole / 2) + tabHoleMat) + centerOffset[1] + mountOffset[1] +.1,
@@ -1840,59 +1812,25 @@ module fan_mount_holes(tabHole, tabHoleMat, thickness, mountOffset, centerOffset
 	  // Need to move the legs back, otherwise they end up twice as far as they should be
 	  // fan_screw_hole_single moves them as well as the translate above.
 	  translate([0, (tabHole / 2) + tabHoleMat, 0]) {
-	       hull() {
-		    fan_screw_hole_single(tabHole,
-					  tabHoleMat,
-					  fanScrewDiameter + fanScrewMat,
-					  thickness,
-					  thickness + .2,
-					  0,
-					  -.1,
-					  0);
-		    fan_screw_hole_single(tabHole,
-					  tabHoleMat,
-					  fanScrewDiameter + fanScrewMat,
-					  thickness,
-					  thickness + .2,
-					  fanScrews[0][0] + mountOffset[0],
-					  mountOffset[1],
-					  fanScrews[0][1] + mountOffset[2]);
-	       }
-	       hull() {
-		    fan_screw_hole_single(tabHole,
-					  tabHoleMat,
-					  fanScrewDiameter + fanScrewMat,
-					  thickness,
-					  thickness + .2,
-					  0,
-					  -.1,
-					  0);
-		    fan_screw_hole_single(tabHole,
-					  tabHoleMat,
-					  fanScrewDiameter + fanScrewMat,
-					  thickness,
-					  thickness + .2,
-					  - abs(fanScrews[1][0]) + mountOffset[0],
-					  mountOffset[1],
-					  fanScrews[1][1] + mountOffset[2]);
-	       }
-	       hull() {
-		    fan_screw_hole_single(tabHole,
-					  tabHoleMat,
-					  fanScrewDiameter + fanScrewMat,
-					  thickness,
-					  thickness + .2,
-					  0,
-					  -.1,
-					  0);
-		    fan_screw_hole_single(tabHole,
-					  tabHoleMat,
-					  fanScrewDiameter + fanScrewMat,
-					  thickness,
-					  thickness + .2,
-					  - abs(fanScrews[2][0]) + mountOffset[0],
-					  mountOffset[1],
-					  - abs(fanScrews[2][1]) + mountOffset[2]);
+	       for(fs = fanScrews) {
+		    hull() {
+			 fan_screw_hole_single(tabHole,
+					       tabHoleMat,
+					       fanScrewDiameter + fanScrewMat,
+					       thickness,
+					       thickness + .2,
+					       0,
+					       -.1,
+					       0);
+			 fan_screw_hole_single(tabHole,
+					       tabHoleMat,
+					       fanScrewDiameter + fanScrewMat,
+					       thickness,
+					       thickness + .2,
+					       fs[0] + mountOffset[0],
+					       mountOffset[1],
+					       fs[1] + mountOffset[2]);
+		    }
 	       }
 	  }
      }
