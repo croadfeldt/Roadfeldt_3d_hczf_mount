@@ -71,7 +71,7 @@ servoInduct = "induct"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Se
 
 // Which side should the z probe be on? Be mindful of clearance with fan mount.
 // If you choose a titan extruder, this will be overridden to left.
-zProbeSide = "right"; // [right:Right of hot end., left:Left of hot end.]
+zProbeSide = "left"; // [right:Right of hot end., left:Left of hot end.]
 
 // Which side should the fan mount to? Be mindful of Z probe clearance.
 printFanSide = "left"; // [left:Left side of hot end., right:Right side of hot end., none:No print cooling fan.]
