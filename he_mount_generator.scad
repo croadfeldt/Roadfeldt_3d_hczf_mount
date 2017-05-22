@@ -70,8 +70,8 @@ fanDuctStyle = "simple"; // [simple:Simple single outlet]
 servoInduct = "induct"; // [servo:Servo w/ Arm, induct:Inductive / Capacitive Sensor, bltouch:BL Touch, none:Neither/None]
 
 // Which side should the z probe be on? Be mindful of clearance with fan mount.
-// If you choose a Prusa i3 style carriage and a titan extruder, this will be overridden to left.
-zProbeSide = "left"; // [right:Right of hot end., left:Left of hot end.]
+// If you choose a titan extruder, this will be overridden to left.
+zProbeSide = "right"; // [right:Right of hot end., left:Left of hot end.]
 
 // Which side should the fan mount to? Be mindful of Z probe clearance.
 printFanSide = "left"; // [left:Left side of hot end., right:Right side of hot end., none:No print cooling fan.]
@@ -174,7 +174,7 @@ prusai3TitanVertOffset = 15;
 // all = All parts
 
 // Which C Bot part should be exported.
-cBotWhich = "duct"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, jhead_col:J Head Style Collar, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, xbump:X Endstop Bumper, bltouch:BL Touch, all:All Parts] 
+cBotWhich = "all"; // [hotm:Carriage with Cold / Hot End  Mount, carrside: Carriage Side, jhead_col:J Head Style Collar, belth:Belt Holder, servo:Servo Bracket, fant:Fan Mount Bracket, fanm:Fan Mount, duct:Fan Duct, zarm:Z Probe Servo Arm, induct:Inductive / Capacitive Sensor, xbump:X Endstop Bumper, bltouch:BL Touch, all:All Parts] 
 
 // Do you want a carriage mount axis limit switch?
 cBotXAxisSwitch = "yl99"; // [yl99:YL-99, keyes:Keyes, gen:Generic Mini Switch, none:None]
@@ -723,7 +723,7 @@ cBotXBumperDepth = 3; // How thick to make the bumper.
 cBotXBumperHolePos = [10,5]; // Where the hole is in relation to the bottom of the bumper.
 
 /* [Hidden] */
-realZProbeSide = (carriage == "prusai3" && realExtruder == "titan" ? "left" : zProbeSide);
+realZProbeSide = (realExtruder == "titan" ? "left" : zProbeSide);
 inductMountWidth = inductDiameter + (probeBraceWidth * 2) + (inductMat * 2);
 cBotProbePos = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops") ? chiCBotProbePos : jHeadCBotProbePos; // Used the correct location of the probe mount based on hotend type.
 heMountWidth = (hotend == "chimera_v6" || hotend == "chimera_vol" || hotend == "cyclops")
