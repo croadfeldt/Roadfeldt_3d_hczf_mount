@@ -78,6 +78,50 @@ module blower_fan_50_20_holes() {
 
 module base_fan_50_20() {
      union() {
+          hull() {
+               translate([0,0,housingOffset])
+                    for (i=[0:(270 - housingAngle)]) {
+                         rotate([0,180 - i,0])
+                              scale([((i * .23) / (270 - housingAngle)) + .77,1,((i * .23) / (270 - housingAngle)) + .77])
+                              cube([housingFinalLength, outletWidth, .1]);
+                    }
+          }
+
+          translate([-25, 0, housingOffset])
+               cube([realOutletDepth, outletWidth, outletHeight]);
+     }
+}
+
+module blower_fan_51_15_base() {
+     union() {
+          base_fan_51_15();
+
+          screw_mount_point(3.25,20,20,0,21);
+          screw_mount_point(3.25,20,20,0,-22);
+          screw_mount_point(3.25,20,-18,0,-22);
+     }
+}
+
+module blower_fan_51_15_holes() {
+     translate([-25.1, outletWallThickness,housingOffset + outletWallThickness])
+          cube([realOutletDepth + .1, outletWidth - (outletWallThickness * 2), outletHeight - (outletWallThickness * 2)]);
+
+     screw_hole_single(2.25,20.2,20,-.1,21);
+     screw_hole_single(2.25,20.2,20,-.1,-22);
+     screw_hole_single(2.25,20.2,-18,-.1,-22);
+
+     hull() {
+          translate([0,outletWallThickness,housingOffset])
+               for (i=[0:(270 - housingAngle)]) {
+                    rotate([0,180 - i,0])
+                         scale([((i * .23) / (270 - housingAngle)) + .77,1,((i * .23) / (270 - housingAngle)) + .77])
+                         cube([housingFinalLength - outletWallThickness, outletWidth - (outletWallThickness * 2), .1]);
+               }
+     }
+}
+
+module base_fan_51_15() {
+     union() {
 	  hull() {
 	       translate([0,0,housingOffset])
 		    for (i=[0:(270 - housingAngle)]) {
