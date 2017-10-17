@@ -620,7 +620,7 @@ blPlateRectDimensions = [8,11.54]; // Width, Depth of rectangle at center of pla
 blPlateInnerDistance = 9; // Distance from center of BL Touch to center of outer mounting holes.
 blMountWidth = (blPlateOuterRadius + blPlateInnerDistance) * 2; // Overall width to consider when placing the BL Touch mounting bracket.
 blMountDistance = 10; // Extra distance from other components.
-blPlateHeight = 28; // The target height from the tip of the of the nozzle for the mount.
+blPlateHeight = 45; // The target height from the tip of the of the nozzle for the mount.
 bltouchBracketExtra = 2; // How much extra should be added to the carriage to provide clearance for the bltouch mount bracket.
 
 // Nema 17 Stepper Dimension variables.
