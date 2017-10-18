@@ -53,6 +53,9 @@ clampMat = 3;
 // To define length of clamp tabs vs size of gap, enter this formula and replace ## with the length of the tab desired: barHeight - (## * 2)
 clampMidGap = barHeight - (10 * 2);
 
+// Should there be a gap in the middle of the bar for something like LED lights?
+clampGapFlag  = 1; [ 0:"No Gap", 1:"Gap" ]
+
 // This increases the clamp size by twice the amount shown.
 // It does not affect the distance to the secured mounting point. But will create a space in
 // the amount shown between the clamp inner dimension and the item being clamped.
@@ -267,7 +270,7 @@ difference() {
      }
 
      // Cut out the gap if needed.
-     if (clampMidGap > 0) {
+     if (clampMidFlag == 1) {
 	  // Move to the center of the clamp opposite of the connecting bar.
 	  translate([-clampSlop + (barHeight / 2) - (clampMidGap / 2), - barWidth - clampSlop - (clampStyle == 2 ? clampSepDistance : 0) - clampMat - .1, - .1])
 	       cube([clampMidGap, clampMat + .2, clampWidth + .2]);
