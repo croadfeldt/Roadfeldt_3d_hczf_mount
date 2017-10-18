@@ -54,7 +54,7 @@ clampMat = 3;
 clampMidGap = barHeight - (10 * 2);
 
 // Should there be a gap in the middle of the bar for something like LED lights?
-clampGapFlag  = 1; [ 0:"No Gap", 1:"Gap" ]
+clampGapFlag  = 1; [ 0:No Gap, 1:Gap ]
 
 // This increases the clamp size by twice the amount shown.
 // It does not affect the distance to the secured mounting point. But will create a space in
