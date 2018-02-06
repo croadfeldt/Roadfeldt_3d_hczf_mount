@@ -486,7 +486,7 @@ xMountHoleHeightOffset = (xMountHeight - (xMountHoleHeight /2));
 chiColdHeight = 30;
 chiColdDepth = 16;
 chiScrewHole = 3.2; // Size of hole for screws that mount the Chimera Cold End.
-chiBowdenHole = 8.2; // Size of hole for bowden tube fittings.
+chiBowdenHole = 9.0; // Size of hole for bowden tube fittings.
 chiHEPosUD = (carriage == "prusai3" ? 15 : 20);
 chiBraceLength = chiColdDepth; // Length of brace for chimera mount in the horizontal. From back plane towards the front.
 chiBraceHeight = (chiColdHeight / 2) - (carriage == "prusai3" ? (chiHEPosUD - (chiColdHeight / 2) < xMountCornerRadius ? xMountCornerRadius - (chiHEPosUD - (chiColdHeight / 2)) : 0) : 0);
